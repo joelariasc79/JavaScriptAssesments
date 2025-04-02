@@ -99,24 +99,105 @@ console.log("Last Name: "+ last);
 
 //4. Give me an example of const data manipulation
 
+const myArray = [1, 2, 3];
+
+// But you *can* modify the contents of the array or object:
+myArray.push(4); // myArray is now [1, 2, 3, 4]
+console.log(myArray);
+
 //5. What is the difference between for-of and for-in show with examples
 // for-of iterate over values
 // for-in iterate over keys
 
 //6. Give me an example of bind and write its usage, comparison with arrow function
-//
+
+const button = {
+  message: "Button clicked!",
+  handleClick: function() {
+    console.log(this.message); // 'this' refers to the button object
+  }
+};
+
+// Without bind, 'this' inside handleClick would refer to the global object (window) in a browser or undefined in strict mode.
+setTimeout(button.handleClick.bind(button), 1000); // Output after 1 second: Button clicked!
+
+// *******************************************************************
+// WIt Arrow Function:
+const button1 = {
+  message: "Button clicked!",
+  handleClick: function() {
+    setTimeout(() => {
+      console.log(this.message);
+    }, 1000);
+  }
+};
+
+button1.handleClick(); //output after 1 second: Button 2 clicked.
+
 
 //7. Create an example showing usage of event loop in concurrent execution cycle
 
+setTimeout(() => {
+  console.log("Inside setTimeout callback (after 2 seconds)");
+}, 2000);
+
+setTimeout(() => {
+  console.log("Inside setTimeout callback (after 0 seconds)");
+}, 0);
+
+for (let i = 0; i < 1000; i++) {
+  console.log(i);
+}
+
+
 //8. create an example showing usage of short hand and default param.
+
+let name = "joel", lastName = "Arias", age = 45;
+
+
+let persona = {
+  name,
+  lastName,
+  age
+}
+
+console.log(persona);
 
 //9. Create two objects with some properties and merge them using Object method and ES6 way
 
+let estudiante = {
+  major: "Computer Science"
+}
+
+// const mergedObj1 = Object.assign(obj1, obj2);
+const people = Object.assign({}, persona, estudiante);
+console.log("People: " , people);
+
 //10. Give me an example of map and set collection each with at least four properties implemented - like get, set, clear, etc
+// Map
+
+const amigos = new Map();
+amigos.set(people, "amigos");
+console.log(amigos.get(people));
+console.log(amigos.keys());
+amigos.clear();
+console.log(amigos.values());
+
+
+// Set
+
+const numeros = new Set();
+numeros.add(5);
+numeros.add(5);
+numeros.add(1);
+console.log(numeros);
+console.log(numeros.has(3));
+numeros.delete(5);
+console.log(numeros);
 
 //11. Create a promise object that get resloved after two seconds and rejected after three. Also it returns five ES6 features on resolved
 
-//12. Use the spread and rest operator to create a function which can multiple numbers from 1...n (n is the number of choice)
+
 
 //13. Use the question #11 to build promises using async and await - with multithread
 
