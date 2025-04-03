@@ -51,7 +51,7 @@ const evilHeroCount = noneMarvelEvil.some(hero => hero.isEvil);
 
 console.log("Are There Marvel Heroes: who are not evil", evilHeroCount);
 
-//2. Use the spread and rest operator to create a function which can multiply numbers from 1...n (n is the number of choice), 
+//2. Use the spread and rest operator to create a function which can multiply numbers from 1...n (n is the number of choice),
 //   using apply keyword we need to implement this one
 
 
@@ -137,6 +137,23 @@ button1.handleClick(); //output after 1 second: Button 2 clicked.
 
 //7. Create an example showing usage of event loop in concurrent execution cycle
 
+// The JavaScript event loop is a mechanism that enables asynchronous programming, allowing JavaScript to handle non-blocking operations.
+//
+// Concepts:
+//
+// Single-Threaded Nature: JavaScript runs on a single thread, meaning it can only execute one task at a time.
+// This could lead to issues if lengthy tasks block the thread. The event loop helps avoid such bottlenecks.
+//
+// Call Stack: JavaScript uses a "call stack" to manage the execution of function calls. When a function is invoked,
+// it is pushed onto the stack. Once execution finishes, it is removed (popped) from the stack.
+//
+// Web APIs and Task Queue: When an asynchronous operation (like setTimeout, HTTP requests, or DOM events) is called,
+// the browser or Node.js environment handles it in the background using Web APIs. Once the operation completes,
+// a "callback function" is queued in the task queue (also called the message queue).
+//
+// Event Loop: The event loop continuously monitors the call stack and task queue. If the call stack is empty,
+// it moves the first callback from the task queue to the call stack for execution.
+
 setTimeout(() => {
   console.log("Inside setTimeout callback (after 2 seconds)");
 }, 2000);
@@ -195,12 +212,175 @@ console.log(numeros.has(3));
 numeros.delete(5);
 console.log(numeros);
 
-//11. Create a promise object that get resloved after two seconds and rejected after three. Also it returns five ES6 features on resolved
+//11. Create a promise object that get resolved after two seconds and rejected after three. Also it returns five ES6 features on resolved
 
+const firstN = "Alice";
+const ageP = 30;
+const numb = [1, 2, 3, 4, 5];
+const per = { firstName: "Bob", lastName: "Smith", city: "New York" };
+
+let promiseObj = new Promise((resolve, reject)=>{
+setTimeout(() => {
+  resolve({
+    "Template literals": `Hello, my name is ${firstN} and I am ${ageP} years old.`, // ES6 Feature 1
+    "Arrow functions": numb.map(number => number * number), // ES6 Feature 2
+    "Destructuring assignment": { firstName, city } = per, // ES6 Feature 3
+    "Shorthand": {firstN, ageP}, // ES6 Feature 4
+    "Default Param": function (a=0, b=0) {return a + b} // ES6 Feature 5
+  })
+}, 2000);
+
+setTimeout(() => {
+  reject({
+    status : "Failed",
+    code : 500,
+    message : "Internal server error!!"
+  })
+}, 3000);
+
+})
+
+
+promiseObj
+    .then((data)=>{ //this access the data send when promise is resolved
+      console.log(data) //upon success you'll make call to authorization
+    })
+    .catch((err)=>{ // this access the data send when promise is rejected
+      console.log(err)
+    })
 
 
 //13. Use the question #11 to build promises using async and await - with multithread
 
+function createPromise() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        "Template literals": `Hello, my name is ${firstN} and I am ${ageP} years old.`,
+        "Arrow functions": numb.map(number => number * number),
+        "Destructuring assignment": { firstName: per.firstName, city: per.city }, // Corrected destructuring
+        "Shorthand": { firstN, ageP },
+        "Default Param": function (a = 0, b = 0) { return a + b }
+      });
+    }, 2000);
+
+    setTimeout(() => {
+      reject({
+        status: "Failed",
+        code: 500,
+        message: "Internal server error!!"
+      });
+    }, 3000);
+  });
+}
+
+async function processData() {
+  try {
+    const data = await createPromise();
+    console.log("Promise resolved:", data);
+    // Simulate authorization call (replace with your actual logic)
+    console.log("Simulating authorization...");
+    await simulateAuthorization(); // Simulate an async authorization call
+  } catch (error) {
+    console.error("Promise rejected:", error);
+  }
+}
+
+async function simulateAuthorization() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Authorization successful (simulated)");
+      resolve();
+    }, 1500);
+  });
+}
+
+processData();
+
+// Multithreading (using worker threads in Node.js)
+const { Worker } = require('worker_threads');
+
+async function processDataInWorker() {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker('./worker.js'); // Create a worker thread
+    worker.on('message', resolve); // Listen for messages from the worker
+    worker.on('error', reject);
+    worker.on('exit', (code) => {
+      if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
+    });
+    worker.postMessage({ firstN, ageP, numb, per }); // Send data to the worker
+  });
+}
+
+async function main() {
+  try {
+    const workerResult = await processDataInWorker();
+    console.log('Worker result:', workerResult);
+  } catch (err) {
+    console.error('Worker error:', err);
+  }
+}
+
+main();
+
+
+
 //14. Create an example of generator function of your choice
 
-//15. Explain your knowledge on function and object protoype what is the purpose of the same - example
+
+function* numberGenerator(start, end) {
+  for (let i = start; i <= end; i++) {
+    yield i;
+  }
+}
+
+// Example usage:
+const generator = numberGenerator(1, 5);
+
+console.log(generator.next().value); // Output: 1
+console.log(generator.next().value); // Output: 2
+console.log(generator.next().value); // Output: 3
+console.log(generator.next().value); // Output: 4
+console.log(generator.next().value); // Output: 5
+console.log(generator.next().value); // Output: undefined
+
+
+//15. Explain your knowledge on function and object prototype what is the purpose of the same - example
+
+// Function prototype: Functions in JavaScript automatically have a prototype property, which is itself an object.
+// This property is key for creating inheritance among objects. When a function is used as a constructor (via new),
+// the object created inherits from the prototype.
+
+function Animal(name) {
+  this.name = name;
+}
+
+Animal.prototype.speak = function() {
+  console.log(`${this.name} makes a noise.`);
+};
+
+const dog = new Animal('Dog');
+dog.speak();
+
+
+// Object prototype: Every JavaScript object has a hidden, internal link to a prototype object.
+// This prototype can either be another object or null. When trying to access a property or method,
+// JavaScript first searches the object itself. If it doesn't find it there, it moves up the prototype chain.
+
+const parentGreet = {
+  greet() {
+    console.log('Hello!');
+  }
+};
+
+const childGreet = Object.create(parentGreet); // Sets the prototype of childObject as parentObject
+childGreet.greet(); // Output: Hello!
+
+
+
+// Purpose:
+
+// Inheritance: Prototypes enable objects to share properties and methods without duplicating them across instances,
+// reducing memory usage.
+// Dynamic Behavior: You can modify or extend object behavior during runtime by altering the prototype.
+// Performance: Instead of duplicating methods in every object, prototypes allow centralized definitions.
