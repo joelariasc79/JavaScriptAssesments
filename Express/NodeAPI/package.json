@@ -1,0 +1,28 @@
+{
+  "name": "expressnodeapi",
+  "version": "1.0.0",
+  "description": "builds restful api's using express over node framework",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start1": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Fast",
+    "unopinionated",
+    "minimalist",
+    "web",
+    "framework",
+    "for",
+    "Node.js"
+  ],
+  "author": "sit",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
