@@ -16,6 +16,7 @@ export default class ApplicationComponent extends Component {
     constructor(props) {
         super();
         this.state = {
+            userName : "react user ",
             user : {
                     userName : "Test User",
                     userAge : 19
@@ -24,7 +25,7 @@ export default class ApplicationComponent extends Component {
         this.sessionName = "MERNStack - React Props"
     }
 
-    changeUserNameEvent = (evt)=>{
+    changeUserNameEvent = (userName)=>{
 
         //this.state.userName = "Tejasvi" //with this way render method will not be called and no new virtual dom will be created
 
@@ -32,13 +33,7 @@ export default class ApplicationComponent extends Component {
         //so that new virtual dom gets created
 
         this.setState({
-            userName : `Dat -  
-                This is coming from Application Component
-                This is coming from Application Component
-
-                This is coming from Application Component
-
-                This is coming from Application Component`,
+            userName : userName
             //userAddress : "Somewhere on earth!!!!!!"
         })
 
@@ -68,7 +63,7 @@ export default class ApplicationComponent extends Component {
         
         console.log("Render method is called!!")
         return( //vitual dom or jsx code (javascript like xml structure)
-            <Router>
+            <Router>                
                 <div className="topdiv">
                     <Header />
                         <Routes>

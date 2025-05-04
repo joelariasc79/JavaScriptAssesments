@@ -1,4 +1,7 @@
 import React, { Component, PureComponent } from "react";
+import {PropTypes} from "prop-types";
+import ComponentTypes from "./ComponentTypes";
+import Footer from "./FooterComponent";
 
 //export default class Home extends Component {
 
@@ -13,7 +16,8 @@ export default class Home extends PureComponent {
         this.state = {
             userName : props.user.userName,
             userAge : props.user.userAge,
-            userAddress : "No Space on earth!!"
+            userAddress : "No Space on earth!!",
+            userData : props.userData
         }
         this.counter = 100;        
         this.intervalObject = null;
@@ -120,17 +124,33 @@ export default class Home extends PureComponent {
                 <input type="text" value={this.state.userName} ref={this.userNameRef} />
 
                 <label>{this.state.userAge}</label>
+                
                 <hr />
                 <label>{this.state.userAddress}</label>
                 {/* binding event to a button in react component */}
                 <button onClick={this.changeUserAddressEvent}>Change User Address</button>
+
+                <Footer>
+                    <h4>Passed in the footer component as prop</h4>
+                    <ComponentTypes />
+                </Footer>
             </>
         )
     }
 }
 
 //we should use default props to assign default values to the properties that we use in our component
-Home.defaultProps = {
-    userName : "The Default User Name",
-    userAge : 25
-}
+// Home.defaultProps = {
+//     userName : "The Default User Name",
+//     userAge : 25
+// }
+
+
+//proptypes are used to mark the properties we use in the component as required so that it shows waring if not present
+//and can be fixed
+
+// Home.propTypes = {
+//     userName : PropTypes.string.isRequired,
+//     userAge : PropTypes.number.isRequired,
+//     userData : PropTypes.string.isRequired
+// }

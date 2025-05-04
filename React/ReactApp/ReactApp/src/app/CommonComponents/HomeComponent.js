@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from "react";
 import {PropTypes} from "prop-types";
+import ComponentTypes from "./ComponentTypes";
+import Footer from "./FooterComponent";
 
 //export default class Home extends Component {
 
@@ -127,6 +129,11 @@ export default class Home extends PureComponent {
                 <label>{this.state.userAddress}</label>
                 {/* binding event to a button in react component */}
                 <button onClick={this.changeUserAddressEvent}>Change User Address</button>
+
+                <Footer>
+                    <h4>Passed in the footer component as prop</h4>
+                    <ComponentTypes />
+                </Footer>
             </>
         )
     }

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import JoelHeader from "./CommonComponents/JoelComponent";
+import JoelHeader from "./JoelComponent";
 
 export default class ApplicationComponent extends Component {
 
