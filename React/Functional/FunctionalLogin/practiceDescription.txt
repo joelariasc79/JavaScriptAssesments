@@ -1,0 +1,4 @@
+- Create a functional component name Login
+- Use Div Based Structure to show text boxes for login details needs to be 4
+- Create one event handler and bind the state change with it to call re-render
+- Use one of the textbox to change the data without using event handler, but using inline code
