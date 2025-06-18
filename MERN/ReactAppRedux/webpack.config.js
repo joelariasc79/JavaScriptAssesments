@@ -1,5 +1,5 @@
 // entry point (file name + path ) ==> next the module depencencies 
-// default configuration - src1/index.js
+// default configuration - src/index.js
 // once - minification, transpilation, reference resolution, bundling is done
 // output path and the name of the file <bundle.js> 
 // default output path is distribution folder => dist/
@@ -40,7 +40,7 @@ config = {
             }
         ]
     },
-    plugins: [new HtmlWebpackPlugin({ template: './src1/index.html' })] //localhost:9090 - loads this html
+    plugins: [new HtmlWebpackPlugin({ template: './src/index.html' })] //localhost:9090 - loads this html
 }
 
 module.exports = config;

@@ -48,7 +48,7 @@ let UserHookComponent = (props)=>{
 
         dispatchUser(SaveUserToDBUsingFetch(userObj))
 
-        //alert("Student send to api via ajax call")
+        //alert("User send to api via ajax call")
 
         evt.preventDefault();
     }
@@ -58,21 +58,21 @@ let UserHookComponent = (props)=>{
             <h1>User SignIn - SignUp Page - Hooks</h1>
             <form className="form-control col-md-12" onSubmit={submitForm}>
                     <b>User Name</b>
-                    <input type="text" className="form-control" placeholder={"Please type Student Name"}
+                    <input type="text" className="form-control" placeholder={"Please type User Name"} 
                         ref={userName} maxLength={20} required></input>
 
                     <b>User Password</b>
-                    <input type="password" className="form-control" placeholder={"Please type Student Password"}
-                        ref={password} maxLength={20} required></input>
+                    <input type="password" className="form-control" placeholder={"Please type User Password"} 
+                        ref={password} maxLength={20} ></input>
     
 
                     <b>User Address</b>
-                    <input type="text" className="form-control" placeholder={"Please type Student Address"}
-                        ref={street} maxLength={40} required></input>
+                    <input type="text" className="form-control" placeholder={"Please type User Address"} 
+                        ref={street} maxLength={40} ></input>
 
                     <b>User Mobile</b>
-                    <input type="number" className="form-control" placeholder={"Please type Student Mobile"}
-                        ref={mobile} maxLength={20} required></input>
+                    <input type="number" className="form-control" placeholder={"Please type User Mobile"} 
+                        ref={mobile} maxLength={20} ></input>
 
 
                     <button type="submit"> Login User </button>

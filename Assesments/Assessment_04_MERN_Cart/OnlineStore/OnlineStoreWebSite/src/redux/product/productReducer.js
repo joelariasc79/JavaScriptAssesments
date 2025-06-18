@@ -1,4 +1,4 @@
-// src/redux/product/productReducer.js
+// src/redux/product/productReviewReducer.js
 import {
     ADD_PRODUCT_REQUEST,
     ADD_PRODUCT_SUCCESS,

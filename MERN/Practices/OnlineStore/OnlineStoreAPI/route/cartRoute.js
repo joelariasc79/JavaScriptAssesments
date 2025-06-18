@@ -22,7 +22,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
         let cart = await cartDataModel.findOne({ userId });
 
         if (cart) {
-            // Cart exists, update it
+            // cart exists, update it
             const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
 
             if (itemIndex > -1) {
@@ -116,7 +116,7 @@ cartRouter.get('/api/cart/:userId', async (req, res) => {
 });
 /**
  * @route POST /api/cart/checkout
- * @description Saves the current cart (marks it as "checked out" or moves it to an order collection).
+ * @description Saves the current cart (marks it as "checked out" or moves it to an orders collection).
  * For this example, we'll simply update the cart and potentially clear it or mark it as complete.
  * In a real scenario, this would involve creating an 'Order' document and potentially clearing the cart.
  * @body {string} userId - The ID of the user whose cart is being checked out.
@@ -124,7 +124,7 @@ cartRouter.get('/api/cart/:userId', async (req, res) => {
  */
 
 cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE TRAILING SLASH HERE
-    // Assuming userId from req.body is the string userId stored in your Cart and User models
+    // Assuming userId from req.body is the string userId stored in your cart and User models
     const { userId: stringUserId } = req.body;
 
     if (!stringUserId) {
@@ -150,10 +150,10 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
         }
 
         if (cart.items.length === 0) {
-            return res.status(400).json({ message: 'Cart is empty, cannot checkout.' });
+            return res.status(400).json({ message: 'cart is empty, cannot checkout.' });
         }
 
-        // Prepare items for the order and calculate totalAmount using populated data
+        // Prepare items for the orders and calculate totalAmount using populated data
         const orderItems = [];
         let calculatedTotalAmount = 0;
 
@@ -201,7 +201,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
             status: 'Pending'
         });
 
-        // Save the new order
+        // Save the new orders
         await order.save();
 
         // 4. Clear the user's cart
@@ -209,7 +209,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
         await cart.save();
 
         res.status(200).json({
-            message: 'Cart successfully checked out and cleared.',
+            message: 'cart successfully checked out and cleared.',
             orderId: order._id,
             totalAmount: order.totalAmount, // This will now be the actual number
             checkedOutItems: order.items    // This will now have name and price

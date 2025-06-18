@@ -59,6 +59,7 @@ main {
   margin: 20px auto;
 }
 
+.coupon-section,
 .products-section,
 .cart-section,
 .add-product-section,
@@ -70,6 +71,7 @@ main {
   margin-bottom: 20px; /* Add some space if multiple sections are visible */
 }
 
+.coupon-section h2,
 .products-section h2,
 .cart-section h2,
 .add-product-section h2,

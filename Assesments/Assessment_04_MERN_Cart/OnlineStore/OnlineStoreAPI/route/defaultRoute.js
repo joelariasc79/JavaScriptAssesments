@@ -62,10 +62,3 @@ router.all('/{*any}', (req, res, next) => {
 
 
 module.exports = router;  
-
-//createNew route with Name Student and have at least 5 API's there similar to defaultRoute,
-//Load these API's via new express app, using mounting and
-//also demonstrate - routeParam, 
-// static middle ware, 
-// sending file back as repsonce, 
-// using query string to get data in api, and fifth api is of your choice!!

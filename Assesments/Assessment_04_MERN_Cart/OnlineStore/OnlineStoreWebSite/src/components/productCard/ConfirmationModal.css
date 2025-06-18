@@ -1,0 +1,73 @@
+/* src/components/ConfirmationModal.css */
+
+.modal-overlay {
+    position: fixed; /* Stays in place even when scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure modal is on top of other content */
+    backdrop-filter: blur(2px); /* Optional: adds a subtle blur effect */
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 450px;
+    width: 90%; /* Responsive width */
+    transform: translateY(-20px); /* Initial slight upward animation */
+    animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.modal-content h2 {
+    color: #28a745; /* Green for success */
+    margin-bottom: 15px;
+    font-size: 1.8em;
+}
+
+.modal-content p {
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.product-name-highlight {
+    font-weight: bold;
+    color: #0056b3; /* A contrasting color for the product name */
+}
+
+.modal-content button {
+    background-color: #007bff; /* Blue button */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.modal-content button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+/* Keyframe animation for modal entry */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

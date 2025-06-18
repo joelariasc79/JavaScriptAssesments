@@ -7,10 +7,13 @@ import Home from "./CommonComponents/HomeComponent";
 import NotFound from "./CommonComponents/NotFoundComponent";
 import About from "./CommonComponents/AboutComponent.jsx";
 import ComponentTypes from "./CommonComponents/ComponentTypes.js";
-//import UserComponent from "./ApplicationComponents/Student/UserComponent.jsx";
-//import UserComponent from "./ApplicationComponents/Student/UserContainer.js";
+//import UserComponent from "./ApplicationComponents/User/UserComponent.jsx";
+//import UserComponent from "./ApplicationComponents/User/UserContainer.js";
 import UserHookComponent from "./ApplicationComponents/User/UserHooksComponent.js";
 import ProductComponent from "./ApplicationComponents/Product/ProductComponent.js";
+import CartComponent from "./ApplicationComponents/Cart/CartComponent.js";
+import Checkout from "./ApplicationComponents/Checkout/CheckoutComponent.js";
+import Hooks from "./Hooks/UnderstandingHooks.js";
 
 export default class ApplicationComponent extends Component {
 
@@ -22,7 +25,7 @@ export default class ApplicationComponent extends Component {
         this.state = {
             userName : "react user ",
             user : {
-                    userName : "Test Student",
+                    userName : "Test User",
                     userAge : 19
                     }
         }
@@ -57,7 +60,7 @@ export default class ApplicationComponent extends Component {
         console.log(this.state.userName)//not updated immediately as - the change is done via callback and as soon as callback 
         // returns value the log line is passed already executed
 
-        //alert("Student Name is updated!!")
+        //alert("User Name is updated!!")
 
         evt.preventDefault();
     }
@@ -76,8 +79,11 @@ export default class ApplicationComponent extends Component {
                             {/* <Route path="user" element={<UserComponent />}/> */}
                             <Route path="userhook" element={<UserHookComponent />}/>
                             <Route path="product" element={<ProductComponent />}/>
+                            <Route path="checkout" element={<Checkout />}/>
+                            <Route path="cart" element={<CartComponent />}/>
                             {/* <Route path="comp" element={<ComponentTypes />}/> */}
                             <Route path="about" element={<About />}/>
+                            <Route path="hook" element={<Hooks />}/>
                             {/* <Route path="about/:id" element={<About />}/> */}
                             {/* <Route path="about/:id/:name" element={<About />}/> */}
                             <Route path="*" element={<NotFound />} />
@@ -154,7 +160,7 @@ export default class ApplicationComponent extends Component {
 //                     <b>{this.state.userName}</b>
 //                     <hr />
 //                     {/* binding event to a button in react component */}
-//                     <button onClick={this.changeUserNameEvent}>Change Student Name</button>
+//                     <button onClick={this.changeUserNameEvent}>Change User Name</button>
 //                     <hr />
 //                     <NotFound />
 //                     <hr />

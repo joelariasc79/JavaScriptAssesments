@@ -2,7 +2,7 @@ import * as actionTypes from "../ActionTypes";
 import axios from "axios";
 
 //product calls
-//Product Action and Server Call: API
+//Product Action and Server Call
 export const saveProduct = (product)=>{
     console.log("Product ", product);
 
@@ -25,7 +25,6 @@ export const saveProduct = (product)=>{
     }
 };
 
-// Redux
 export const addProduct = (products)=>{
     return {
         type : actionTypes.ADD_PRODUCTS_TOSTORE,
@@ -33,7 +32,6 @@ export const addProduct = (products)=>{
     }
 }
 
-// API
 export const fetchProducts = ()=>{
     console.log("Product ");
 
@@ -54,7 +52,6 @@ export const fetchProducts = ()=>{
     }
 };
 
-// REDUX
 export const setLoading = (loading)=>{
     return {
         type : "SET_LOADING",

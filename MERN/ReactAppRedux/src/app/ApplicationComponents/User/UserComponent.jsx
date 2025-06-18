@@ -6,7 +6,7 @@
 
 import React, { useState, useRef } from "react";
 //import { connect } from "react-redux"; //helps to connect react component with redux store
-//import { AddUserToStore } from "../../State/Student/UserAction";
+//import { AddUserToStore } from "../../State/User/UserAction";
 
 let UserComponent = (props)=>{
 
@@ -44,7 +44,7 @@ let UserComponent = (props)=>{
             mobile
         })
 
-        //alert("Student send to signin via reducer")
+        //alert("User send to signin via reducer")
 
         evt.preventDefault();
     }
@@ -94,7 +94,7 @@ let UserComponent = (props)=>{
                      </div>
                      <div className="form-control">
                          <div className="col-md-7 button">
-                             <input type="submit" className="button" onClick={saveUserClick} value={"Save Student"}></input>
+                             <input type="submit" className="button" onClick={saveUserClick} value={"Save User"}></input>
                          </div>
                      </div>
                 </div>

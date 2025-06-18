@@ -78,7 +78,7 @@ function CartComponent() {
 
     // After payment success, the cart and checkoutOrderDetails are cleared.
     // So, if we reach here AND checkoutOrderDetails is present, it means we are in the
-    // "order confirmed, awaiting payment" state.
+    // "orders confirmed, awaiting payment" state.
     if (checkoutOrderDetails) {
         return (
             <div style={styles.container}>
@@ -136,7 +136,7 @@ function CartComponent() {
                     const itemId = product?._id;
 
                     if (!itemId) {
-                        console.warn("Cart item missing productId or _id:", item);
+                        console.warn("cart item missing productId or _id:", item);
                         return null;
                     }
 
@@ -429,7 +429,7 @@ export default CartComponent;
 //
 //     return (
 //         <div style={styles.container}>
-//             <h1 style={styles.heading}>Your Shopping Cart (User: {userId})</h1>
+//             <h1 style={styles.heading}>Your Shopping cart (User: {userId})</h1>
 //
 //             {/* Display cart items or empty message IF NO CHECKOUT DETAILS */}
 //             {cartItems.length === 0 && !checkoutOrderDetails ? (
@@ -446,7 +446,7 @@ export default CartComponent;
 //                                 const itemId = product?._id;
 //
 //                                 if (!itemId) {
-//                                     console.warn("Cart item missing productId or _id:", item);
+//                                     console.warn("cart item missing productId or _id:", item);
 //                                     return null;
 //                                 }
 //
@@ -513,14 +513,14 @@ export default CartComponent;
 //                     </p>
 //                 )}
 //
-//                 {/* Show "Cart Checkout" button if there are items and no successful checkout yet */}
+//                 {/* Show "cart Checkout" button if there are items and no successful checkout yet */}
 //                 {cartItems.length > 0 && !checkoutOrderDetails && (
 //                     <button
 //                         onClick={handleCheckout}
 //                         style={styles.checkoutButton}
 //                         disabled={loading}
 //                     >
-//                         Cart Checkout
+//                         cart Checkout
 //                     </button>
 //                 )}
 //

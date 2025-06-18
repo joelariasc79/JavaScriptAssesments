@@ -1,4 +1,4 @@
-// src/redux/product/productActions.js
+// src/redux/product/productReviewActions.js
 import axios from 'axios';
 
 // Action Types

@@ -4,6 +4,7 @@
 
 import * as actionTypes from "../ActionTypes";
 import axios from  "axios";
+import { fetchUserCart } from "../Cart/CartAction";
 
 export const AddUserToStore = (user)=>{
     return{ 
@@ -31,6 +32,7 @@ export const SaveUserToDBUsingFetch = (userObj)=>{
                 console.log(userData)
                 //dispatch or send saved/signin user to reducer
                 dispatch(AddUserToStore(userData))
+                dispatch(fetchUserCart(userData._id))
             })
             .catch((error)=>console.log(error))
         }
@@ -55,6 +57,7 @@ export const SaveUserToDB = (user)=>{
 
             //this is now going to be dispatched to store and update the redux values
             dispatch(AddUserToStore(userData))
+            dispatch(fetchUserCart(userData._id))
         })
         .catch((errrObj)=>console.log("Error occurred at sign-in sign-up", errrObj))
     }

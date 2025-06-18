@@ -23,7 +23,7 @@ const initialState = {
     cart: null,
     loading: false,
     error: null,
-    checkoutOrderDetails: null, // To store order details after successful checkout
+    checkoutOrderDetails: null, // To store orders details after successful checkout
     paymentSuccess: false, // To track if payment was successful
 };
 
@@ -70,8 +70,8 @@ const cartReducer = (state = initialState, action) => {
                 loading: false,
                 cart: { items: [] }, // Clear cart after successful checkout
                 error: null,
-                checkoutOrderDetails: action.payload, // Store the order details from checkout API response
-                paymentSuccess: false, // Payment hasn't happened yet for this order
+                checkoutOrderDetails: action.payload, // Store the orders details from checkout API response
+                paymentSuccess: false, // Payment hasn't happened yet for this orders
             };
 
         case PROCESS_PAYMENT_SUCCESS:

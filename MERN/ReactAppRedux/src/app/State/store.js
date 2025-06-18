@@ -15,11 +15,13 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import userReducer from "./User/UserReducer";
 import productReducer from "./Product/ProductReducer";
+import cartReducer from "./Cart/CartReducer";
 
 
 let rootReducer = combineReducers({
-    userReducer, //userReducer : userReducer
-    productReducer
+    userReducer, //userReducer : userReducer //short hand for es6
+    productReducer,
+    cartReducer
   })
 
 

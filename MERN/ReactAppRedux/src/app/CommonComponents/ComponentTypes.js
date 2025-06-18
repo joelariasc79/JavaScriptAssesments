@@ -92,7 +92,7 @@ export default class ComponentTypes extends Component {
                              <label>{this.state.userAddress}</label>
                          </div>
                          <div className="col-md-7">
-                             <input type="submit" className="form-control button" onClick={this.saveUserClick} value={"Save Student"}></input>
+                             <input type="submit" className="form-control button" onClick={this.saveUserClick} value={"Save User"}></input>
                          </div>
                      </div>
                 </div>                
@@ -103,11 +103,11 @@ export default class ComponentTypes extends Component {
                 <form className="form-control col-md-12" action={"/api/saveUser"} method="post" 
                     onSubmit={this.submitForm}>
                     <b>User Name</b>
-                    <input type="text" className="form-control" placeholder={"Please type Student Name"}
+                    <input type="text" className="form-control" placeholder={"Please type User Name"} 
                         ref={this.userNameRef} maxLength={20} required></input>
 
                     <b>User Address</b>
-                    <input type="text" className="form-control" placeholder={"Default Student Address"}
+                    <input type="text" className="form-control" placeholder={"Default User Address"} 
                         ref={this.userAddressRef} maxLength={20} required></input>
 
                     <button type="submit"> Save </button>

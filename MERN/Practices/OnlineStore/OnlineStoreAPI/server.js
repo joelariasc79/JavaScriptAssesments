@@ -54,7 +54,7 @@ app.use(orderRoute);
 
 // Basic route for testing
 app.get('/', (req, res) => {
-    res.send('Shopping Cart API is running!');
+    res.send('Shopping cart API is running!');
 });
 
 console.log("Rest API is listening at 9000")

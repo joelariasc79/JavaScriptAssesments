@@ -151,7 +151,7 @@ export default class Home extends PureComponent {
             //     <hr />
             //     <label>{this.state.userAddress}</label>
             //     {/* binding event to a button in react component */}
-            //     <button onClick={this.changeUserAddressEvent}>Change Student Address</button>
+            //     <button onClick={this.changeUserAddressEvent}>Change User Address</button>
 
             //     {/* child of home component */}
             //     <ComponentTypes userAge={this.state.userAge} 
@@ -163,7 +163,7 @@ export default class Home extends PureComponent {
 
 //we should use default props to assign default values to the properties that we use in our component
 // Home.defaultProps = {
-//     userName : "The Default Student Name",
+//     userName : "The Default User Name",
 //     userAge : 25
 // }
 
