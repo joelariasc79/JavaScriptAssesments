@@ -1,0 +1,294 @@
+/* src/components/CartComponent.css */
+.cart-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.cart-heading {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.cart-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+}
+
+.cart-error-message {
+    text-align: center;
+    color: red;
+    padding: 20px;
+    border: 1px dashed red;
+    border-radius: 5px;
+}
+
+.cart-success-message {
+    text-align: center;
+    color: green;
+    padding: 20px;
+    border: 1px dashed green;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.cart-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.item-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.item-description {
+    font-size: 0.9em;
+    color: #777;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.item-price {
+    color: #555;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.item-controls {
+    display: flex;
+    align-items: center;
+}
+
+.control-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 0 5px;
+}
+
+.control-button:hover {
+    background-color: #0056b3;
+}
+
+.remove-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 10px;
+}
+
+.remove-button:hover {
+    background-color: #c82333;
+}
+
+.item-quantity {
+    padding: 0 8px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.cart-summary {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+}
+
+.total-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.checkout-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+    background-color: #218838;
+}
+
+.checkout-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.clear-cart-button {
+    background-color: #6c757d; /* Distinct color for clear cart */
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.clear-cart-button:hover {
+    background-color: #5a6268;
+}
+
+.clear-cart-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+
+.checkout-details {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.checked-out-items-list {
+    list-style: disc;
+    margin-left: 20px;
+    padding: 0;
+}
+
+.checked-out-item {
+    margin-bottom: 5px;
+}
+
+/* --- NEW CSS for Coupon Application Section --- */
+.coupon-apply-section {
+    display: flex;
+    flex-wrap: wrap; /* Allow elements to wrap on small screens */
+    gap: 10px; /* Space between input and button */
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px dashed #b8daff; /* Light blue dashed border */
+    border-radius: 5px;
+    background-color: #e0f2ff; /* Very light blue background */
+    align-items: center; /* Vertically align items */
+    justify-content: center; /* Center horizontally */
+}
+
+.coupon-input {
+    flex-grow: 1; /* Allows input to take available space */
+    padding: 10px 15px;
+    border: 1px solid #007bff; /* Blue border */
+    border-radius: 5px;
+    font-size: 1em;
+    outline: none; /* Remove default outline */
+}
+
+.coupon-input:focus {
+    border-color: #0056b3; /* Darker blue on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); /* Focus glow */
+}
+
+.apply-coupon-button {
+    background-color: #17a2b8; /* Teal-ish blue */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.apply-coupon-button:hover {
+    background-color: #138496; /* Darker teal on hover */
+}
+
+.apply-coupon-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.coupon-error-message-inline {
+    width: 100%; /* Take full width if wrapped */
+    text-align: center;
+    color: #dc3545; /* Red */
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.applied-coupon-info {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #d4edda; /* Light green for success */
+    border: 1px solid #28a745; /* Green border */
+    border-radius: 5px;
+    color: #155724; /* Dark green text */
+}
+
+.applied-coupon-info p {
+    margin: 5px 0;
+}
+
+.applied-coupon-info strong {
+    font-weight: bold;
+}
+
+.clear-applied-coupon-button {
+    background-color: #ffc107; /* Orange/Yellow for removal */
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.clear-applied-coupon-button:hover {
+    background-color: #e0a800; /* Darker orange on hover */
+}
