@@ -1,18 +1,37 @@
 // OnlineStoreAPI/servers.js
+require('dotenv').config();
+
 let express = require('express');
-const app = express(); // when we invoke it creates an express application which helps to build a web server
 
-// Import http and Socket.IO Server
-const http = require('http');
+const http = require('http'); // Import http and Socket.IO Server
 const { Server } = require('socket.io');
-
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path'); // Needed for serving static files (if you serve React build)
+const cors = require("cors");
+// const path = require('path'); // Needed for serving static files (if you serve React build)
 
-// Import the Notification model and Notification Service
-const Notification = require('./DataModel/notificationDataModel'); // Corrected path based on your folder structure
+// Correctly import userRouter and authenticateToken from the userRoute module
+const { userRouter, authenticateToken } = require("./route/userRoute")
+const productRoute = require("./route/productRoute")
+const cartRoute = require("./route/cartRoute")
+const orderRoute = require('./route/orderRoute');
+const couponRoute = require('./route/couponRoute');
+const setupScheduledTasks = require('./utils/cronJobs'); // Assuming this path is correct
+const notification = require('./DataModel/notificationDataModel'); // Corrected path based on your folder structure
 const notificationService = require('./services/notificationService'); // Corrected path based on your folder structure
+
+const app = express();
+// Middleware
+app.use(bodyParser.json()); // For parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(express.json({limit:'2mb', extended:false})); // json middle-ware for setting request content type to json in body
+// allowing the cross origin resource sharing
+// Ensure this CORS config matches your frontend's URL (e.g., http://localhost:3000 for React dev server)
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:9000'], // Add your React dev server URL here
+    methods: ['GET', 'POST', 'PUT', 'DELETE'] // Add all methods your API uses
+}));
+
 
 // MongoDB Connection (ensure this is only done once)
 mongoose.connect('mongodb://localhost:27017/shoppingcartdb', {
@@ -22,37 +41,12 @@ mongoose.connect('mongodb://localhost:27017/shoppingcartdb', {
     .then(() => console.log('MongoDB connected successfully'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-
-// Middleware
-app.use(bodyParser.json()); // For parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
-
-// Correctly import userRouter and authenticateToken from the userRoute module
-const { userRouter, authenticateToken } = require("./route/userRoute")
-const productRoute = require("./route/productRoute")
-const cartRoute = require("./route/cartRoute")
-const orderRoute = require('./route/orderRoute');
-const couponRoute = require('./route/couponRoute');
-const setupScheduledTasks = require('./utils/cronJobs'); // Assuming this path is correct
-
-// calling the cors instance
-const cors = require("cors");
-
 globalThis.rootPath = __dirname;
 
-// allowing the cross origin resource sharing
-// Ensure this CORS config matches your frontend's URL (e.g., http://localhost:3000 for React dev server)
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:9000'], // Add your React dev server URL here
-    methods: ['GET', 'POST', 'PUT', 'DELETE'] // Add all methods your API uses
-}));
 
 // setting up the middleware static to handle all the static files we need to serve to client
 // Serve static React build files in production (uncomment if you build and serve frontend from here)
 // app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-// json middle-ware for setting request content type to json in body
-app.use(express.json({limit:'2mb', extended:false}));
 
 
 // Use the routers

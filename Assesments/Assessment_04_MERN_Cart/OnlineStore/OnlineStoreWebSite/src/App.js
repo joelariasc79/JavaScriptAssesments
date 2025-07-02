@@ -25,6 +25,13 @@ import ProductForm from './components/products/ProductForm';
 import UserManagement from './components/userManagement/UserManagement';
 import LoginComponent from './components/login/LoginComponent';
 import OrderComponent from './components/orders/OrderManagementComponent';
+// NEW: Import HomeComponent
+import HomeComponent from './components/home/HomeComponent'; // Path to your new Home component
+// NEW: Import AboutComponent
+import AboutComponent from './components/about/AboutComponent'; // Path to your new About component
+// NEW: Import LogoutComponent
+import LogoutComponent from './components/logout/LogoutComponent'; // Path to your new Logout component
+
 import './app.css';
 import './notification.css';
 
@@ -67,7 +74,8 @@ function App() {
         username = currentUser.username || currentUser.userId;
     }
 
-    const [activeSection, setActiveSection] = useState('products');
+    // Set initial activeSection to 'home' if a token exists, otherwise 'home' (always default to home on initial load)
+    const [activeSection, setActiveSection] = useState(token ? 'home' : 'home');
     const [socket, setSocket] = useState(null);
 
     // --- Socket.IO Connection and Event Listeners ---
@@ -137,15 +145,19 @@ function App() {
         } else {
             dispatch(clearAllNotifications());
             dispatch(updateNotificationCount(0));
+            // When not logged in, ensure we are on Home or About, not a logged-in only section
+            if (!['home', 'about', 'logoutSuccess'].includes(activeSection)) { // MODIFIED: Check current section
+                setActiveSection('home'); // MODIFIED: Default to home if not logged in and not on a public page
+            }
         }
-    }, [currentUserId, token, dispatch]);
+    }, [currentUserId, token, dispatch, activeSection]); // Added activeSection to dependencies
 
-
+    // This useEffect is fine, it only fetches products when the active section IS 'products'
     useEffect(() => {
-        if (activeSection === 'products') {
+        if (activeSection === 'products' && token) { // MODIFIED: Only fetch products if logged in
             dispatch(fetchAllProducts());
         }
-    }, [dispatch, activeSection]);
+    }, [dispatch, activeSection, token]); // Added token to dependencies
 
     useEffect(() => {
         if (token && !currentUser && currentUserId) {
@@ -185,10 +197,8 @@ function App() {
                 setActiveSection('products');
                 break;
             case 'static_review_cart':
-                setActiveSection('cart');
-                break;
             case 'static_make_payment':
-                setActiveSection('ordersManagement');
+                setActiveSection('ordersManagement'); // Redirect to orders for payment related notifications
                 break;
             case 'static_assist_order':
             case 'order_cancelled':
@@ -241,7 +251,8 @@ function App() {
         }
 
         dispatch(logoutUser()); // Dispatch the logout action
-        setActiveSection('products'); // Optionally redirect to products or login page
+        // MODIFIED: Set active section to 'logoutSuccess' to show the logout message
+        setActiveSection('logoutSuccess');
         setShowNotificationDropdown(false); // Close dropdown on logout
         dispatch(clearAllNotifications()); // Clear local notifications state
         dispatch(updateNotificationCount(0)); // Reset local unread count
@@ -262,9 +273,10 @@ function App() {
                 </section>
             );
         }
-        // IMPORTANT: LoginComponent is now always in the header.
-        // This section should only display the "Please log in" message without a second LoginComponent.
-        if (!token) {
+
+        // If not logged in and not on logoutSuccess, ensure only Home/About are accessible sections
+        if (!token && !['home', 'about', 'logoutSuccess'].includes(activeSection)) { // MODIFIED: Restrict sections when logged out
+            setActiveSection('home'); // Force navigate to home if somehow on a restricted section
             return (
                 <section className="initial-load-message">
                     <p className="status-message info">Please log in to access the application features.</p>
@@ -272,14 +284,41 @@ function App() {
             );
         }
 
+        // Handle the cases where the user is NOT logged in and lands on 'home', 'about', or 'logoutSuccess'
+        // Or if the user IS logged in and lands on any section.
         switch (activeSection) {
+            // NEW: Home section
+            case 'home':
+                return (
+                    <section className="home-section">
+                        <HomeComponent />
+                    </section>
+                );
+            // NEW: About section
+            case 'about':
+                return (
+                    <section className="about-section">
+                        <AboutComponent />
+                    </section>
+                );
+            // NEW: Logout Success section
+            case 'logoutSuccess':
+                return (
+                    <section className="logout-success-section">
+                        <LogoutComponent />
+                    </section>
+                );
             case 'coupons':
+                // Only render if token exists, otherwise fallback to default message below
+                if (!token) return <section className="initial-load-message"><p className="status-message info">Please log in to access this feature.</p></section>;
                 return (
                     <section className="coupon-section">
                         <CouponComponent />
                     </section>
                 );
             case 'products':
+                // Only render if token exists, otherwise fallback to default message below
+                if (!token) return <section className="initial-load-message"><p className="status-message info">Please log in to access product listings.</p></section>;
                 return (
                     <section className="products-section">
                         <h2>Available Products</h2>
@@ -301,6 +340,8 @@ function App() {
                     </section>
                 );
             case 'cart':
+                // Only render if token exists, otherwise fallback to default message below
+                if (!token) return <section className="initial-load-message"><p className="status-message info">Please log in to view your cart.</p></section>;
                 return (
                     <section className="cart-section">
                         <CartComponent
@@ -310,26 +351,32 @@ function App() {
                     </section>
                 );
             case 'addProduct':
-                return isAdmin ? (
+                // Only render if admin AND token exists, otherwise fallback to default message below
+                if (!token || !isAdmin) return (
+                    <section className="access-denied-message">
+                        <p className="status-message error">Access Denied: You must be an administrator and logged in to add products.</p>
+                    </section>
+                );
+                return (
                     <section className="add-product-section">
                         <ProductForm />
                     </section>
-                ) : (
-                    <section className="access-denied-message">
-                        <p className="status-message error">Access Denied: You must be an administrator to add products.</p>
-                    </section>
                 );
             case 'userManagement':
-                return isAdmin ? (
+                // Only render if admin AND token exists, otherwise fallback to default message below
+                if (!token || !isAdmin) return (
+                    <section className="access-denied-message">
+                        <p className="status-message error">Access Denied: You must be an administrator and logged in to manage users.</p>
+                    </section>
+                );
+                return (
                     <section className="user-management-section">
                         <UserManagement />
                     </section>
-                ) : (
-                    <section className="access-denied-message">
-                        <p className="status-message error">Access Denied: You must be an administrator to manage users.</p>
-                    </section>
                 );
             case 'ordersManagement':
+                // Only render if token exists, otherwise fallback to default message below
+                if (!token) return <section className="initial-load-message"><p className="status-message info">Please log in to view your orders.</p></section>;
                 return (
                     <section className="orders-section">
                         <OrderComponent
@@ -339,7 +386,13 @@ function App() {
                     </section>
                 );
             default:
-                return null;
+                // Default fallback if activeSection is not recognized, potentially
+                // directing to home or login prompt based on token presence.
+                return (
+                    <section className="initial-load-message">
+                        <p className="status-message info">Select a section from the navigation.</p>
+                    </section>
+                );
         }
     };
 
@@ -349,27 +402,41 @@ function App() {
             <header className="App-header">
                 <h1>My E-commerce App</h1>
                 <nav className="main-nav">
-                    <button onClick={() => setActiveSection('coupons')}
-                            className={activeSection === 'coupons' ? 'active' : ''}>Coupons
+                    {/* Always visible: Home button */}
+                    <button onClick={() => setActiveSection('home')}
+                            className={activeSection === 'home' ? 'active' : ''}>Home
                     </button>
-                    <button onClick={() => setActiveSection('products')}
-                            className={activeSection === 'products' ? 'active' : ''}>Products
-                    </button>
-                    <button onClick={() => setActiveSection('cart')}
-                            className={activeSection === 'cart' ? 'active' : ''}>Cart
-                    </button>
-                    {isAdmin && (
-                        <button onClick={() => setActiveSection('addProduct')}
-                                className={activeSection === 'addProduct' ? 'active' : ''}>Add Product
-                        </button>
+
+                    {/* These tabs are visible only when a user is logged in (token exists) */}
+                    {token && (
+                        <>
+                            <button onClick={() => setActiveSection('coupons')}
+                                    className={activeSection === 'coupons' ? 'active' : ''}>Coupons
+                            </button>
+                            <button onClick={() => setActiveSection('products')}
+                                    className={activeSection === 'products' ? 'active' : ''}>Products
+                            </button>
+                            <button onClick={() => setActiveSection('cart')}
+                                    className={activeSection === 'cart' ? 'active' : ''}>Cart
+                            </button>
+                            {isAdmin && (
+                                <button onClick={() => setActiveSection('addProduct')}
+                                        className={activeSection === 'addProduct' ? 'active' : ''}>Add Product
+                                </button>
+                            )}
+                            {isAdmin && (
+                                <button onClick={() => setActiveSection('userManagement')}
+                                        className={activeSection === 'userManagement' ? 'active' : ''}>User Management
+                                </button>
+                            )}
+                            <button onClick={() => setActiveSection('ordersManagement')}
+                                    className={activeSection === 'ordersManagement' ? 'active' : ''}>Order Management
+                            </button>
+                        </>
                     )}
-                    {isAdmin && (
-                        <button onClick={() => setActiveSection('userManagement')}
-                                className={activeSection === 'userManagement' ? 'active' : ''}>User Management
-                        </button>
-                    )}
-                    <button onClick={() => setActiveSection('ordersManagement')}
-                            className={activeSection === 'ordersManagement' ? 'active' : ''}>Order Management
+                    {/* Always visible: About button (moved to the end) */}
+                    <button onClick={() => setActiveSection('about')}
+                            className={activeSection === 'about' ? 'active' : ''}>About
                     </button>
                 </nav>
                 <div className="auth-area">
