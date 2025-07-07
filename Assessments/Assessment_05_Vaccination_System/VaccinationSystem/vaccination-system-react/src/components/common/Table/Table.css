@@ -1,0 +1,28 @@
+/* components/common/Table/Table.css */
+.table-container {
+    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    border: 1px solid var(--color-light-gray);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-white);
+}
+
+.table th,
+.table td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--color-light-gray);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--color-light-gray);
+}

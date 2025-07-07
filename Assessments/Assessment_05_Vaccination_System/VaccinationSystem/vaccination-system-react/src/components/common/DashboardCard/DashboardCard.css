@@ -1,0 +1,29 @@
+/* src/components/common/DashboardCard/DashboardCard.css */
+.dashboard-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #007bff; /* Highlight on hover */
+}
+
+.dashboard-card h3 {
+    color: #007bff;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4em;
+}
+
+.dashboard-card p {
+    color: #666;
+    font-size: 0.95em;
+    line-height: 1.5;
+}

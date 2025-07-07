@@ -1,0 +1,39 @@
+/* src/pages/Hospital/RegisterVaccinePage.css */
+.register-vaccine-container {
+    padding: 30px;
+    max-width: 500px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.register-vaccine-container h2 {
+    color: var(--color-primary); /* Using your CSS variable */
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.register-vaccine-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between form fields */
+}
+
+.register-vaccine-form .input-group {
+    text-align: left; /* Align labels to the left */
+}
+
+.form-error-message {
+    color: var(--color-error); /* Using your CSS variable */
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.register-vaccine-form button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border-radius: 8px;
+}

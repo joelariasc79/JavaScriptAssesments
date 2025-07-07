@@ -1,0 +1,321 @@
+/* src/notification.css */
+
+.notification-bell-container {
+    position: absolute; /* Changed from relative to absolute */
+    top: 40px;       /* Adjust distance from the top edge of the header */
+    right: 730px;     /* Adjust distance from the right edge of the header */
+    display: inline-block; /* Keep for internal display if needed */
+    z-index: 1000;   /* Ensure it stays on top of other content */
+    /* Removed margin-left as it's no longer relevant for absolute positioning */
+}
+
+.notification-bell {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    position: relative;
+    color: #333; /* Darker color for the bell icon */
+    border-radius: 50%;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/*.App-header {*/
+/*    background-color: #282c34; !* Example background *!*/
+/*    min-height: 70px; !* Example height *!*/
+/*    padding: 10px 20px;*/
+/*    display: flex; !* Crucial for aligning children *!*/
+/*    align-items: center; !* Vertically centers all direct children (h1, bell, nav, auth-area) *!*/
+/*    justify-content: space-between; !* Distributes children with space between them *!*/
+/*    color: white;*/
+/*    position: relative; !* Keep this if you have other absolutely positioned elements later *!*/
+/*    width: 100%;*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+/*.notification-bell-container {*/
+/*    position: relative; !* Reverted to relative (or can be removed for default static) *!*/
+/*    display: inline-block; !* Keep for internal display if needed *!*/
+/*    z-index: 1000;   !* Ensure it stays on top of other content *!*/
+/*    !* top, right, and margin-left properties removed *!*/
+/*    margin-left: 10px; !* Optional: Add some space between h1 and bell *!*/
+/*}*/
+
+/*.notification-bell {*/
+/*    background: none;*/
+/*    border: none;*/
+/*    cursor: pointer;*/
+/*    padding: 8px;*/
+/*    position: relative; !* Keep this for the badge positioning *!*/
+/*    color: #333; !* Darker color for the bell icon *!*/
+/*    border-radius: 50%;*/
+/*    transition: background-color 0.2s ease-in-out;*/
+/*}*/
+
+
+.notification-bell:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification-bell svg {
+    width: 28px; /* Slightly larger icon */
+    height: 28px;
+    vertical-align: middle;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0px; /* Adjust as needed */
+    right: 0px; /* Adjust as needed */
+    background-color: #ef4444; /* Red color for unread count */
+    color: white;
+    font-size: 0.75rem; /* Smaller font size */
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+    min-width: 20px; /* Ensure circular shape */
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transform: translate(25%, -25%); /* Offset badge for better positioning */
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%; /* Position below the bell */
+    right: 0;
+    width: 300px; /* Adjust width as needed */
+    max-height: 400px; /* Max height for scrollable list */
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* Ensure it appears above other content */
+    margin-top: 10px; /* Spacing from the bell */
+    padding: 10px 0; /* Padding inside the dropdown */
+}
+
+.notification-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.2s ease-in-out;
+    color: #333; /* Set a default text color for all notification items */
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: #e0f2fe; /* Light blue for unread */
+    font-weight: 500;
+    color: #000; /* Ensure black text for unread for better visibility */
+}
+
+.notification-item.read {
+    background-color: #f8f8f8; /* Lighter background for read */
+    color: #666; /* Slightly lighter gray for read items */
+}
+
+.notification-item:hover {
+    background-color: #f0f0f0;
+}
+
+.notification-text {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    margin-bottom: 5px;
+    color: #000; /* Set the text color to black */
+}
+
+.notification-date {
+    font-size: 0.75rem;
+    color: #888; /* Keep date text a bit lighter */
+    align-self: flex-end; /* Align date to the right within the item */
+}
+
+.dropdown-message {
+    padding: 15px;
+    text-align: center;
+    color: #555;
+    font-style: italic;
+}
+
+.dropdown-message.error-message {
+    color: #dc2626; /* Red for errors */
+}
+
+.clear-all-notifications {
+    padding: 10px 15px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.clear-all-notifications button {
+    background-color: #6366f1; /* Indigo color for clear all */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.clear-all-notifications button:hover {
+    background-color: #4f46e5;
+}
+
+/*!* src/notification.css *!*/
+
+/*.notification-bell-container {*/
+/*    position: relative;*/
+/*    display: inline-block;*/
+/*    margin-left: 200px; !* Adjust spacing from login component *!*/
+/*}*/
+
+/*.notification-bell {*/
+/*    background: none;*/
+/*    border: none;*/
+/*    cursor: pointer;*/
+/*    padding: 8px;*/
+/*    position: relative;*/
+/*    color: #333; !* Darker color for the bell icon *!*/
+/*    border-radius: 50%;*/
+/*    transition: background-color 0.2s ease-in-out;*/
+/*}*/
+
+/*.notification-bell:hover {*/
+/*    background-color: rgba(0, 0, 0, 0.05);*/
+/*}*/
+
+/*.notification-bell svg {*/
+/*    width: 28px; !* Slightly larger icon *!*/
+/*    height: 28px;*/
+/*    vertical-align: middle;*/
+/*}*/
+
+/*.notification-badge {*/
+/*    position: absolute;*/
+/*    top: 0px; !* Adjust as needed *!*/
+/*    right: 0px; !* Adjust as needed *!*/
+/*    background-color: #ef4444; !* Red color for unread count *!*/
+/*    color: white;*/
+/*    font-size: 0.75rem; !* Smaller font size *!*/
+/*    font-weight: bold;*/
+/*    border-radius: 50%;*/
+/*    padding: 2px 6px;*/
+/*    min-width: 20px; !* Ensure circular shape *!*/
+/*    height: 20px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);*/
+/*    transform: translate(25%, -25%); !* Offset badge for better positioning *!*/
+/*}*/
+
+/*.notification-dropdown {*/
+/*    position: absolute;*/
+/*    top: 100%; !* Position below the bell *!*/
+/*    right: 0;*/
+/*    width: 300px; !* Adjust width as needed *!*/
+/*    max-height: 400px; !* Max height for scrollable list *!*/
+/*    overflow-y: auto;*/
+/*    background-color: white;*/
+/*    border: 1px solid #ddd;*/
+/*    border-radius: 8px;*/
+/*    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);*/
+/*    z-index: 1000; !* Ensure it appears above other content *!*/
+/*    margin-top: 10px; !* Spacing from the bell *!*/
+/*    padding: 10px 0; !* Padding inside the dropdown *!*/
+/*}*/
+
+/*.notification-dropdown ul {*/
+/*    list-style: none;*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*}*/
+
+/*.notification-item {*/
+/*    padding: 10px 15px;*/
+/*    border-bottom: 1px solid #eee;*/
+/*    cursor: pointer;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    transition: background-color 0.2s ease-in-out;*/
+/*    color: #333; !* Set a default text color for all notification items *!*/
+/*}*/
+
+/*.notification-item:last-child {*/
+/*    border-bottom: none;*/
+/*}*/
+
+/*.notification-item.unread {*/
+/*    background-color: #e0f2fe; !* Light blue for unread *!*/
+/*    font-weight: 500;*/
+/*    color: #000; !* Ensure black text for unread for better visibility *!*/
+/*}*/
+
+/*.notification-item.read {*/
+/*    background-color: #f8f8f8; !* Lighter background for read *!*/
+/*    color: #666; !* Slightly lighter gray for read items *!*/
+/*}*/
+
+/*.notification-item:hover {*/
+/*    background-color: #f0f0f0;*/
+/*}*/
+
+/*.notification-text {*/
+/*    font-size: 0.9rem;*/
+/*    line-height: 1.3;*/
+/*    margin-bottom: 5px;*/
+/*    color: #000; !* Set the text color to black *!*/
+/*}*/
+
+/*.notification-date {*/
+/*    font-size: 0.75rem;*/
+/*    color: #888; !* Keep date text a bit lighter *!*/
+/*    align-self: flex-end; !* Align date to the right within the item *!*/
+/*}*/
+
+/*.dropdown-message {*/
+/*    padding: 15px;*/
+/*    text-align: center;*/
+/*    color: #555;*/
+/*    font-style: italic;*/
+/*}*/
+
+/*.dropdown-message.error-message {*/
+/*    color: #dc2626; !* Red for errors *!*/
+/*}*/
+
+/*.clear-all-notifications {*/
+/*    padding: 10px 15px;*/
+/*    text-align: center;*/
+/*    border-top: 1px solid #eee;*/
+/*}*/
+
+/*.clear-all-notifications button {*/
+/*    background-color: #6366f1; !* Indigo color for clear all *!*/
+/*    color: white;*/
+/*    border: none;*/
+/*    padding: 8px 15px;*/
+/*    border-radius: 5px;*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.2s ease-in-out;*/
+/*}*/
+
+/*.clear-all-notifications button:hover {*/
+/*    background-color: #4f46e5;*/
+/*}*/
