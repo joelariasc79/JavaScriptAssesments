@@ -22,7 +22,7 @@ export const fetchVaccineStock = createAsyncThunk(
     }
 );
 
-// Async Thunk to update vaccine stock
+// Async Thunk to update vaccine stock (PATCH for increment/decrement)
 export const updateVaccineStock = createAsyncThunk(
     'vaccineStock/updateVaccineStock',
     async ({ hospitalId, vaccineId, changeQty }, { rejectWithValue }) => {
@@ -38,14 +38,32 @@ export const updateVaccineStock = createAsyncThunk(
     }
 );
 
+// NEW Async Thunk to create initial vaccine stock (POST)
+export const createVaccineStock = createAsyncThunk( // Exported correctly now
+    'vaccineStock/createVaccineStock',
+    async ({ hospitalId, vaccineId, initialQuantity }, { rejectWithValue }) => {
+        try {
+            // This assumes a POST endpoint like /api/vaccine-stock
+            const response = await apiService.createVaccineStock(hospitalId, vaccineId, initialQuantity);
+            return response.data;
+        } catch (error) {
+            const message = error.response?.data?.message || error.message;
+            return rejectWithValue(message);
+        }
+    }
+);
+
+
 const vaccineStockSlice = createSlice({
     name: 'vaccineStock',
     initialState: {
         currentStock: null, // Stores the fetched stock for the selected vaccine/hospital
         loadingStock: false,
         errorStock: null,
-        updateStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+        updateStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed' for PATCH
         updateError: null,
+        createStatus: 'idle', // NEW: 'idle' | 'loading' | 'succeeded' | 'failed' for POST
+        createError: null,   // NEW: Error for POST
     },
     reducers: {
         clearStockStatus(state) {
@@ -53,6 +71,8 @@ const vaccineStockSlice = createSlice({
             state.errorStock = null;
             state.updateStatus = 'idle';
             state.updateError = null;
+            state.createStatus = 'idle'; // Clear create status too
+            state.createError = null;    // Clear create error too
         },
         clearCurrentStock(state) {
             state.currentStock = null;
@@ -75,7 +95,7 @@ const vaccineStockSlice = createSlice({
                 state.errorStock = action.payload;
                 state.currentStock = null;
             })
-            // Update Vaccine Stock
+            // Update Vaccine Stock (PATCH)
             .addCase(updateVaccineStock.pending, (state) => {
                 state.updateStatus = 'loading';
                 state.updateError = null;
@@ -87,6 +107,19 @@ const vaccineStockSlice = createSlice({
             .addCase(updateVaccineStock.rejected, (state, action) => {
                 state.updateStatus = 'failed';
                 state.updateError = action.payload;
+            })
+            // NEW: Create Vaccine Stock (POST)
+            .addCase(createVaccineStock.pending, (state) => {
+                state.createStatus = 'loading';
+                state.createError = null;
+            })
+            .addCase(createVaccineStock.fulfilled, (state, action) => {
+                state.createStatus = 'succeeded';
+                state.currentStock = action.payload.vaccineStock; // Set current stock with the newly created record
+            })
+            .addCase(createVaccineStock.rejected, (state, action) => {
+                state.createStatus = 'failed';
+                state.createError = action.payload;
             });
     },
 });

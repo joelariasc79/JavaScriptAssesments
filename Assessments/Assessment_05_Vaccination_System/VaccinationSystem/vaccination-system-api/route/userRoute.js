@@ -2,7 +2,7 @@ const express = require('express');
 const userRouter = express.Router({ strict: true, caseSensitive: true });
 const bcrypt = require('bcryptjs'); // Import bcryptjs for password hashing and comparison
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
-const UserModel = require('../DataModel/userDataModel'); // Import the Mongoose User model
+const UserModel = require('../dataModel/userDataModel'); // Import the Mongoose User model
 const mongoose = require('mongoose'); // Import mongoose to use its Types.ObjectId.isValid and other utilities
 
 // --- IMPORTANT: JWT Secret Key ---
@@ -387,20 +387,65 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+//
+//         // Ensure user is authorized to view this profile
+//         if (req.user.role === 'patient' && req.user.userId !== userId) {
+//             return res.status(403).json({ message: 'Access denied. Patients can only view their own profile.' });
+//         }
+//         // Hospital staff can view any user's profile within their hospital (optional, depending on granular access)
+//         // Admin can view any profile.
+//
+//         const user = await UserModel.findById(userId)
+//             .select('-password') // Exclude password
+//             .populate('hospital', 'name location'); // Populate hospital details
+//
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found.' });
+//         }
+//
+//         res.status(200).json(user);
+//     } catch (error) {
+//         console.error('Error fetching user profile:', error);
+//         res.status(500).json({ message: 'Internal server error fetching user profile.', error: error.message });
+//     }
+// });
+
 // New: Get All Users (Admin only)
+// userRouter.get('/api/admin/users', authenticateToken, async (req, res) => {
+//     try {
+//         // Ensure only admins can access this route
+//         if (req.user.role !== 'admin') {
+//             return res.status(403).json({ message: 'Access denied. Only administrators can view all users.' });
+//         }
+//
+//         // Select all fields except password for security AND populate hospital field
+//         const users = await UserModel.find({}).select('-password').populate('hospital');
+//         res.status(200).json(users);
+//     } catch (error) {
+//         console.error('Error fetching all users:', error);
+//         res.status(500).json({ message: 'Error fetching all users', error: error.message });
+//     }
+// });
+
+// <-- NEW: Get all users (for hospital staff to select patients)
 userRouter.get('/api/users', authenticateToken, async (req, res) => {
     try {
-        // Ensure only admins can access this route
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Only administrators can view all users.' });
+        // Only admin and hospital staff can view all users
+        if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+            return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view all users.' });
         }
 
-        // Select all fields except password for security AND populate hospital field
-        const users = await UserModel.find({}).select('-password').populate('hospital');
+        const users = await UserModel.find({})
+            .select('-password') // Exclude passwords
+            .populate('hospital', 'name'); // Populate hospital name for staff users
+
         res.status(200).json(users);
     } catch (error) {
         console.error('Error fetching all users:', error);
-        res.status(500).json({ message: 'Error fetching all users', error: error.message });
+        res.status(500).json({ message: 'Internal server error fetching users.', error: error.message });
     }
 });
 

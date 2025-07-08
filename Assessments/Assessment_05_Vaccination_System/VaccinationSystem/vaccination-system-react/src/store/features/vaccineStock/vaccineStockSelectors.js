@@ -27,3 +27,14 @@ export const selectUpdateStockError = createSelector(
     selectVaccineStockState,
     (stockState) => stockState.updateError
 );
+
+// NEW: Selectors for create operation status and error
+export const selectCreateStockStatus = createSelector(
+    selectVaccineStockState,
+    (stockState) => stockState.createStatus
+);
+
+export const selectCreateStockError = createSelector(
+    selectVaccineStockState,
+    (stockState) => stockState.createError
+);

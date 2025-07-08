@@ -12,11 +12,10 @@ import RegisterPage from '../pages/Auth/RegisterPage';
 // Lazy load Hospital related page components (HospitalDashboard UNCOMMENTED as it exists)
 const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard/HospitalDashboard'));
 const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
-const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/UpdateVaccineStockPage/UpdateVaccineStockPage'));
-
+const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
+const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
 
 // The other pages below are still commented out as they don't exist yet:
-// const ApproveVaccinesPage = lazy(() => import('../pages/Hospital/ApproveVaccinesPage'));
 // const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage'));
 
 // Admin-specific components (ALL COMMENTED OUT)
@@ -101,14 +100,14 @@ const AppRoutes = () => {
                  </PrivateRoute>
                  }
                 />
-                {/*<Route*/}
-                {/* path="/hospital/patients/approve"*/}
-                {/* element={*/}
-                {/* <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>*/}
-                {/* <ApproveVaccinesPage />*/}
-                {/* </PrivateRoute>*/}
-                {/* }*/}
-                {/*/>*/}
+                <Route
+                    path="/hospital/orders/create"
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <CreateVaccinationOrderPage />
+                        </PrivateRoute>
+                    }
+                />
                 {/*<Route*/}
                 {/* path="/hospital/vaccinated-list"*/}
                 {/* element={*/}
@@ -117,7 +116,6 @@ const AppRoutes = () => {
                 {/* </PrivateRoute>*/}
                 {/* }*/}
                 {/*/>*/}
-
 
                 {/* Admin-only routes (still commented out, but would typically use /admin/* paths) */}
                 {/*

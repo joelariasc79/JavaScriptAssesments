@@ -1,4 +1,4 @@
-// DataModel/orderDataModel.js
+// dataModel/orderDataModel.js
 const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({

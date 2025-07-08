@@ -5,6 +5,9 @@ import hospitalsReducer from './features/hospitals/hospitalSlice';
 import vaccinesReducer from './features/vaccines/vaccineSlice';
 import vaccineStockReducer from './features/vaccineStock/vaccineStockSlice';
 import patientsReducer from './features/patients/patientSlice';
+import vaccinationOrderReducer from './features/vaccinationOrder/vaccinationOrderSlice';
+import usersReducer from './features/users/usersSlice';
+
 // import bookingsReducer from './features/bookings/bookingsSlice';
 // import paymentsReducer from './features/payments/paymentsSlice';
 // import reportsReducer from './features/reports/reportsSlice';
@@ -14,9 +17,11 @@ export const store = configureStore({
         auth: authReducer,
         hospitals: hospitalsReducer,
         vaccines: vaccinesReducer,
-        vaccineStock: vaccineStockReducer
-        , patients: patientsReducer
-        // ,
+        vaccineStock: vaccineStockReducer,
+        patients: patientsReducer,
+        vaccinationOrder: vaccinationOrderReducer,
+        users: usersReducer
+        //,
         // bookings: bookingsReducer,
         // payments: paymentsReducer,
         // reports: reportsReducer,

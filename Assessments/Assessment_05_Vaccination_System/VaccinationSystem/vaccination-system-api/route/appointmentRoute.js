@@ -1,11 +1,11 @@
 // route/appointmentRoute.js
 const express = require('express');
 const appointmentRouter = express.Router({ strict: true, caseSensitive: true });
-const AppointmentModel = require('../DataModel/appointmentDataModel');
-const VaccineStockModel = require('../DataModel/vaccineStockDataModel');
-const VaccineModel = require('../DataModel/vaccineDataModel');
-const HospitalModel = require('../DataModel/hospitalDataModel');
-const UserModel = require('../DataModel/userDataModel');
+const AppointmentModel = require('../dataModel/appointmentDataModel');
+const VaccineStockModel = require('../dataModel/vaccineStockDataModel');
+const VaccineModel = require('../dataModel/vaccineDataModel');
+const HospitalModel = require('../dataModel/hospitalDataModel');
+const UserModel = require('../dataModel/userDataModel');
 const mongoose = require('mongoose');
 const QRCode = require('qrcode'); // Import the qrcode library
 

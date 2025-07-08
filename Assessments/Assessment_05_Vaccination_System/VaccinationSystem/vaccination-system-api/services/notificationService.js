@@ -1,6 +1,6 @@
 // service/notificationService.js
-const NotificationModel = require('../DataModel/notificationDataModel');
-const UserModel = require('../DataModel/userDataModel'); // To get user's contact info
+const NotificationModel = require('../dataModel/notificationDataModel');
+const UserModel = require('../dataModel/userDataModel'); // To get user's contact info
 
 // --- Simulation of SMS/Email sending ---
 // In a real application, you would use libraries like Twilio (SMS) or Nodemailer/SendGrid (Email) here.

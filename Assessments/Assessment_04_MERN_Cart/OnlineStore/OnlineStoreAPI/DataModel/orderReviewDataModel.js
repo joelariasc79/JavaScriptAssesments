@@ -1,4 +1,4 @@
-// DataModel/orderReviewDataModel.js
+// dataModel/orderReviewDataModel.js
 const mongoose = require('mongoose');
 
 const OrderReviewSchema = new mongoose.Schema({

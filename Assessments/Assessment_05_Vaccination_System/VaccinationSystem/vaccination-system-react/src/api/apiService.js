@@ -9,6 +9,7 @@ const apiService = {
     login: (usernameOrEmail, password) => axiosInstance.post('/api/auth/login', { usernameOrEmail, password }),
     register: (userData) => axiosInstance.post('/api/auth/register', userData), // Example: register method
     getProfile: (userId) => axiosInstance.get(`/api/users/${userId}`),
+    getAllUsers: () => axiosInstance.get('/api/users'), // <-- NEW: Fetch all users (for patient selection)
 
     // Example: Admin/Hospital Endpoints (uncomment and implement as needed)
     getAllHospitals: () => axiosInstance.get('/api/hospitals'),
@@ -17,9 +18,8 @@ const apiService = {
     getVaccineStock: (hospitalId, vaccineId) => axiosInstance.get(`/api/vaccine-stock/${hospitalId}/${vaccineId}`),
     updateVaccineStock: (hospitalId, vaccineId, changeQty) =>
         axiosInstance.patch(`/api/vaccine-stock/${hospitalId}/${vaccineId}`, { changeQty }),
+    createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
 
-    // approveVaccineToPatient: (hospitalId, patientId, vaccineId, doseNumber) =>
-    //     axiosInstance.post(`/api/hospitals/${hospitalId}/approve-vaccine`, { patientId, vaccineId, doseNumber }),
     // getHospitalVaccinatedPersons: (hospitalId) =>
     //     axiosInstance.get(`/api/hospitals/${hospitalId}/vaccinated-persons`),
 

@@ -27,23 +27,3 @@ export const selectFetchVaccinesError = createSelector(
     selectVaccineState,
     (vaccineState) => vaccineState.fetchError
 );
-
-// // src/store/features/vaccine/vaccineSelectors.js
-// import { createSelector } from '@reduxjs/toolkit';
-//
-// const selectVaccineState = (state) => state.vaccines; // Assuming 'vaccines' is the key in your root reducer
-//
-// export const selectRegistrationStatus = createSelector(
-//     selectVaccineState,
-//     (vaccineState) => vaccineState.registrationStatus
-// );
-//
-// export const selectRegistrationError = createSelector(
-//     selectVaccineState,
-//     (vaccineState) => vaccineState.registrationError
-// );
-//
-// export const selectAllVaccines = createSelector(
-//     selectVaccineState,
-//     (vaccineState) => vaccineState.vaccines
-// );

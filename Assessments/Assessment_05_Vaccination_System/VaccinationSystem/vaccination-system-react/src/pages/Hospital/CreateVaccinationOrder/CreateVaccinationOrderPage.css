@@ -1,0 +1,82 @@
+/* src/pages/Hospital/CreateVaccinationOrderPage.css */
+.create-vaccination-order-container {
+    padding: 30px;
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.create-vaccination-order-container h2 {
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.create-vaccination-order-container p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.create-vaccination-order-container p strong {
+    color: var(--color-secondary);
+}
+
+.create-order-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.form-group {
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--color-text-primary);
+}
+
+/* Reusing select-box styles from VaccinesStock.css if it's available globally or in common styles */
+/* If not, include similar styles here: */
+.select-box {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-base);
+    box-sizing: border-box;
+    background-color: var(--color-white);
+    color: var(--color-text-primary);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2C197.3L159.9%2C69.8c-4.8-4.8-12.5-4.8-17.3%2C0L5.4%2C197.3c-4.8%2C4.8-4.8%2C12.5%2C0%2C17.3s12.5%2C4.8%2C17.3%2C0l130.8-130.8c4.8-4.8%2C12.5-4.8%2C17.3%2C0l130.8%2C130.8c4.8%2C4.8%2C12.5%2C4.8%2C17.3%2C0S291.8%2C202.1%2C287%2C197.3z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px;
+}
+
+.select-box:focus {
+    border-color: var(--color-secondary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+.form-error-message {
+    color: var(--color-error);
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.create-order-form button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border-radius: 8px;
+}

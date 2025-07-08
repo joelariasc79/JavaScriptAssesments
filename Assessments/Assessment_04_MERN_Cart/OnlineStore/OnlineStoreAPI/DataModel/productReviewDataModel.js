@@ -1,4 +1,4 @@
-// DataModel/productReviewDataModel.js
+// dataModel/productReviewDataModel.js
 const mongoose = require('mongoose');
 
 const ProductReviewSchema = new mongoose.Schema({

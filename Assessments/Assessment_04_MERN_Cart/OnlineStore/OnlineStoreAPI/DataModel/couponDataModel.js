@@ -1,4 +1,4 @@
-// backend/DataModel/couponDataModel.js
+// backend/dataModel/couponDataModel.js
 const mongoose = require('mongoose');
 
 const couponSchema = new mongoose.Schema({

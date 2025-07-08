@@ -18,7 +18,8 @@ const hospitalRouter = require("./route/hospitalRoute");
 const vaccineRouter = require("./route/vaccineRoute");
 const vaccineStockRouter = require("./route/vaccineStockRoute");
 const appointmentRouter = require("./route/appointmentRoute");
-const vaccinationRecordRouter = require("./route/vaccinationRecordRoute");
+const vaccinationOrderRouter = require('./route/vaccinationOrderRoute');
+
 const reportRouter = require("./route/reportRoute");
 const notificationRouter = require("./route/notificationRoute");
 
@@ -55,7 +56,7 @@ app.use(hospitalRouter);
 app.use(vaccineRouter);
 app.use(vaccineStockRouter);
 app.use(appointmentRouter);
-app.use(vaccinationRecordRouter);
+app.use(vaccinationOrderRouter);
 app.use(reportRouter);
 app.use(notificationRouter);
 

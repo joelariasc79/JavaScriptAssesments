@@ -1,8 +1,8 @@
 // route/notificationRoute.js
 const express = require('express');
 const notificationRouter = express.Router({ strict: true, caseSensitive: true });
-const NotificationModel = require('../DataModel/notificationDataModel');
-const UserModel = require('../DataModel/userDataModel'); // To get user details for sending
+const NotificationModel = require('../dataModel/notificationDataModel');
+const UserModel = require('../dataModel/userDataModel'); // To get user details for sending
 const mongoose = require('mongoose');
 
 const { authenticateToken } = require('./userRoute'); // Adjust path if needed

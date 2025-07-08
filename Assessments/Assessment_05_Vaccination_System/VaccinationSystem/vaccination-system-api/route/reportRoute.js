@@ -1,10 +1,10 @@
 // route/reportRoute.js
 const express = require('express');
 const reportRouter = express.Router({ strict: true, caseSensitive: true });
-const VaccinationRecordModel = require('../DataModel/vaccinationRecordDataModel');
-const UserModel = require('../DataModel/userDataModel');
-const VaccineModel = require('../DataModel/vaccineDataModel');
-const HospitalModel = require('../DataModel/hospitalDataModel');
+const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel');
+const UserModel = require('../dataModel/userDataModel');
+const VaccineModel = require('../dataModel/vaccineDataModel');
+const HospitalModel = require('../dataModel/hospitalDataModel');
 const mongoose = require('mongoose');
 
 // Assuming authenticateToken is exported from userRoute.js

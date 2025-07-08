@@ -44,10 +44,16 @@ const HospitalDashboard = () => {
                     onClick={() => handleNavigation('/hospital/vaccines/stock')}
                 />
 
+                {/*<DashboardCard*/}
+                {/*    title="Approve Vaccinations"*/}
+                {/*    description="Review and approve patient vaccination requests for your hospital."*/}
+                {/*    onClick={() => handleNavigation('/hospital/orders/create')}*/}
+                {/*/>*/}
+
                 <DashboardCard
-                    title="Approve Vaccinations"
-                    description="Review and approve patient vaccination requests for your hospital."
-                    onClick={() => handleNavigation('/hospital/patients/approve')}
+                    title="Create Vaccination Order" // Updated title
+                    description="Initiate a new vaccination order for a patient: approve patient vaccination" // Updated description
+                    onClick={() => handleNavigation('/hospital/orders/create')}
                 />
 
                 <DashboardCard
