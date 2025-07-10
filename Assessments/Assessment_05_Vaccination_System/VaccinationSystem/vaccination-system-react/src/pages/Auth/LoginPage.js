@@ -26,10 +26,10 @@ const LoginPage = () => {
             // Redirect based on role after successful login
             switch (currentUser.role) {
                 case 'admin': // Use lowercase to match your schema enum
-                    navigate('/admin'); // If you create a separate admin dashboard
+                    navigate('/admin'); // If you create a separate admin PatientDashboard
                     break;
                 case 'hospital_staff': // Use lowercase to match your schema enum
-                    navigate('/hospital'); // Redirect hospital staff to the hospital dashboard
+                    navigate('/hospital'); // Redirect hospital staff to the hospital PatientDashboard
                     break;
                 case 'patient': // Use lowercase to match your schema enum
                     navigate('/patient/dashboard');

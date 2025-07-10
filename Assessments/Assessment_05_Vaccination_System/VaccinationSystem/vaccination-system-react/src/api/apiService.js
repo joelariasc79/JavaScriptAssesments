@@ -19,15 +19,33 @@ const apiService = {
     updateVaccineStock: (hospitalId, vaccineId, changeQty) =>
         axiosInstance.patch(`/api/vaccine-stock/${hospitalId}/${vaccineId}`, { changeQty }),
     createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
+    // // NEW: Fetch all vaccination orders (for admin/hospital use, potentially for patients too)
+    // getAllVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders'),
+    // // NEW: Update a specific vaccination order (e.g., for scheduling)
+    // updateVaccinationOrder: (orderId, updateData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}`, updateData),
+    // // getHospitalVaccinatedPersons: (hospitalId) =>
+    // //     axiosInstance.get(`/api/hospitals/${hospitalId}/vaccinated-persons`),
 
-    // getHospitalVaccinatedPersons: (hospitalId) =>
-    //     axiosInstance.get(`/api/hospitals/${hospitalId}/vaccinated-persons`),
+
+    // //////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////
+    // Patient Endpoints (Updated and New)
+    getPatientDashboard: (patientId) => axiosInstance.get(`/api/patients/${patientId}/dashboard`),
+    // NEW: Get all vaccination orders for a specific patient
+    getPatientVaccinationOrders: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}`),
+    // NEW: Endpoint to schedule an appointment for an existing order (might be a PATCH on order)
+    // Assuming backend will have a route like /api/vaccination-orders/:orderId/schedule
+    schedulePatientAppointment: (orderId, appointmentData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/schedule`, appointmentData),
+    // NEW: Get approved/scheduled appointments for a patient
+    getPatientApprovedAppointments: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}/scheduled`),
 
     // Example: Patient Endpoints (uncomment and implement as needed)
     // registerPatient: (patientData) => axiosInstance.post('/api/patients/register', patientData),
-    // getPatientDashboard: (patientId) => axiosInstance.get(`/api/patients/${patientId}/dashboard`),
     // scheduleAppointment: (appointmentDetails) => axiosInstance.post('/api/appointments/schedule', appointmentDetails),
     // makePayment: (paymentDetails) => axiosInstance.post('/api/payments/process', paymentDetails),
+
+
+
 
 
 

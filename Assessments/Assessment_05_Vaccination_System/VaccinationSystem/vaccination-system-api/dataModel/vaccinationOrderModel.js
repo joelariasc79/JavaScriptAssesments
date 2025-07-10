@@ -35,7 +35,7 @@ const vaccinationOrderSchema = new mongoose.Schema({
     },
     appointmentStatus: {
         type: String,
-        enum: ['pending_scheduling', 'scheduled', 'missed', 'cancelled'],
+        enum: ['pending_scheduling', 'scheduled', 'missed', 'cancelled', 'completed'],
         default: 'pending_scheduling'
     },
     appointment_date: { // Date of the scheduled appointment
@@ -44,8 +44,8 @@ const vaccinationOrderSchema = new mongoose.Schema({
     },
     vaccinationStatus: {
         type: String,
-        enum: ['pending_vaccination', 'vaccinated', 'not_vaccinated', 'cancelled'],
-        default: 'pending_vaccination'
+        enum: ['pending_approval', 'pending_vaccination', 'vaccinated', 'not_vaccinated', 'cancelled'],
+        default: 'pending_approval'
     },
     // Reference to the actual VaccinationRecord once vaccination occurs
     vaccinationRecordId: {

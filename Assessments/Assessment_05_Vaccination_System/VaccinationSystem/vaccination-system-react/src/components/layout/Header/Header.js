@@ -20,7 +20,7 @@ const Header = () => {
         <header className="header">
             <div className="header-left">
                 <Link to="/" className="app-logo">
-                    {isAuthenticated ? "CareShield Vax Dashboard" : "CareShield Vax"}
+                    {isAuthenticated ? "CareShield HealthCare System Dashboard" : "CareShield HealthCare System"}
                 </Link>
             </div>
             <nav className="header-nav">

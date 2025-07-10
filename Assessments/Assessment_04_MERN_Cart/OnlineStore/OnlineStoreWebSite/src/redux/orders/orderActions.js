@@ -109,7 +109,7 @@ export const submitOrderReviewFailure = (error) => ({ type: SUBMIT_ORDER_REVIEW_
 
 /**
  * Fetches all orders from the backend.
- * This might be used by an admin dashboard.
+ * This might be used by an admin PatientDashboard.
  * @param {string} token - JWT token for authentication.
  */
 export const fetchAllOrders = (token) => {

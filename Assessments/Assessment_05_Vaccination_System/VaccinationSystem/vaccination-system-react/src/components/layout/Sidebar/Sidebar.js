@@ -1,4 +1,4 @@
-// For Admin/Hospital dashboard
+// For Admin/Hospital PatientDashboard
 // components/layout/Sidebar/Sidebar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -18,23 +18,25 @@ const Sidebar = () => {
             case 'ADMIN':
                 return [
                     { path: '/admin', label: 'Admin Dashboard' },
-                    { path: '/admin/hospitals', label: 'Manage Hospitals' },
-                    { path: '/admin/vaccines/register', label: 'Register Vaccine' },
-                    { path: '/reports', label: 'View Reports' },
+                    // { path: '/admin/hospitals', label: 'Manage Hospitals' },
+                    // { path: '/admin/vaccines/register', label: 'Register Vaccine' },
+                    // { path: '/reports', label: 'View Reports' },
                 ];
-            case 'HOSPITAL':
+            case 'HOSPITAL_STAFF':
+            // case 'HOSPITAL':
                 return [
-                    { path: '/admin', label: 'Hospital Dashboard' },
-                    { path: '/admin/vaccines/stock', label: 'Update Vaccine Stock' },
-                    { path: '/admin/patients/approve', label: 'Approve Vaccines' },
-                    { path: '/admin/vaccinated-list', label: 'Vaccinated Persons' },
+                    { path: '/hospital', label: 'Hospital1 Dashboard' },
+                    // { path: '/hospital/vaccines/stock', label: 'Update Vaccine Stock' },
+                    // { path: '/hospital/patients/approve', label: 'Approve Vaccines' },
+                    // { path: '/hospital/vaccinated-list', label: 'Vaccinated Persons' },
                 ];
             case 'PATIENT':
                 return [
-                    { path: '/patient/dashboard', label: 'Patient Dashboard' },
-                    { path: '/patient/register', label: 'Register Patient' },
-                    { path: '/patient/schedule', label: 'Schedule Appointment' },
-                    { path: '/patient/payment', label: 'Make Payment' },
+                    { path: '/patient/PatientDashboard', label: 'Patient Dashboard' },
+                    // { path: '/patient/PatientDashboard', label: 'Patient Dashboard' },
+                    // { path: '/patient/register', label: 'Register Patient' },
+                    // { path: '/patient/schedule', label: 'Schedule Appointment' },
+                    // { path: '/patient/payment', label: 'Make Payment' },
                 ];
             default:
                 return [];

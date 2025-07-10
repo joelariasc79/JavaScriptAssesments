@@ -46,7 +46,7 @@ const RegisterVaccinePage = () => {
             setOtherInfo('');
             setStrainsCovered('');
 
-            navigate('/hospital'); // Redirect to hospital dashboard or vaccine list
+            navigate('/hospital'); // Redirect to hospital PatientDashboard or vaccine list
         } else if (registrationStatus === 'failed') {
             setFormError(registrationError || 'Vaccine registration failed. Please try again.');
         }

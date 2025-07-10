@@ -14,17 +14,21 @@ const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard
 const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
 const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
-
 // The other pages below are still commented out as they don't exist yet:
 // const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage'));
 
+// //////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////
 // Admin-specific components (ALL COMMENTED OUT)
 // const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
 const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/HospitalListPage'));
 
+// //////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////
 // Patient Pages (ALL COMMENTED OUT)
 // import RegisterPatientPage from '../pages/Patient/RegisterPatientPage';
-// import PatientDashboardPage from '../pages/Patient/PatientDashboardPage';
+const PatientDashboardPage = lazy(() => import('../pages/Patient/PatientDashboard/PatientDashboardPage'));
+
 // import PaymentPage from '../pages/Patient/PaymentPage';
 // import ScheduleAppointmentPage from '../pages/Patient/ScheduleAppointmentPage';
 
@@ -129,8 +133,15 @@ const AppRoutes = () => {
                 />
                 */}
 
-                {/* Patient Routes (Protected) - ALL COMMENTED OUT */}
-                {/* ... */}
+                {/* Patient Routes (Protected) */}
+                <Route
+                    path="/patient/dashboard"
+                    element={
+                        <PrivateRoute allowedRoles={['patient']}>
+                            <PatientDashboardPage />
+                        </PrivateRoute>
+                    }
+                />
 
                 {/* Reporting Routes (Protected, accessible to specific roles) - ALL COMMENTED OUT */}
                 {/* ... */}

@@ -58,7 +58,7 @@ const CreateVaccinationOrderPage = () => {
             setDoseNumber('');
             setChargeToBePaid(''); // Reset calculated charge
             setFormError('');
-            // Redirect to the hospital dashboard after creation
+            // Redirect to the hospital PatientDashboard after creation
             navigate('/hospital'); // Changed navigation target here
         } else if (createOrderStatus === 'failed') {
             setFormError(createOrderError || 'Failed to create vaccination order. Please try again.');
