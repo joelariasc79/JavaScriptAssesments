@@ -19,6 +19,10 @@ const apiService = {
     updateVaccineStock: (hospitalId, vaccineId, changeQty) =>
         axiosInstance.patch(`/api/vaccine-stock/${hospitalId}/${vaccineId}`, { changeQty }),
     createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
+    getPendingApprovalVaccinationOrders: (hospitalId) =>
+        axiosInstance.get(`/api/vaccination-orders/hospital/${hospitalId}/pending-approval`),
+    patch: (url, data) => axiosInstance.patch(url, data),
+
     // // NEW: Fetch all vaccination orders (for admin/hospital use, potentially for patients too)
     // getAllVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders'),
     // // NEW: Update a specific vaccination order (e.g., for scheduling)

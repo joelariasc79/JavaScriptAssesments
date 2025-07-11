@@ -7,6 +7,8 @@ import vaccineStockReducer from './features/vaccineStock/vaccineStockSlice';
 import patientsReducer from './features/patients/patientSlice';
 import vaccinationOrderReducer from './features/vaccinationOrder/vaccinationOrderSlice';
 import usersReducer from './features/users/usersSlice';
+import pendingOrdersReducer from './features/pendingOrders/pendingOrdersSlice'; // NEW: Import the new reducer
+
 
 // import bookingsReducer from './features/bookings/bookingsSlice';
 // import paymentsReducer from './features/payments/paymentsSlice';
@@ -20,8 +22,9 @@ export const store = configureStore({
         vaccineStock: vaccineStockReducer,
         patients: patientsReducer,
         vaccinationOrder: vaccinationOrderReducer,
-        users: usersReducer
-        //,
+        users: usersReducer,
+        pendingOrders: pendingOrdersReducer
+        // ,
         // bookings: bookingsReducer,
         // payments: paymentsReducer,
         // reports: reportsReducer,

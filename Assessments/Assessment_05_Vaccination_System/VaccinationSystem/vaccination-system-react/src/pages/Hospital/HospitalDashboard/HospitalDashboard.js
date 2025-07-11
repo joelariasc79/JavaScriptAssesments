@@ -50,11 +50,33 @@ const HospitalDashboard = () => {
                 {/*    onClick={() => handleNavigation('/hospital/orders/create')}*/}
                 {/*/>*/}
 
+                {/* UPDATED DashboardCard for Approve Vaccination Orders */}
                 <DashboardCard
-                    title="Create Vaccination Order" // Updated title
-                    description="Initiate a new vaccination order for a patient: approve patient vaccination" // Updated description
-                    onClick={() => handleNavigation('/hospital/orders/create')}
+                    title="Approve Vaccination Orders" // Changed title
+                    description="Review and approve patient vaccination requests for your hospital." // Changed description
+                    onClick={() => handleNavigation('/hospital/orders/pending-approval')} // Changed navigation path
                 />
+
+                {/* Keep Create Vaccination Order if Hospital Staff can still create orders for patients,
+                    but based on previous discussion, the patient now creates their own.
+                    If hospital staff should *also* be able to create orders, you would keep this,
+                    but the previous `CreateVaccinationOrderPage` might be renamed to
+                    `HospitalCreateVaccinationOrderPage` to avoid confusion with `PatientCreateVaccinationOrderPage`.
+                    For now, I'm assuming the 'Create' card is removed from hospital dashboard,
+                    as patients create their own, and staff 'approve'.
+                    If hospital staff still needs a dedicated "Create Order" feature for *any* patient,
+                    you'd need to create a new page for that.
+                */}
+                {/* <DashboardCard
+                    title="Create Vaccination Order (Staff)" // Example if staff still needs to create
+                    description="Initiate a new vaccination order for a patient."
+                    onClick={() => handleNavigation('/hospital/orders/create-for-patient')} // New distinct path
+                /> */}
+                {/*<DashboardCard*/}
+                {/*    title="Create Vaccination Order" // Updated title*/}
+                {/*    description="Initiate a new vaccination order for a patient: approve patient vaccination" // Updated description*/}
+                {/*    onClick={() => handleNavigation('/hospital/orders/create')}*/}
+                {/*/>*/}
 
                 <DashboardCard
                     title="View Vaccinated List"

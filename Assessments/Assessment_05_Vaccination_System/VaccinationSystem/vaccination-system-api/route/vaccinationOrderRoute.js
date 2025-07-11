@@ -496,7 +496,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
 
 
 // ////////////////////////////////////////////////////////////////////////////////////
-// Implement later: Is not part of the Assesment requirements, but is the right way to do it
+// Implement later: Is not part of the Assessment requirements, but is the right way to do it
 // ////////////////////////////////////////////////////////////////////////////////////
 
 // /**
@@ -732,6 +732,49 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
             return res.status(409).json({ message: 'A vaccination record for this order already exists.' });
         }
         res.status(500).json({ message: 'Internal server error marking vaccination order as vaccinated.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/vaccination-orders/hospital/:hospitalId/pending-approval
+ * @description Get all vaccination orders with 'pending_approval' status for a specific hospital.
+ * @param {string} hospitalId - The ID of the hospital.
+ * @access Protected (Admin, Hospital Staff - for their own hospital)
+ */
+vaccinationOrderRouter.get('/api/vaccination-orders/hospital/:hospitalId/pending-approval', authenticateToken, async (req, res) => {
+    try {
+        const { hospitalId } = req.params;
+        const loggedInUser = req.user;
+
+        // Validate hospitalId format
+        if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+            return res.status(400).json({ message: 'Invalid hospital ID format.' });
+        }
+
+        // Authorization check
+        if (loggedInUser.role !== 'admin' && loggedInUser.role !== 'hospital_staff') {
+            return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view pending approval orders.' });
+        }
+
+        // Hospital staff can only view orders for their assigned hospital
+        if (loggedInUser.role === 'hospital_staff' && loggedInUser.hospitalId.toString() !== hospitalId) {
+            return res.status(403).json({ message: 'Access denied. Hospital staff can only view pending approval orders for their assigned hospital.' });
+        }
+
+        // Find orders with the specified hospitalId and pending_approval status
+        const pendingOrders = await VaccinationOrderModel.find({
+            hospitalId: hospitalId,
+            vaccinationStatus: 'pending_approval'
+        })
+            .populate('userId', 'username name email') // Populate patient details
+            .populate('hospitalId', 'name') // Populate hospital name
+            .populate('vaccineId', 'name type manufacturer'); // Populate vaccine details
+
+        res.status(200).json({ message: 'Pending approval vaccination orders fetched successfully!', orders: pendingOrders });
+
+    } catch (error) {
+        console.error('Error fetching pending approval vaccination orders:', error);
+        res.status(500).json({ message: 'Internal server error fetching pending approval vaccination orders.', error: error.message });
     }
 });
 
