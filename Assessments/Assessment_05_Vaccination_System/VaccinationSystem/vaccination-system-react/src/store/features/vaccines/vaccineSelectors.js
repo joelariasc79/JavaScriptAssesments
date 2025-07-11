@@ -17,13 +17,13 @@ export const selectAllVaccines = createSelector(
     (vaccineState) => vaccineState.vaccines
 );
 
-// NEW: Selectors for fetching all vaccines status and error
-export const selectFetchVaccinesStatus = createSelector(
+
+export const selectFetchVaccinesStatus = createSelector( // Corrected name
     selectVaccineState,
     (vaccineState) => vaccineState.fetchStatus
 );
 
-export const selectFetchVaccinesError = createSelector(
+export const selectFetchVaccinesError = createSelector( // Corrected name
     selectVaccineState,
     (vaccineState) => vaccineState.fetchError
 );

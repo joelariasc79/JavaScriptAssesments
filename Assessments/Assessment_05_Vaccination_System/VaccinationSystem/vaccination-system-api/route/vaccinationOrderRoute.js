@@ -18,21 +18,27 @@ const { authenticateToken } = require('./userRoute'); // Adjust path if needed
 /**
  * @route POST /api/vaccination-orders
  * @description Create a new vaccination order.
- * @body {string} userId, {string} hospitalId, {string} vaccineId, {number} dose_number, {number} charge_to_be_paid
- * @access Protected (Admin, Hospital Staff)
+ * @body {string} userId (optional, only mandatory for Admin, Hospital Staff), {string} hospitalId, {string} vaccineId, {number} dose_number, {number} charge_to_be_paid
+ * @access Protected (Patient, Admin, Hospital Staff)
  */
 vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async (req, res) => {
     try {
-        if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
-            return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can create vaccination orders.' });
+        // Allow 'patient' role to create vaccination orders
+        if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff' && req.user.role !== 'patient') {
+            return res.status(403).json({ message: 'Access denied. Only administrators, hospital staff, and patients can create vaccination orders.' });
         }
 
-        const { userId, hospitalId, vaccineId, dose_number, charge_to_be_paid } = req.body;
-        const createdBy = req.user.userId; // The ID of the staff creating the order
+        // For patients, the userId for the order is implicitly the authenticated user's ID.
+        // For admin/hospital_staff, the userId for the patient is expected in the body.
+        const userId = req.user.role === 'patient' ? req.user.userId : req.body.userId;
+
+        const { hospitalId, vaccineId, dose_number, charge_to_be_paid } = req.body;
+        const createdBy = req.user.userId; // The ID of the user creating the order (patient, staff, or admin)
 
         // --- Input Validation ---
-        if (!userId || !hospitalId || !vaccineId || dose_number === undefined || dose_number === null || charge_to_be_paid === undefined || charge_to_be_paid === null) {
-            return res.status(400).json({ message: 'Missing required fields: userId, hospitalId, vaccineId, dose_number, charge_to_be_paid.' });
+        // userId is now derived for patients, so it's not checked in req.body for missing fields.
+        if (!hospitalId || !vaccineId || dose_number === undefined || dose_number === null || charge_to_be_paid === undefined || charge_to_be_paid === null) {
+            return res.status(400).json({ message: 'Missing required fields: hospitalId, vaccineId, dose_number, charge_to_be_paid.' });
         }
         if (typeof dose_number !== 'number' || dose_number < 1) {
             return res.status(400).json({ message: 'Dose number must be a positive integer.' });
@@ -46,48 +52,53 @@ vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async 
             return res.status(400).json({ message: 'Invalid ID format for user, hospital, or vaccine.' });
         }
 
-        // --- Authorization Check (Hospital Staff specific) ---
+        // --- Authorization Check (Hospital Staff specific - removed for patient) ---
+        // This check is removed as patients can select any hospital.
+        // If an admin or hospital staff creates an order, their existing specific checks would apply
+        // (e.g., hospital staff can only create for their hospital, if that rule is desired).
+        // For this update, we assume patients can choose any hospital.
         if (req.user.role === 'hospital_staff' && req.user.hospitalId.toString() !== hospitalId) {
             return res.status(403).json({ message: 'Access denied. Hospital staff can only create orders for their own hospital.' });
         }
 
+
         // --- Existence Checks for Referenced Documents ---
         const [userExists, hospitalExists, vaccineExists] = await Promise.all([
-            UserModel.findById(userId),
+            UserModel.findById(userId), // Check if the patient (userId) exists
             HospitalModel.findById(hospitalId),
             VaccineModel.findById(vaccineId)
         ]);
 
         if (!userExists) return res.status(404).json({ message: 'Patient (User) not found.' });
-        if (userExists.role !== 'patient') return res.status(400).json({ message: 'Selected user is not a patient.' }); // Ensure the selected user is a patient
+        // Ensure the selected user (who is creating the order for themselves) is indeed a patient
+        if (userExists.role !== 'patient') {
+            return res.status(400).json({ message: 'The authenticated user is not registered as a patient.' });
+        }
         if (!hospitalExists) return res.status(404).json({ message: 'Hospital not found.' });
         if (!vaccineExists) return res.status(404).json({ message: 'Vaccine not found.' });
 
         // --- Prevent Duplicate Pending/Active Orders ---
-        // Check if an order for the same user, hospital, vaccine, and dose number already exists
-        // with an 'active' vaccination status (not vaccinated/not_vaccinated)
-        // AND an 'active' payment status (not cancelled/refunded).
         const existingPendingOrActiveOrder = await VaccinationOrderModel.findOne({
-            userId,
-            hospitalId, // Added hospitalId to the uniqueness check
-            vaccineId,
-            dose_number,
-            vaccinationStatus: { $nin: ['vaccinated', 'not_vaccinated', 'cancelled'] }, // Not yet completed/failed/cancelled vaccination
-            paymentStatus: { $nin: ['cancelled', 'refunded'] } // Not yet cancelled or refunded payment
-        });
-
-        if (existingPendingOrActiveOrder) {
-            return res.status(409).json({ message: `A pending or active vaccination order for dose ${dose_number} of this vaccine already exists for this patient at this hospital.` });
-        }
-
-        // --- Create Vaccination Order ---
-        const newOrder = new VaccinationOrderModel({
             userId,
             hospitalId,
             vaccineId,
             dose_number,
+            vaccinationStatus: { $nin: ['vaccinated', 'not_vaccinated', 'cancelled'] },
+            paymentStatus: { $nin: ['cancelled', 'refunded'] }
+        });
+
+        if (existingPendingOrActiveOrder) {
+            return res.status(409).json({ message: `A pending or active vaccination order for dose ${dose_number} of this vaccine already exists for you at this hospital.` });
+        }
+
+        // --- Create Vaccination Order ---
+        const newOrder = new VaccinationOrderModel({
+            userId, // Use the derived userId (authenticated patient's ID)
+            hospitalId,
+            vaccineId,
+            dose_number,
             charge_to_be_paid,
-            createdBy
+            createdBy // The ID of the patient who created the order
         });
 
         const savedOrder = await newOrder.save();
@@ -103,9 +114,6 @@ vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async 
 
     } catch (error) {
         console.error('Error creating vaccination order:', error);
-        // The duplicate key error (code 11000) from a unique index might still fire
-        // if you have a unique compound index that only checks userId, vaccineId, dose_number.
-        // The more specific check above handles the status conditions.
         if (error.code === 11000) {
             return res.status(409).json({ message: 'A similar pending vaccination order already exists for this patient, vaccine, and dose (possibly due to a database unique constraint).' });
         }

@@ -30,8 +30,6 @@ const PatientDashboardPage = () => {
                     title="Create A Vaccination Order"
                     description="Request a new vaccination for yourself or a dependent."
                     onClick={() => handleNavigation('/patient/orders/create')}
-                    // You'll need to create a component for this page
-                    // Example: <CreatePatientVaccinationOrderPage />
                 />
 
                 <DashboardCard

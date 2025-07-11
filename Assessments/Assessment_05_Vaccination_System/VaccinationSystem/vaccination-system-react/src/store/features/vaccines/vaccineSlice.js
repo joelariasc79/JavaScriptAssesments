@@ -1,5 +1,5 @@
 // src/store/features/vaccine/vaccineSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'; // Make sure createSelector is imported here
 import apiService from '../../../api/apiService';
 
 // Async Thunk for registering a new vaccine
@@ -16,13 +16,13 @@ export const registerVaccine = createAsyncThunk(
     }
 );
 
-// NEW: Async Thunk for fetching all vaccines
+// Async Thunk for fetching all vaccines
 export const fetchAllVaccines = createAsyncThunk(
     'vaccine/fetchAllVaccines',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await apiService.getAllVaccines(); // Assuming apiService.getAllVaccines exists and works
-            return response.data; // This should be an array of vaccine objects
+            const response = await apiService.getAllVaccines();
+            return response.data;
         } catch (error) {
             const message = error.response?.data?.message || error.message;
             return rejectWithValue(message);
@@ -33,11 +33,11 @@ export const fetchAllVaccines = createAsyncThunk(
 const vaccineSlice = createSlice({
     name: 'vaccine',
     initialState: {
-        vaccines: [], // To store a list of vaccines if fetched later
-        registrationStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+        vaccines: [],
+        registrationStatus: 'idle',
         registrationError: null,
-        fetchStatus: 'idle', // NEW: Status for fetching all vaccines
-        fetchError: null,    // NEW: Error for fetching all vaccines
+        fetchStatus: 'idle',
+        fetchError: null,
         updateStatus: 'idle',
         updateError: null,
     },
@@ -50,7 +50,6 @@ const vaccineSlice = createSlice({
             state.updateStatus = 'idle';
             state.updateError = null;
         },
-        // Optionally, clear fetch status as well
         clearFetchStatus(state) {
             state.fetchStatus = 'idle';
             state.fetchError = null;
@@ -65,30 +64,62 @@ const vaccineSlice = createSlice({
             })
             .addCase(registerVaccine.fulfilled, (state, action) => {
                 state.registrationStatus = 'succeeded';
-                // If you want new vaccines to appear in the list immediately
-                // state.vaccines.push(action.payload.vaccine);
             })
             .addCase(registerVaccine.rejected, (state, action) => {
                 state.registrationStatus = 'failed';
                 state.registrationError = action.payload;
             })
-            // NEW: Handle fetching all vaccines
+            // Handle fetching all vaccines
             .addCase(fetchAllVaccines.pending, (state) => {
                 state.fetchStatus = 'loading';
                 state.fetchError = null;
             })
             .addCase(fetchAllVaccines.fulfilled, (state, action) => {
                 state.fetchStatus = 'succeeded';
-                state.vaccines = action.payload; // Set the fetched array of vaccines
+                state.vaccines = action.payload;
                 state.fetchError = null;
             })
             .addCase(fetchAllVaccines.rejected, (state, action) => {
                 state.fetchStatus = 'failed';
                 state.fetchError = action.payload;
-                state.vaccines = []; // Clear vaccines on error, or keep previous state if preferred
+                state.vaccines = [];
             });
     },
 });
 
-export const { clearRegistrationStatus, clearUpdateStatus, clearFetchStatus } = vaccineSlice.actions; // Export new action
+// Export synchronous actions directly from the slice
+export const { clearRegistrationStatus, clearUpdateStatus, clearFetchStatus } = vaccineSlice.actions;
+
+// --- IMPORTANT: Move all selector exports here, before the default export ---
+const selectVaccineState = (state) => state.vaccines; // Assuming 'vaccine' is the correct key in your root reducer
+
+export const selectRegistrationStatus = createSelector(
+    selectVaccineState,
+    (vaccineState) => vaccineState.registrationStatus
+);
+
+export const selectRegistrationError = createSelector(
+    selectVaccineState,
+    (vaccineState) => vaccineState.registrationError
+);
+
+export const selectAllVaccines = createSelector(
+    selectVaccineState,
+    (vaccineState) => vaccineState.vaccines
+);
+
+// Selectors for fetching all vaccines status and error
+export const selectFetchVaccinesStatus = createSelector(
+    selectVaccineState,
+    (vaccineState) => vaccineState.fetchStatus
+);
+
+export const selectFetchVaccinesError = createSelector(
+    selectVaccineState,
+    (vaccineState) => vaccineState.fetchError
+);
+// --- End of selector exports ---
+
+// The default export should typically be the last line for clarity
 export default vaccineSlice.reducer;
+
