@@ -72,6 +72,7 @@ const HospitalDashboard = () => {
                     description="Initiate a new vaccination order for a patient."
                     onClick={() => handleNavigation('/hospital/orders/create-for-patient')} // New distinct path
                 /> */}
+
                 {/*<DashboardCard*/}
                 {/*    title="Create Vaccination Order" // Updated title*/}
                 {/*    description="Initiate a new vaccination order for a patient: approve patient vaccination" // Updated description*/}

@@ -238,20 +238,77 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/reject', authenticateT
 });
 
 
+// /**
+//  * @route PATCH /api/vaccination-orders/:id/mark-as-paid
+//  * @description Mark a vaccination order as 'paid'.
+//  * @access Protected (Admin, Hospital Staff) - NOT for direct patient use via frontend "Pay Now" button (unless modified for patient role).
+//  * This endpoint is for hospital staff/admin to record a payment.
+//  */
+// vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-as-paid', authenticateToken, async (req, res) => {
+//     try {
+//         // Authorization check: Only admin or hospital staff can mark orders as paid
+//         // If a patient is to initiate payment, this authorization needs to be adjusted
+//         // or a separate payment gateway flow needs to be implemented.
+//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can mark vaccination orders as paid.' });
+//         }
+//
+//         const orderId = req.params.id;
+//
+//         // Validate order ID format
+//         if (!mongoose.Types.ObjectId.isValid(orderId)) {
+//             return res.status(400).json({ message: 'Invalid order ID format.' });
+//         }
+//
+//         const order = await VaccinationOrderModel.findById(orderId);
+//
+//         // Check if the order exists
+//         if (!order) {
+//             return res.status(404).json({ message: 'Vaccination order not found.' });
+//         }
+//
+//         // Hospital staff specific authorization: Can only mark as paid for their own hospital
+//         if (req.user.role === 'hospital_staff' && order.hospitalId && req.user.hospitalId.toString() !== order.hospitalId.toString()) {
+//             return res.status(403).json({ message: 'Access denied. Hospital staff can only mark orders as paid for their assigned hospital.' });
+//         }
+//
+//         // Check current status: Only orders that are 'pending_payment' can be marked as paid
+//         if (order.paymentStatus === 'paid') {
+//             return res.status(400).json({ message: 'Order is already marked as paid.' });
+//         }
+//         if (order.paymentStatus === 'refunded' || order.paymentStatus === 'cancelled') {
+//             return res.status(400).json({ message: `Order cannot be marked as paid. Current payment status is '${order.paymentStatus}'.` });
+//         }
+//
+//         // Update the payment status
+//         order.paymentStatus = 'paid';
+//
+//         const updatedOrder = await order.save();
+//
+//         // Populate essential fields for response
+//         const populatedOrder = await VaccinationOrderModel.findById(updatedOrder._id)
+//             .populate('userId', 'username name email')
+//             .populate('hospitalId', 'name')
+//             .populate('vaccineId', 'name type');
+//
+//         res.status(200).json({ message: 'Vaccination order marked as paid successfully!', order: populatedOrder });
+//
+//     } catch (error) {
+//         console.error('Error marking vaccination order as paid:', error);
+//         res.status(500).json({ message: 'Internal server error marking vaccination order as paid.', error: error.message });
+//     }
+// });
+
+
 /**
  * @route PATCH /api/vaccination-orders/:id/mark-as-paid
- * @description Marks a vaccination order's paymentStatus as 'paid'.
- * @param {string} id - The ID of the vaccination order to mark as paid.
- * @access Protected (Admin, Hospital Staff)
+ * @description Mark a vaccination order as 'paid'.
+ * @access Protected (Patient - for their own order, Admin, Hospital Staff - for their hospital's orders)
  */
 vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-as-paid', authenticateToken, async (req, res) => {
     try {
-        // Authorization check: Only admin or hospital staff can mark orders as paid
-        if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
-            return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can mark vaccination orders as paid.' });
-        }
-
         const orderId = req.params.id;
+        const loggedInUser = req.user; // User from authenticated token
 
         // Validate order ID format
         if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -265,9 +322,20 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-as-paid', authent
             return res.status(404).json({ message: 'Vaccination order not found.' });
         }
 
-        // Hospital staff specific authorization: Can only mark as paid for their own hospital
-        if (req.user.role === 'hospital_staff' && order.hospitalId && req.user.hospitalId.toString() !== order.hospitalId.toString()) {
-            return res.status(403).json({ message: 'Access denied. Hospital staff can only mark orders as paid for their assigned hospital.' });
+        // --- Authorization Check ---
+        const isPatientOwner = order.userId.toString() === loggedInUser.userId;
+        const isAdmin = loggedInUser.role === 'admin';
+        const isHospitalStaff = loggedInUser.role === 'hospital_staff';
+
+        if (isPatientOwner && loggedInUser.role === 'patient') {
+            // Patient can mark their own order as paid
+            // No additional hospital check needed here, as they own the order.
+        } else if (isAdmin) {
+            // Admin can mark any order as paid
+        } else if (isHospitalStaff && order.hospitalId && loggedInUser.hospitalId.toString() === order.hospitalId.toString()) {
+            // Hospital staff can mark orders as paid for their assigned hospital
+        } else {
+            return res.status(403).json({ message: 'Access denied. You are not authorized to mark this vaccination order as paid.' });
         }
 
         // Check current status: Only orders that are 'pending_payment' can be marked as paid
@@ -277,6 +345,11 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-as-paid', authent
         if (order.paymentStatus === 'refunded' || order.paymentStatus === 'cancelled') {
             return res.status(400).json({ message: `Order cannot be marked as paid. Current payment status is '${order.paymentStatus}'.` });
         }
+        // Also check vaccinationStatus to ensure it's not already completed/vaccinated/cancelled
+        if (order.vaccinationStatus === 'vaccinated' || order.vaccinationStatus === 'cancelled' || order.appointmentStatus === 'completed') {
+            return res.status(400).json({ message: `Order cannot be marked as paid. Vaccination or appointment status is '${order.vaccinationStatus}' or '${order.appointmentStatus}'.` });
+        }
+
 
         // Update the payment status
         order.paymentStatus = 'paid';
@@ -775,6 +848,125 @@ vaccinationOrderRouter.get('/api/vaccination-orders/hospital/:hospitalId/pending
     } catch (error) {
         console.error('Error fetching pending approval vaccination orders:', error);
         res.status(500).json({ message: 'Internal server error fetching pending approval vaccination orders.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/vaccination-orders/patient
+ * @description Get all vaccination orders with 'pending_approval', 'pending_vaccination', 'vaccinated' status
+ * for the current authenticated patient.
+ * @access Protected (Patient)
+ */
+vaccinationOrderRouter.get('/api/vaccination-orders/patient', authenticateToken, async (req, res) => {
+    try {
+        const patientId = req.user.userId; // Get the patient's ID from the authenticated token
+
+        // Authorization check: Only patients can access their own approved orders
+        if (req.user.role !== 'patient') {
+            return res.status(403).json({ message: 'Access denied. This endpoint is for patients only.' });
+        }
+
+        // Find orders for the authenticated patient that are in 'pending_vaccination' status
+        const approvedOrders = await VaccinationOrderModel.find({
+            userId: patientId,
+            vaccinationStatus:    ['pending_approval', 'pending_vaccination', 'vaccinated'],
+        })
+            .populate('hospitalId', 'name address phone email') // Populate hospital details
+            .populate('vaccineId', 'name type manufacturer description') // Populate vaccine details
+            .sort({ createdAt: -1 }); // Sort by newest first
+
+        res.status(200).json({ message: 'Vaccination orders fetched successfully!', orders: approvedOrders });
+
+    } catch (error) {
+        console.error('Error fetching vaccination orders for patient:', error);
+        res.status(500).json({ message: 'Internal server error fetching vaccination orders.', error: error.message });
+    }
+});
+
+
+// /**
+//  * @route GET /api/vaccination-orders/patient/approved-for-vaccination
+//  * @description Get all vaccination orders with 'pending_vaccination' status for the current authenticated patient.
+//  * These are orders that have been approved by hospital staff.
+//  * @access Protected (Patient)
+//  */
+// // vaccinationOrderRouter.get('/api/vaccination-orders/patient/approved-for-vaccination', authenticateToken, async (req, res) => {
+//     try {
+//         const patientId = req.user.userId; // Get the patient's ID from the authenticated token
+//
+//         // Authorization check: Only patients can access their own approved orders
+//         if (req.user.role !== 'patient') {
+//             return res.status(403).json({ message: 'Access denied. This endpoint is for patients only.' });
+//         }
+//
+//         // Find orders for the authenticated patient that are in 'pending_vaccination' status
+//         const approvedOrders = await VaccinationOrderModel.find({
+//             userId: patientId,
+//             vaccinationStatus: 'pending_vaccination'
+//             // ,
+//             // paymentStatus: 'pending_payment',
+//             // appointmentStatus: 'pending_scheduling'
+//
+//         })
+//             .populate('hospitalId', 'name address phone email') // Populate hospital details
+//             .populate('vaccineId', 'name type manufacturer description') // Populate vaccine details
+//             .sort({ createdAt: -1 }); // Sort by newest first
+//
+//         res.status(200).json({ message: 'Approved vaccination orders fetched successfully!', orders: approvedOrders });
+//
+//     } catch (error) {
+//         console.error('Error fetching approved vaccination orders for patient:', error);
+//         res.status(500).json({ message: 'Internal server error fetching approved vaccination orders.', error: error.message });
+//     }
+// });
+
+/**
+ * @route GET /api/vaccination-records/hospital/:hospitalId/vaccinated-persons
+ * @description Get all vaccination records (and associated patient info) for a specific hospital.
+ * @param {string} hospitalId - The ID of the hospital.
+ * @access Protected (Admin, Hospital Staff - for their own hospital)
+ */
+vaccinationOrderRouter.get('/api/vaccination-records/hospital/:hospitalId/vaccinated-persons', authenticateToken, async (req, res) => {
+    try {
+        const { hospitalId } = req.params;
+        const loggedInUser = req.user;
+
+        // Validate hospitalId format
+        if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+            return res.status(400).json({ message: 'Invalid hospital ID format.' });
+        }
+
+        // Authorization check
+        if (loggedInUser.role !== 'admin' && loggedInUser.role !== 'hospital_staff') {
+            return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view vaccinated persons information.' });
+        }
+
+        // Hospital staff can only view records for their assigned hospital
+        if (loggedInUser.role === 'hospital_staff' && loggedInUser.hospitalId.toString() !== hospitalId) {
+            return res.status(403).json({ message: 'Access denied. Hospital staff can only view vaccinated persons for their assigned hospital.' });
+        }
+
+        // Find vaccination records for the specified hospitalId
+        const vaccinatedPersons = await VaccinationRecordModel.find({
+            hospitalId: hospitalId
+        })
+            .populate('userId', 'username name email age gender contact_number address') // Populate patient details
+            .populate('vaccineId', 'name type manufacturer') // Populate vaccine details
+            .populate('hospitalId', 'name') // Populate hospital name
+            .sort({ vaccination_date: -1 }); // Sort by newest vaccination date first
+
+        // Filter out records where userId might be null (if patient was deleted, though schema says required)
+        const filteredVaccinatedPersons = vaccinatedPersons.filter(record => record.userId !== null);
+
+
+        res.status(200).json({
+            message: 'Vaccinated persons information fetched successfully!',
+            records: filteredVaccinatedPersons
+        });
+
+    } catch (error) {
+        console.error('Error fetching vaccinated persons information:', error);
+        res.status(500).json({ message: 'Internal server error fetching vaccinated persons information.', error: error.message });
     }
 });
 

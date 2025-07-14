@@ -16,7 +16,7 @@ const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard
 const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
 const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPage')); // You need to create this file
-
+const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage')); // NEW: Import for vaccinated list page
 
 // The other pages below are still commented out as they don't exist yet:
 // const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage'));
@@ -38,6 +38,7 @@ const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/H
 // import RegisterPatientPage from '../pages/Patient/RegisterPatientPage';
 const PatientDashboardPage = lazy(() => import('../pages/Patient/PatientDashboard/PatientDashboardPage'));
 const CreatePatientVaccinationOrderPage = lazy(() => import('../pages/Patient/CreateVaccinationOrder/CreatePatientVaccinationOrderPage')); // NEW: Patient-specific order creation page
+const PatientVaccinationOrdersPage = lazy(() => import('../pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage')); // NEW: Page to view approved vaccination orders
 
 // import PaymentPage from '../pages/Patient/PaymentPage';
 // import ScheduleAppointmentPage from '../pages/Patient/ScheduleAppointmentPage';
@@ -136,14 +137,14 @@ const AppRoutes = () => {
                 {/*    }*/}
                 {/*/>*/}
 
-                {/*<Route*/}
-                {/* path="/hospital/vaccinated-list"*/}
-                {/* element={*/}
-                {/* <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>*/}
-                {/* <HospitalVaccinatedListPage />*/}
-                {/* </PrivateRoute>*/}
-                {/* }*/}
-                {/*/>*/}
+                <Route
+                 path="/hospital/vaccinated-list"
+                 element={
+                 <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                 <HospitalVaccinatedListPage />
+                 </PrivateRoute>
+                 }
+                />
 
                 {/* Admin-only routes (still commented out, but would typically use /admin/* paths) */}
                 {/*
@@ -172,6 +173,15 @@ const AppRoutes = () => {
                     element={
                         <PrivateRoute allowedRoles={['patient']}>
                             <CreatePatientVaccinationOrderPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/patient/orders" // Route for patient to view approved orders
+                    element={
+                        <PrivateRoute allowedRoles={['patient']}>
+                            <PatientVaccinationOrdersPage />
                         </PrivateRoute>
                     }
                 />

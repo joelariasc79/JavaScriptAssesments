@@ -35,25 +35,9 @@ const PatientDashboardPage = () => {
                 <DashboardCard
                     title="Review Vaccination Orders"
                     description="View the status of your pending and completed vaccination requests."
-                    onClick={() => handleNavigation('/patient/orders/review')}
+                    onClick={() => handleNavigation('/patient/orders')}
                     // You'll need to create a component for this page
                     // Example: <ReviewPatientOrdersPage />
-                />
-
-                <DashboardCard
-                    title="Schedule an Appointment"
-                    description="Book an appointment for your approved vaccination orders."
-                    onClick={() => handleNavigation('/patient/appointments/schedule')}
-                    // You'll need to create a component for this page
-                    // Example: <ScheduleAppointmentPage />
-                />
-
-                <DashboardCard
-                    title="View Approved Appointments"
-                    description="See details of your scheduled and approved vaccination appointments."
-                    onClick={() => handleNavigation('/patient/appointments/view')}
-                    // You'll need to create a component for this page
-                    // Example: <ViewApprovedAppointmentsPage />
                 />
 
                 {/* Add more DashboardCard components as needed for patient features */}

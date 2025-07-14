@@ -7,9 +7,9 @@ const apiService = {
     // Auth Endpoints
     // Corrected parameter name to usernameOrEmail to match backend
     login: (usernameOrEmail, password) => axiosInstance.post('/api/auth/login', { usernameOrEmail, password }),
-    register: (userData) => axiosInstance.post('/api/auth/register', userData), // Example: register method
+    register: (userData) => axiosInstance.post('/api/auth/register', userData),
     getProfile: (userId) => axiosInstance.get(`/api/users/${userId}`),
-    getAllUsers: () => axiosInstance.get('/api/users'), // <-- NEW: Fetch all users (for patient selection)
+    getAllUsers: () => axiosInstance.get('/api/users'),
 
     // Example: Admin/Hospital Endpoints (uncomment and implement as needed)
     getAllHospitals: () => axiosInstance.get('/api/hospitals'),
@@ -21,38 +21,25 @@ const apiService = {
     createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
     getPendingApprovalVaccinationOrders: (hospitalId) =>
         axiosInstance.get(`/api/vaccination-orders/hospital/${hospitalId}/pending-approval`),
+    // //////////////////////////////////////////////////////////////////////////////////////////
+    // This is used by approveVaccineOrderPage, update name from patch to approveVaccineStock
     patch: (url, data) => axiosInstance.patch(url, data),
-
-    // // NEW: Fetch all vaccination orders (for admin/hospital use, potentially for patients too)
-    // getAllVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders'),
-    // // NEW: Update a specific vaccination order (e.g., for scheduling)
-    // updateVaccinationOrder: (orderId, updateData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}`, updateData),
-    // // getHospitalVaccinatedPersons: (hospitalId) =>
-    // //     axiosInstance.get(`/api/hospitals/${hospitalId}/vaccinated-persons`),
-
-
     // //////////////////////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////
+    getVaccinatedPersonsByHospital: (hospitalId) => axiosInstance.get(`/api/vaccination-records/hospital/${hospitalId}/vaccinated-persons`),
+
+
     // Patient Endpoints (Updated and New)
     getPatientDashboard: (patientId) => axiosInstance.get(`/api/patients/${patientId}/dashboard`),
-    // NEW: Get all vaccination orders for a specific patient
-    getPatientVaccinationOrders: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}`),
-    // NEW: Endpoint to schedule an appointment for an existing order (might be a PATCH on order)
-    // Assuming backend will have a route like /api/vaccination-orders/:orderId/schedule
-    schedulePatientAppointment: (orderId, appointmentData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/schedule`, appointmentData),
-    // NEW: Get approved/scheduled appointments for a patient
+    getPatientVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders/patient'),
+    schedulePatientAppointment: (orderId, appointmentData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/schedule-appointment`, appointmentData),
     getPatientApprovedAppointments: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}/scheduled`),
-
-    // Example: Patient Endpoints (uncomment and implement as needed)
-    // registerPatient: (patientData) => axiosInstance.post('/api/patients/register', patientData),
-    // scheduleAppointment: (appointmentDetails) => axiosInstance.post('/api/appointments/schedule', appointmentDetails),
-    // makePayment: (paymentDetails) => axiosInstance.post('/api/payments/process', paymentDetails),
+    markOrderAsVaccinated: (orderId, vaccinationDate) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-vaccinated`, { vaccination_date: vaccinationDate }),
+    markOrderAsPaid: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-as-paid`),
+    cancelOrderByPatient: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/cancel-by-patient`),
 
 
-
-
-
-
+    // //////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////
     // Example: Reporting Endpoints (uncomment and implement as needed)
     // getReportByAgeGender: (filters) => axiosInstance.get('/api/reports/age-gender', { params: filters }),
     // getDosesAdministeredReport: () => axiosInstance.get('/api/reports/doses-administered'),
