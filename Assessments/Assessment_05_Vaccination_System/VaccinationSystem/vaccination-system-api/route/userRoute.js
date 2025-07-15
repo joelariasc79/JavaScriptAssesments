@@ -32,15 +32,33 @@ function authenticateToken(req, res, next) {
 userRouter.post('/api/auth/register', async (req, res) => {
     try {
         // This route is for general user registration (defaulting to 'patient' role)
-        const { username, email, password, address, name, age, profession, contact_number, gender, pre_existing_disease, medical_certificate_url } = req.body;
+        const {
+            username,
+            email,
+            password,
+            address, // This will be an object
+            name,
+            age,
+            profession,
+            contact_number,
+            gender,
+            pre_existing_disease, // This will now be an array
+            medical_certificate_url,
+            medical_practitioner
+        } = req.body;
 
         // Basic validation for patient registration
-        if (!username || !email || !password || !address || !name || !contact_number) {
-            return res.status(400).json({ message: 'Missing required registration fields.' });
+        // Ensure all top-level required fields for a patient are present.
+        // As per the client-side form and common sense for a patient record,
+        // we'll treat address object itself as required, and then its key sub-fields.
+        if (!username || !email || !password || !name || !contact_number || !medical_practitioner) {
+            return res.status(400).json({ message: 'Missing required registration fields (username, email, password, name, contact number, medical practitioner).' });
         }
 
-        if (address && (!address.street || !address.city || !address.state || !address.zipCode)) {
-            return res.status(400).json({ message: 'Address fields (street, city, state, zipCode) are required for hospital staff registration if address is provided.' });
+        // Validate address sub-fields specifically for patient registration
+        // Assuming address is always expected for patient registration via this route
+        if (!address || !address.street || !address.city || !address.state || !address.zipCode) {
+            return res.status(400).json({ message: 'Address fields (street, city, state, zipCode) are required for patient registration.' });
         }
 
         // Check if user already exists by username or email
@@ -55,15 +73,16 @@ userRouter.post('/api/auth/register', async (req, res) => {
             username,
             email,
             password,
-            address,
+            address, // Mongoose will handle this as an embedded document
             name,
             age,
             profession,
             contact_number,
             gender,
-            pre_existing_disease,
+            pre_existing_disease, // Mongoose will handle this as an array
             medical_certificate_url,
-            role: 'patient' // Default role for this specific registration endpoint
+            role: 'patient', // Default role for this specific registration endpoint
+            medical_practitioner
         });
         const savedUser = await newUser.save();
 

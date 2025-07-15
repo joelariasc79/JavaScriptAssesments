@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
         country: { type: String, default: 'USA', trim: true }
     },
     gender: { type: String, enum: ['Male', 'Female', 'Other', 'Prefer not to say'] },
-    pre_existing_disease: { type: String }, // Can be Text or Array of Strings if structured
+    pre_existing_disease: { type: Array }, // Can be Text or Array of Strings if structured
     medical_certificate_url: { type: String }, // URL to a stored certificate
     role: { type: String, enum: ['patient', 'admin', 'hospital_staff'], default: 'patient' },
     // --- ADD THIS NEW FIELD TO LINK TO HOSPITAL ---
@@ -32,6 +32,11 @@ const UserSchema = new mongoose.Schema({
         ref: 'Hospital', // This tells Mongoose which model the ID refers to
         // required: false // It's optional because not all users (like patients or global admins) need a hospital link
         required: function() { return this.role === 'hospital_staff'; } // Required only if role is hospital_staff
+    },
+    medical_practitioner: {
+        type: String, // Or Schema.Types.ObjectId if linking to another User (medical practitioner)
+        trim: true,
+        required: function() { return this.role === 'patient'; } // Required only if role is patient
     }
 }, { timestamps: true }); // Mongoose automatically adds createdAt and updatedAt fields
 

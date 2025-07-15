@@ -51,8 +51,9 @@ const RegisterPage = () => {
             zipCode: '',
         },
         gender: '', // This will be "" if not selected
-        pre_existing_disease: '',
+        pre_existing_disease: '', // CHANGED: Now handled as a comma-separated string in the input
         medical_certificate_url: '',
+        medical_practitioner: '',
     });
 
     // Error state for form fields
@@ -143,6 +144,11 @@ const RegisterPage = () => {
             newErrors['address.zipCode'] = 'Zip Code is required.';
             isValid = false;
         }
+        // Medical practitioner is required for patient
+        if (isEmpty(formData.medical_practitioner)) {
+            newErrors.medical_practitioner = 'Medical Practitioner is required.';
+            isValid = false;
+        }
 
         // Age validation (if provided)
         if (formData.age !== '' && (!isPositiveNumber(Number(formData.age)) || Number(formData.age) < 0)) {
@@ -158,14 +164,28 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            // Process pre_existing_disease from comma-separated string to an array
+            const processedDiseases = formData.pre_existing_disease
+                .split(',') // Split by comma
+                .map(disease => disease.trim()) // Trim whitespace from each item
+                .filter(disease => disease !== '' && disease.toLowerCase() !== 'none'); // Remove empty strings and explicit 'none'
+
+            // If no actual diseases are listed, but the user typed something like "None" or nothing,
+            // ensure it's an empty array or ['None'] if that's preferred for "no diseases".
+            // Backend script logic inserted ['None'] if nothing was selected.
+            // For now, if the user leaves it blank or types "None", we'll send an empty array.
+            const finalPreExistingDiseases = processedDiseases.length > 0 ? processedDiseases : ['None'];
+
+
             // Prepare data for dispatch, converting age to number
             const dataToRegister = {
                 ...formData,
                 age: formData.age === '' ? undefined : Number(formData.age), // Send as number or undefined if empty
                 confirmPassword: undefined, // Don't send to backend
-                // IMPORTANT CHANGE HERE: Send gender as undefined if it's an empty string
-                gender: formData.gender === '' ? undefined : formData.gender,
+                gender: formData.gender === '' ? undefined : formData.gender, // Send gender as undefined if empty string
+                pre_existing_disease: finalPreExistingDiseases, // NEW: Send as an array
             };
+
             dispatch(registerPatient(dataToRegister));
         }
     };
@@ -353,15 +373,21 @@ const RegisterPage = () => {
                         </select>
                     </div>
 
-                    <Input
-                        label="Pre-existing Disease (Optional)"
-                        id="pre_existing_disease"
-                        name="pre_existing_disease"
-                        type="text"
-                        value={formData.pre_existing_disease}
-                        onChange={handleChange}
-                        placeholder="Any pre-existing medical conditions?"
-                    />
+                    {/* UPDATED: Changed to a textarea for multiple pre-existing diseases */}
+                    <div className="input-group">
+                        <label htmlFor="pre_existing_disease" className="input-label">Pre-existing Diseases (Optional)</label>
+                        <textarea
+                            id="pre_existing_disease"
+                            name="pre_existing_disease"
+                            value={formData.pre_existing_disease}
+                            onChange={handleChange}
+                            placeholder="Enter multiple diseases, separated by commas (e.g., Diabetes, Hypertension, Asthma)"
+                            className="input-field textarea-field" // Add a class for textarea specific styling if needed
+                            rows="3" // Adjust height as needed
+                        ></textarea>
+                        {errors.pre_existing_disease && <p className="error-message">{errors.pre_existing_disease}</p>}
+                    </div>
+
                     <Input
                         label="Medical Certificate URL (Optional)"
                         id="medical_certificate_url"
@@ -370,6 +396,17 @@ const RegisterPage = () => {
                         value={formData.medical_certificate_url}
                         onChange={handleChange}
                         placeholder="URL to your medical certificate"
+                    />
+                    <Input
+                        label="Medical Practitioner"
+                        id="medical_practitioner"
+                        name="medical_practitioner"
+                        type="text"
+                        value={formData.medical_practitioner}
+                        onChange={handleChange}
+                        placeholder="Enter your medical practitioner's name"
+                        required
+                        error={errors.medical_practitioner}
                     />
 
                     <Button
