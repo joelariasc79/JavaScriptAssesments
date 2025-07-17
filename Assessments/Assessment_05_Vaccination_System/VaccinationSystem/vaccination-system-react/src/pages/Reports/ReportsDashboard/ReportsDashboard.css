@@ -1,0 +1,43 @@
+/* src/pages/Reports/ReportsDashboard/ReportsDashboard.css */
+
+.reports-header {
+    display: flex; /* Enables flexbox layout */
+    justify-content: space-between; /* This pushes items to the far ends of the container */
+    align-items: center; /* This vertically centers items within the flex container */
+    margin-bottom: var(--spacing-lg); /* Adds space below the header section */
+}
+
+.reports-header h2 {
+    /* Ensure no conflicting margins push it around */
+    margin: 0;
+}
+
+.reports-dashboard-container {
+    padding: var(--spacing-xl);
+    background-color: var(--color-background-light);
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
+.reports-dashboard-container h2 {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-h2);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Enhancements for DashboardCard specific to reports, if needed */
+.reports-grid .dashboard-card {
+    /* You can override or add specific styles here if needed */
+    /* For example, to adjust padding or shadow for report cards */
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-medium);
+}

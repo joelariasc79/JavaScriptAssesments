@@ -3,6 +3,9 @@ const userRouter = express.Router({ strict: true, caseSensitive: true });
 const bcrypt = require('bcryptjs'); // Import bcryptjs for password hashing and comparison
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const UserModel = require('../dataModel/userDataModel'); // Import the Mongoose User model
+const HospitalModel = require('../dataModel/hospitalDataModel'); // Make sure this is imported
+const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel'); // Make sure this is imported
+
 const mongoose = require('mongoose'); // Import mongoose to use its Types.ObjectId.isValid and other utilities
 
 // --- IMPORTANT: JWT Secret Key ---
@@ -549,6 +552,358 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Error deleting user', error: error.message });
     }
 });
+
+const authorizeReportAccess = (req, res, next) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+        return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view reports.' });
+    }
+    next();
+};
+
+/**
+ * @route GET /api/reports/user-demographics
+ * @description Generates reports on user demographics (Age, Gender, Pre-Existing Disease, Medical Practitioner).
+ * @queryParam {string} groupBy - Required. Can be 'age_group', 'gender', 'pre_existing_disease', 'medical_practitioner'.
+ * @access Protected (Admin, Hospital Staff)
+ *
+ * Example Response Structure:
+ * [
+ * { _id: 'Male', count: 15 },
+ * { _id: 'Female', count: 20 }
+ * ]
+ *
+ * For age_group:
+ * [
+ * { _id: '0-18', count: 5 },
+ * { _id: '19-30', count: 12 }
+ * ]
+ */
+userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeReportAccess, async (req, res) => {
+    try {
+        const { groupBy } = req.query;
+
+        // Validate groupBy parameter against allowed values
+        const allowedGroupBy = ['age_group', 'gender', 'pre_existing_disease', 'medical_practitioner'];
+        if (!groupBy || !allowedGroupBy.includes(groupBy)) {
+            return res.status(400).json({
+                message: `Invalid groupBy parameter. Choose from ${allowedGroupBy.join(', ')}.`
+            });
+        }
+
+        let aggregationPipeline = [];
+
+        // 1. Match only distinct vaccinated users
+        //    We want demographics of *people who have been vaccinated*.
+        //    A user might have multiple vaccination records (for different doses),
+        //    so we need to get distinct users who have at least one record.
+        aggregationPipeline.push(
+            {
+                $group: {
+                    _id: "$userId" // Group by userId to get distinct vaccinated users
+                }
+            },
+            {
+                $lookup: {
+                    from: UserModel.collection.name, // The collection name of the User model
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            {
+                $unwind: "$userDetails" // Deconstruct the userDetails array
+            },
+            {
+                $replaceRoot: { newRoot: "$userDetails" } // Promote userDetails to the root of the document
+            }
+        );
+
+        // Optional: If you want to filter by hospital for 'hospital_staff'
+        // This report is about *user demographics*, so filtering by user's hospital might not be
+        // directly meaningful if a patient can be vaccinated at multiple hospitals.
+        // If the intent is "demographics of patients *vaccinated at THIS hospital*",
+        // the initial `$match` should be on `VaccinationRecord.hospitalId`.
+        // For simplicity for now, this report provides demographics of all *vaccinated* patients.
+        // If `req.user.role === 'hospital_staff'` and you want to restrict to *their* hospital:
+        // You would add a $match on hospitalId within the initial lookup/group for VaccinationRecord
+        /*
+        if (req.user.role === 'hospital_staff' && req.user.hospitalId) {
+            // Option A: If `VaccinationRecord` itself should be filtered by hospital.
+            // This needs to be added *before* the $group by userId.
+            aggregationPipeline.unshift({ $match: { hospitalId: new mongoose.Types.ObjectId(req.user.hospitalId) } });
+        }
+        */
+
+        // Now, apply the demographic grouping based on the user details
+        switch (groupBy) {
+            case 'age_group':
+                aggregationPipeline.push(
+                    {
+                        $bucket: {
+                            groupBy: "$age",
+                            boundaries: [0, 18, 30, 50, 65, Infinity],
+                            default: "Unknown/Not Provided",
+                            output: {
+                                "count": { "$sum": 1 }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: {
+                                $switch: {
+                                    branches: [
+                                        { case: { $eq: ["$_id", 0] }, then: "0-18" },
+                                        { case: { $eq: ["$_id", 18] }, then: "19-30" },
+                                        { case: { $eq: ["$_id", 30] }, then: "31-50" },
+                                        { case: { $eq: ["$_id", 50] }, then: "51-65" },
+                                        { case: { $eq: ["$_id", 65] }, then: "66+" },
+                                    ],
+                                    default: "$_id"
+                                }
+                            },
+                            count: 1
+                        }
+                    }
+                );
+                break;
+            case 'gender':
+                aggregationPipeline.push({
+                    $group: {
+                        _id: { $ifNull: ["$gender", "Unknown/Not Provided"] },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            case 'pre_existing_disease':
+                // Note: Assuming 'pre_existing_disease' on UserModel is an array.
+                // If it's a single string, remove $unwind.
+                aggregationPipeline.push(
+                    {
+                        $unwind: "$pre_existing_disease"
+                    },
+                    {
+                        $group: {
+                            _id: { $ifNull: ["$pre_existing_disease", "None/Not Provided"] },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    // Optional: Filter out 'None' if it's explicitly stored as a string and not desired in the report
+                    { $match: { _id: { $ne: 'None' } } }
+                );
+                break;
+            case 'medical_practitioner':
+                // Assuming 'medical_practitioner' on UserModel is a direct string or ObjectId ref
+                aggregationPipeline.push({
+                    $group: {
+                        _id: { $ifNull: ["$medical_practitioner", "Unknown/Not Provided"] },
+                        count: { $sum: 1 }
+                    }
+                });
+                // If medical_practitioner is an ObjectId and you want their names, you'd need another $lookup here.
+                // For simplicity, we're grouping by the ID or string stored.
+                /* Example if medical_practitioner is an ObjectId ref to User:
+                aggregationPipeline.push(
+                    {
+                        $lookup: {
+                            from: UserModel.collection.name, // Assuming medical_practitioners are also Users
+                            localField: "medical_practitioner",
+                            foreignField: "_id",
+                            as: "practitionerDetails"
+                        }
+                    },
+                    { $unwind: { path: "$practitionerDetails", preserveNullAndEmptyArrays: true } }, // preserve for "Unknown"
+                    {
+                        $group: {
+                            _id: {
+                                $ifNull: ["$practitionerDetails.name", "Unknown/Not Provided"]
+                            },
+                            count: { $sum: 1 }
+                        }
+                    }
+                );
+                */
+                break;
+            // No default case needed here because `groupBy` is already validated
+        }
+
+        // Sort by count descending (optional but good for charts)
+        aggregationPipeline.push({ $sort: { count: -1 } });
+
+        // Execute the aggregation pipeline on VaccinationRecordModel model
+        const reportData = await VaccinationRecordModel.aggregate(aggregationPipeline);
+        res.status(200).json(reportData);
+
+    } catch (error) {
+        console.error('Error fetching user demographic report:', error);
+        res.status(500).json({ message: 'Internal server error fetching report.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/reports/doses-daily
+ * @description Reports the number of vaccine doses administered each day.
+ * @queryParam {string} [startDate] - Optional start date (YYYY-MM-DD).
+ * @queryParam {string} [endDate] - Optional end date (YYYY-MM-DD).
+ * @queryParam {string} [hospitalId] - Optional. Filter by a specific hospital (for admin)
+ * or implicitly filtered by staff's hospital.
+ * @access Protected (Admin, Hospital Staff)
+ *
+ * Example Response Structure:
+ * [
+ * { _id: '2025-07-01', count: 10 },
+ * { _id: '2025-07-02', count: 15 }
+ * ]
+ */
+userRouter.get('/api/reports/doses-daily', authenticateToken, authorizeReportAccess, async (req, res) => {
+    try {
+        const { startDate, endDate, hospitalId, groupBy } = req.query; // <-- Add groupBy here
+        let matchConditions = {};
+
+        console.log(`[DEBUG] Received query: groupBy=${groupBy}, startDate=${startDate}, endDate=${endDate}, hospitalId=${hospitalId}`);
+        console.log(`[DEBUG] User role: ${req.user.role}, User hospitalId: ${req.user.hospitalId}`);
+
+        // Date range filtering (remains the same)
+        if (startDate || endDate) {
+            matchConditions.vaccination_date = {};
+            if (startDate) {
+                const start = new Date(startDate);
+                if (isNaN(start.getTime())) {
+                    return res.status(400).json({ message: 'Invalid start date format.' });
+                }
+                start.setUTCHours(0, 0, 0, 0);
+                matchConditions.vaccination_date.$gte = start;
+            }
+            if (endDate) {
+                const end = new Date(endDate);
+                if (isNaN(end.getTime())) {
+                    return res.status(400).json({ message: 'Invalid end date format.' });
+                }
+                end.setUTCHours(23, 59, 59, 999);
+                matchConditions.vaccination_date.$lte = end;
+            }
+        }
+
+        // Hospital filtering (remains the same)
+        if (req.user.role === 'hospital_staff') {
+            if (!req.user.hospitalId) {
+                return res.status(403).json({ message: 'Hospital staff user is not associated with a hospital.' });
+            }
+            matchConditions.hospitalId = new mongoose.Types.ObjectId(req.user.hospitalId);
+        } else if (req.user.role === 'admin' && hospitalId) {
+            if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+                return res.status(400).json({ message: 'Invalid hospital ID format provided for filtering.' });
+            }
+            matchConditions.hospitalId = new mongoose.Types.ObjectId(hospitalId);
+        }
+
+        console.log(`[DEBUG] Final matchConditions:`, JSON.stringify(matchConditions, null, 2));
+
+        let aggregationPipeline = [
+            { $match: matchConditions }
+        ];
+
+        // --- NEW LOGIC: Conditional Grouping based on 'groupBy' parameter ---
+        if (groupBy === 'hospital') {
+            aggregationPipeline.push(
+                {
+                    $lookup: {
+                        from: 'hospitals', // Your hospitals collection name
+                        localField: 'hospitalId',
+                        foreignField: '_id',
+                        as: 'hospitalDetails'
+                    }
+                },
+                {
+                    $unwind: { path: '$hospitalDetails', preserveNullAndEmptyArrays: true }
+                },
+                {
+                    $group: {
+                        _id: { $ifNull: ["$hospitalDetails.name", "Unknown Hospital"] },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { _id: 1 } } // Sort by hospital name
+            );
+        } else { // Default or if groupBy is 'daily' or invalid
+            aggregationPipeline.push(
+                {
+                    $group: {
+                        _id: { $dateToString: { format: "%Y-%m-%d", date: "$vaccination_date" } },
+                        count: { $sum: 1 }
+                    }
+                },
+                { $sort: { _id: 1 } } // Sort by date
+            );
+        }
+
+        const reportData = await VaccinationRecordModel.aggregate(aggregationPipeline);
+
+        console.log(`[DEBUG] Aggregation result count: ${reportData.length}`);
+        res.status(200).json(reportData);
+
+    } catch (error) {
+        console.error('Error fetching doses report:', error);
+        res.status(500).json({ message: 'Internal server error fetching report.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/reports/population-coverage
+ * @description Reports the percentage of the patient population covered by at least one vaccine dose.
+ * @queryParam {string} [hospitalId] - Optional. Filter by a specific hospital (for admin)
+ * or implicitly filtered by staff's hospital.
+ * @access Protected (Admin, Hospital Staff)
+ *
+ * Example Response Structure:
+ * {
+ * totalPatients: 100,
+ * vaccinatedPatients: 75,
+ * coveragePercentage: 75
+ * }
+ */
+userRouter.get('/api/reports/population-coverage', authenticateToken, authorizeReportAccess, async (req, res) => {
+    try {
+        const { hospitalId } = req.query;
+        let totalPatients = 0; // Represents all registered patients in the system.
+        let vaccinatedPatientsCount = 0;
+
+        let vaccineRecordMatchConditions = {};
+
+        // If hospital staff, limit vaccinated count to records from their hospital
+        if (req.user.role === 'hospital_staff') {
+            vaccineRecordMatchConditions.hospitalId = req.user.hospitalId;
+        } else if (req.user.role === 'admin' && hospitalId) {
+            // Admin can request coverage for a specific hospital
+            if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+                return res.status(400).json({ message: 'Invalid hospital ID format for filtering.' });
+            }
+            vaccineRecordMatchConditions.hospitalId = new mongoose.Types.ObjectId(hospitalId);
+        }
+
+        // Calculate total registered patients (overall system population)
+        totalPatients = await UserModel.countDocuments({ role: 'patient' });
+
+        // Calculate distinct users who have received at least one vaccine dose
+        const distinctVaccinatedUserIds = await VaccinationRecordModel.distinct('userId', vaccineRecordMatchConditions);
+        vaccinatedPatientsCount = distinctVaccinatedUserIds.length;
+
+        const coveragePercentage = totalPatients > 0
+            ? (vaccinatedPatientsCount / totalPatients) * 100
+            : 0;
+
+        res.status(200).json({
+            totalPatients,
+            vaccinatedPatients: vaccinatedPatientsCount,
+            coveragePercentage: parseFloat(coveragePercentage.toFixed(2)) // Round to 2 decimal places
+        });
+
+    } catch (error) {
+        console.error('Error fetching population coverage report:', error);
+        res.status(500).json({ message: 'Internal server error fetching report.', error: error.message });
+    }
+});
+
 
 
 // Export both the router and the middleware for use in your main application file

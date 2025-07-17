@@ -7,7 +7,8 @@ import vaccineStockReducer from './features/vaccineStock/vaccineStockSlice';
 import patientsReducer from './features/patients/patientSlice';
 import vaccinationOrderReducer from './features/vaccinationOrder/vaccinationOrderSlice';
 import usersReducer from './features/users/usersSlice';
-import pendingOrdersReducer from './features/pendingOrders/pendingOrdersSlice'; // NEW: Import the new reducer
+import pendingOrdersReducer from './features/pendingOrders/pendingOrdersSlice';
+import reportsReducer from './features/reports/reportsSlice';
 
 
 // import bookingsReducer from './features/bookings/bookingsSlice';
@@ -23,11 +24,8 @@ export const store = configureStore({
         patients: patientsReducer,
         vaccinationOrder: vaccinationOrderReducer,
         users: usersReducer,
-        pendingOrders: pendingOrdersReducer
-        // ,
-        // bookings: bookingsReducer,
-        // payments: paymentsReducer,
-        // reports: reportsReducer,
+        pendingOrders: pendingOrdersReducer,
+        reports: reportsReducer
     },
     // Middleware can be added here. Redux Toolkit includes redux-thunk by default.
     // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(myCustomMiddleware),

@@ -52,18 +52,6 @@
     color: var(--color-white);
 }
 
-/* NEW: Success Variant (Green) */
-.button--success {
-    background-color: var(--color-success, #4CAF50); /* Default green if --color-success not defined */
-    color: var(--color-white);
-    border: 1px solid var(--color-success, #4CAF50); /* Added border for consistency, can remove if you prefer no border */
-}
-.button--success:hover:not(.button--disabled) {
-    background-color: var(--color-success-dark, #45a049); /* Slightly darker green on hover */
-    border-color: var(--color-success-dark, #45a049); /* Keep border consistent on hover */
-}
-
-
 /* Sizes */
 .button--small {
     padding: var(--spacing-xs) var(--spacing-sm);

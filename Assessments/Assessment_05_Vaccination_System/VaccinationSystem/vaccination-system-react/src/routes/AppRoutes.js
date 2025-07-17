@@ -13,41 +13,34 @@ import RegisterPage from '../pages/Auth/RegisterPage';
 // //////////////////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////////////////
 const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard/HospitalDashboard'));
+const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/HospitalListPage'));
 const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
 const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPage')); // You need to create this file
-const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage')); // NEW: Import for vaccinated list page
-
-// The other pages below are still commented out as they don't exist yet:
-// const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage'));
-
+const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage'));
 // Change for ApproveVaccinationOrderPage
 // const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
 
 
+// //////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////////////
+// Reports Pages (ALL COMMENTED OUT)
+const ReportsDashboard = lazy(() => import('../pages/Reports/ReportsDashboard/ReportsDashboard.js'));
+const AgeGenderReportPage = lazy(() => import('../pages/Reports/AgeGenderReportPage/AgeGenderReportPage'));
+const DosesAdministeredReportPage = lazy(() => import('../pages/Reports/DosesAdministeredReportPage/DosesAdministeredReportPage'));
+const PopulationCoverageReportPage = lazy(() => import('../pages/Reports/PopulationCoverageReportPage/PopulationCoverageReportPage'));
 
-// //////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////
-// Admin-specific components (ALL COMMENTED OUT)
-// const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
-const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/HospitalListPage'));
+
 
 // //////////////////////////////////////////////////////////////////////////////////////////
 // //////////////////////////////////////////////////////////////////////////////////////////
 // Patient Pages (ALL COMMENTED OUT)
-// import RegisterPatientPage from '../pages/Patient/RegisterPatientPage';
 const PatientDashboardPage = lazy(() => import('../pages/Patient/PatientDashboard/PatientDashboardPage'));
-const CreatePatientVaccinationOrderPage = lazy(() => import('../pages/Patient/CreateVaccinationOrder/CreatePatientVaccinationOrderPage')); // NEW: Patient-specific order creation page
-const PatientVaccinationOrdersPage = lazy(() => import('../pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage')); // NEW: Page to view approved vaccination orders
+const CreatePatientVaccinationOrderPage = lazy(() => import('../pages/Patient/CreateVaccinationOrder/CreatePatientVaccinationOrderPage'));
+const PatientVaccinationOrdersPage = lazy(() => import('../pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage'));
 
-// import PaymentPage from '../pages/Patient/PaymentPage';
-// import ScheduleAppointmentPage from '../pages/Patient/ScheduleAppointmentPage';
 
-// Report Pages (ALL COMMENTED OUT)
-// import ReportsDashboard from '../pages/Reports/ReportsDashboard';
-// import AgeGenderReportPage from '../pages/Reports/AgeGenderReportPage';
-// import DosesAdministeredReportPage from '../pages/Reports/DosesAdministeredReportPage';
-// import PopulationCoverageReportPage from '../pages/Reports/PopulationCoverageReportPage';
+
 
 // Watchlist Page (ALL COMMENTED OUT)
 // import WatchlistDisplayPage from '../pages/Watchlist/WatchlistDisplayPage';
@@ -187,7 +180,38 @@ const AppRoutes = () => {
                 />
 
                 {/* Reporting Routes (Protected, accessible to specific roles) - ALL COMMENTED OUT */}
-                {/* ... */}
+                <Route
+                    path="/reports" // General reports dashboard
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <ReportsDashboard />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/reports/age-gender" // Specific report page, if you break them out
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <AgeGenderReportPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/reports/doses-administered" // Specific report page
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <DosesAdministeredReportPage />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/reports/population-coverage" // Specific report page
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <PopulationCoverageReportPage />
+                        </PrivateRoute>
+                    }
+                />
 
                 {/* Watchlist (Public or accessible to all authenticated users) - ALL COMMENTED OUT */}
                 {/* ... */}

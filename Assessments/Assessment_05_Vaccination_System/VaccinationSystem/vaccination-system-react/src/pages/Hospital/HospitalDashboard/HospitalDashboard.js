@@ -73,19 +73,17 @@ const HospitalDashboard = () => {
                     onClick={() => handleNavigation('/hospital/orders/create-for-patient')} // New distinct path
                 /> */}
 
-                {/*<DashboardCard*/}
-                {/*    title="Create Vaccination Order" // Updated title*/}
-                {/*    description="Initiate a new vaccination order for a patient: approve patient vaccination" // Updated description*/}
-                {/*    onClick={() => handleNavigation('/hospital/orders/create')}*/}
-                {/*/>*/}
-
                 <DashboardCard
                     title="View Vaccinated List"
                     description="See a list of vaccinated individuals at your hospital."
                     onClick={() => handleNavigation('/hospital/vaccinated-list')}
                 />
 
-                {/* Add more DashboardCard components as needed */}
+                <DashboardCard
+                    title="View Reports"
+                    description="Access various reports on patient demographics and vaccination data."
+                    onClick={() => handleNavigation('/reports')} // Navigate to the main reports dashboard
+                />
             </div>
         </div>
     );

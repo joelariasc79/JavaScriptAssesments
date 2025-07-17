@@ -1,0 +1,24 @@
+/* src/components/charts/PieChart/PieChart.css */
+
+.pie-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-sm);
+}
+
+.pie-chart-container svg {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.arc path {
+    stroke: var(--color-white); /* Separator between slices */
+    stroke-width: 1px;
+}
+
+.arc text {
+    pointer-events: none; /* Prevent text from blocking mouse events on slices */
+    font-weight: bold;
+}

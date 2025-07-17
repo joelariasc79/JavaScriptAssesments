@@ -39,11 +39,30 @@ const apiService = {
 
 
     // //////////////////////////////////////////////////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////////////////////
-    // Example: Reporting Endpoints (uncomment and implement as needed)
-    // getReportByAgeGender: (filters) => axiosInstance.get('/api/reports/age-gender', { params: filters }),
-    // getDosesAdministeredReport: () => axiosInstance.get('/api/reports/doses-administered'),
-    // getPopulationCoverageReport: () => axiosInstance.get('/api/reports/population-coverage'),
+    // Reporting endpoints:
+
+    /**
+     * Fetches user demographic reports grouped by a specified criterion.
+     * @param {string} groupBy - The field to group by (e.g., 'age_group', 'gender', 'pre_existing_disease', 'medical_practitioner').
+     * @returns {Promise} Axios promise resolving to report data.
+     */
+    getUserDemographicsReport: (groupBy) => axiosInstance.get('/api/reports/user-demographics', { params: { groupBy } }),
+
+    // You can uncomment and add the other two reporting endpoints here as well:
+    /**
+     * Fetches the number of doses administered daily.
+     * @param {object} [filters] - Optional object with startDate, endDate, hospitalId.
+     * @returns {Promise} Axios promise resolving to daily doses data.
+     */
+    getDosesDailyReport: (filters) => axiosInstance.get('/api/reports/doses-daily', { params: filters }),
+
+    /**
+     * Fetches population coverage report.
+     * @param {object} [filters] - Optional object with hospitalId.
+     * @returns {Promise} Axios promise resolving to coverage data.
+     */
+    getPopulationCoverageReport: (filters) => axiosInstance.get('/api/reports/population-coverage', { params: filters }),
+
 
     // Example: Watchlist/Public Data Endpoints (uncomment and implement as needed)
     // getVaccinationSummary: () => axiosInstance.get('/api/public/vaccination-summary'),
