@@ -34,7 +34,6 @@ const AdminDashboard = () => {
                     <p>Adjust vaccine quantities for hospitals.</p>
                 </div>
 
-                {/* ApproveVaccinesPage and HospitalVaccinatedListPage might be 'HOSPITAL' role, but the prompt says 'Admin/HospitalDashboard.js (this is only available for admin users) it will let me to open ... ApproveVaccinesPage.js HospitalVaccinatedListPage.js'. I'll make them accessible from here, assuming admin can also perform/access these. */}
                 <div className="dashboard-card" onClick={() => handleNavigation('/admin/patients/approve')}>
                     <h3>Approve Vaccinations</h3>
                     <p>Review and approve patient vaccination requests.</p>

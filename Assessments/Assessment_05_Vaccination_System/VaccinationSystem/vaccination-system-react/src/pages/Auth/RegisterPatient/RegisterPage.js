@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Input from '../../components/common/Input/Input';
-import Button from '../../components/common/Button/Button';
-import Modal from '../../components/common/Modal/Modal';
+import Input from '../../../components/common/Input/Input';
+import Button from '../../../components/common/Button/Button';
+import Modal from '../../../components/common/Modal/Modal';
 import {
     registerPatient,
     clearRegistrationStatus,
-} from '../../store/features/patients/patientSlice';
+} from '../../../store/features/patients/patientSlice';
 import {
     selectRegistrationStatus,
     selectRegistrationError,
     selectRegisteredPatient,
 }
-    from '../../store/features/patients/patientSelectors';
+    from '../../../store/features/patients/patientSelectors';
 import {
     isEmpty,
     isValidEmail,
     isValidPassword,
     doStringsMatch,
     isPositiveNumber,
-} from '../../utils/validators';
+} from '../../../utils/validators';
 
 // Import the new CSS file
 import './RegisterPage.css';

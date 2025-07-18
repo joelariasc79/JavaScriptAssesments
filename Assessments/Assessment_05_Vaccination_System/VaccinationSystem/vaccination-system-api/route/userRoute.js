@@ -905,6 +905,88 @@ userRouter.get('/api/reports/population-coverage', authenticateToken, authorizeR
 });
 
 
+userRouter.get('/api/reports/watchlist-summary', authenticateToken, authorizeReportAccess, async (req, res) => {
+    try {
+        const ageDistribution = await UserModel.aggregate([
+            { $match: { role: 'patient', age: { $exists: true, $ne: null } } },
+            {
+                $bucket: {
+                    groupBy: "$age",
+                    // Corrected boundaries to align with desired output age groups
+                    boundaries: [0, 18, 45, 65, Infinity],
+            default: "Other",
+            output: {
+            count: { $sum: 1 }
+        }
+    }
+        },
+        {
+            $project: {
+                _id: 0,
+                    age_group: {
+                    $switch: {
+                        branches: [
+                            { case: { $eq: ["$_id", 0] }, then: "0-17" },
+                            { case: { $eq: ["$_id", 18] }, then: "18-44" },
+                            { case: { $eq: ["$_id", 45] }, then: "45-64" },
+                            { case: { $eq: ["$_id", 65] }, then: "65+" }
+                        ],
+                            default: "Unknown Age Group"
+                    }
+                },
+                count: "$count"
+            }
+        },
+        { $sort: { age_group: 1 } }
+    ]);
+        const totalPatientsWithAge = ageDistribution.reduce((sum, item) => sum + item.count, 0);
+        const agePercentages = ageDistribution.map(item => ({
+            age_group: item.age_group,
+            percentage: totalPatientsWithAge > 0 ? parseFloat(((item.count / totalPatientsWithAge) * 100).toFixed(2)) : 0
+        }));
+
+            // --- 2. Calculate Gender Distribution Percentage ---
+        const genderDistribution = await UserModel.aggregate([
+            { $match: { role: 'patient', gender: { $exists: true, $ne: null } } },
+            {
+                $group: {
+                    _id: "$gender",
+            count: { $sum: 1 }
+    }
+    },
+        { $sort: { _id: 1 } }
+    ]);
+        const totalPatientsWithGender = genderDistribution.reduce((sum, item) => sum + item.count, 0);
+        const genderPercentages = genderDistribution.map(item => ({
+            gender: item._id,
+            percentage: totalPatientsWithGender > 0 ? parseFloat(((item.count / totalPatientsWithGender) * 100).toFixed(2)) : 0
+        }));
+
+            // --- 3. Calculate Total Population Coverage Percentage
+            // This reuses the logic from your existing population-coverage report
+        let totalPatients = await UserModel.countDocuments({ role: 'patient' });
+        const distinctVaccinatedUserIds = await VaccinationRecordModel.distinct('userId', {});
+            let vaccinatedPatientsCount = distinctVaccinatedUserIds.length;
+        const overallCoveragePercentage = totalPatients > 0
+            ? parseFloat(((vaccinatedPatientsCount / totalPatients) * 100).toFixed(2))
+            : 0;
+
+            // --- Combine all data into a single response
+        res.status(200).json({
+            ageDistribution: agePercentages,
+            genderDistribution: genderPercentages,
+            overallPopulationCoverage: {
+                percentage: overallCoveragePercentage,
+                totalPatients: totalPatients,
+                vaccinatedPatients: vaccinatedPatientsCount
+                    },
+            timestamp: new Date().toISOString() // Useful for frontend to know when data was last updated
+    });
+    } catch (error) {
+        console.error('Error fetching watchlist summary:', error);
+        res.status(500).json({ message: 'Internal server error fetching watchlist summary.', error: error.message });
+    }
+});
 
 // Export both the router and the middleware for use in your main application file
 module.exports = { userRouter, authenticateToken };

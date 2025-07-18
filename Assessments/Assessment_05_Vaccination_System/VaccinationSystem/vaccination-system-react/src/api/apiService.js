@@ -5,13 +5,18 @@ import axiosInstance from './axiosInstance';
 // Centralized API service for all backend interactions
 const apiService = {
     // Auth Endpoints
-    // Corrected parameter name to usernameOrEmail to match backend
+    /**
+     * Fetches the watchlist summary report, including age and gender distribution, and overall population coverage.
+     * @returns {Promise} Axios promise resolving to the summary data.
+     */
+
+    // Auth
     login: (usernameOrEmail, password) => axiosInstance.post('/api/auth/login', { usernameOrEmail, password }),
     register: (userData) => axiosInstance.post('/api/auth/register', userData),
     getProfile: (userId) => axiosInstance.get(`/api/users/${userId}`),
     getAllUsers: () => axiosInstance.get('/api/users'),
 
-    // Example: Admin/Hospital Endpoints (uncomment and implement as needed)
+    // Admin/Hospital Endpoints (uncomment and implement as needed)
     getAllHospitals: () => axiosInstance.get('/api/hospitals'),
     registerVaccine: (vaccineData) => axiosInstance.post('/api/vaccines', vaccineData),
     getAllVaccines: () => axiosInstance.get('/api/vaccines'),
@@ -40,32 +45,13 @@ const apiService = {
 
     // //////////////////////////////////////////////////////////////////////////////////////////
     // Reporting endpoints:
-
-    /**
-     * Fetches user demographic reports grouped by a specified criterion.
-     * @param {string} groupBy - The field to group by (e.g., 'age_group', 'gender', 'pre_existing_disease', 'medical_practitioner').
-     * @returns {Promise} Axios promise resolving to report data.
-     */
     getUserDemographicsReport: (groupBy) => axiosInstance.get('/api/reports/user-demographics', { params: { groupBy } }),
-
-    // You can uncomment and add the other two reporting endpoints here as well:
-    /**
-     * Fetches the number of doses administered daily.
-     * @param {object} [filters] - Optional object with startDate, endDate, hospitalId.
-     * @returns {Promise} Axios promise resolving to daily doses data.
-     */
     getDosesDailyReport: (filters) => axiosInstance.get('/api/reports/doses-daily', { params: filters }),
-
-    /**
-     * Fetches population coverage report.
-     * @param {object} [filters] - Optional object with hospitalId.
-     * @returns {Promise} Axios promise resolving to coverage data.
-     */
     getPopulationCoverageReport: (filters) => axiosInstance.get('/api/reports/population-coverage', { params: filters }),
 
 
-    // Example: Watchlist/Public Data Endpoints (uncomment and implement as needed)
-    // getVaccinationSummary: () => axiosInstance.get('/api/public/vaccination-summary'),
+    // Watchlist/Public Data Endpoints (uncomment and implement as needed)
+    getWatchlistSummary: () => axiosInstance.get('/api/reports/watchlist-summary'),
 
     // Example: QR Code related (if handled by backend)
     // generateQRCodeData: (paymentId) => axiosInstance.get(`/api/payments/${paymentId}/qrcode-data`),

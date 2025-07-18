@@ -6,44 +6,41 @@ import { useSelector } from 'react-redux';
 import { selectIsAuthenticated, selectCurrentUser } from '../store/features/auth/authSelectors'; // Keep selectCurrentUser
 
 // Import your public page components
-import LoginPage from '../pages/Auth/LoginPage';
-import RegisterPage from '../pages/Auth/RegisterPage';
+import LoginPage from '../pages/Auth/Login/LoginPage';
+import RegisterPage from '../pages/Auth/RegisterPatient/RegisterPage';
 
-// Lazy load Hospital related page components (HospitalDashboard UNCOMMENTED as it exists)
+
 // //////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////
+// Lazy load Hospital related page components
 const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard/HospitalDashboard'));
 const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/HospitalListPage'));
 const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
 const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPage')); // You need to create this file
 const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage'));
-// Change for ApproveVaccinationOrderPage
+// Create a CreateVaccinationOrderPage on Behalf of the Patient
 // const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
 
 
+
 // //////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////
-// Reports Pages (ALL COMMENTED OUT)
+// Reports Pages
 const ReportsDashboard = lazy(() => import('../pages/Reports/ReportsDashboard/ReportsDashboard.js'));
 const AgeGenderReportPage = lazy(() => import('../pages/Reports/AgeGenderReportPage/AgeGenderReportPage'));
 const DosesAdministeredReportPage = lazy(() => import('../pages/Reports/DosesAdministeredReportPage/DosesAdministeredReportPage'));
 const PopulationCoverageReportPage = lazy(() => import('../pages/Reports/PopulationCoverageReportPage/PopulationCoverageReportPage'));
 
 
-
 // //////////////////////////////////////////////////////////////////////////////////////////
-// //////////////////////////////////////////////////////////////////////////////////////////
-// Patient Pages (ALL COMMENTED OUT)
+// Patient Pages
 const PatientDashboardPage = lazy(() => import('../pages/Patient/PatientDashboard/PatientDashboardPage'));
 const CreatePatientVaccinationOrderPage = lazy(() => import('../pages/Patient/CreateVaccinationOrder/CreatePatientVaccinationOrderPage'));
 const PatientVaccinationOrdersPage = lazy(() => import('../pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage'));
 
 
-
-
-// Watchlist Page (ALL COMMENTED OUT)
-// import WatchlistDisplayPage from '../pages/Watchlist/WatchlistDisplayPage';
+// //////////////////////////////////////////////////////////////////////////////////////////
+// Watchlist Page
+const WatchlistDisplayPage = lazy(() => import('../pages/Watchlist/WatchlistDisplayPage'));
 
 
 // PrivateRoute component - Updated to check roles
@@ -213,8 +210,15 @@ const AppRoutes = () => {
                     }
                 />
 
-                {/* Watchlist (Public or accessible to all authenticated users) - ALL COMMENTED OUT */}
-                {/* ... */}
+                {/* Watchlist (Public or accessible to all authenticated users)*/}
+                <Route
+                    path="/watchlist"
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff', 'patient']}>
+                            <WatchlistDisplayPage />
+                        </PrivateRoute>
+                    }
+                />
 
 
                 {/*/!* Admin-only routes (if HospitalListPage is for admin) *!/*/}

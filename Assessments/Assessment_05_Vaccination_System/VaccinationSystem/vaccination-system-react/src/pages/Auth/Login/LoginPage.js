@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { loginUser } from '../../store/features/auth/authSlice';
-import { selectAuthStatus, selectAuthError, selectIsAuthenticated, selectCurrentUser } from '../../store/features/auth/authSelectors';
-import Input from '../../components/common/Input/Input'; // Assuming your Input component is here
-import Button from '../../components/common/Button/Button'; // Assuming your Button component is here
+import { loginUser } from '../../../store/features/auth/authSlice';
+import { selectAuthStatus, selectAuthError, selectIsAuthenticated, selectCurrentUser } from '../../../store/features/auth/authSelectors';
+import Input from '../../../components/common/Input/Input'; // Assuming your Input component is here
+import Button from '../../../components/common/Button/Button'; // Assuming your Button component is here
 import './LoginPage.css'; // For specific styles
 
 const LoginPage = () => {

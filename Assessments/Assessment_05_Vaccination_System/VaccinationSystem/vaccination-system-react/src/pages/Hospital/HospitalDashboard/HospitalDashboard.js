@@ -1,10 +1,11 @@
-/* src/pages/Hospital/HospitalDashboard.js */
+/* src/pages/Hospital/HospitalDashboard/HospitalDashboard.js */ // Corrected path in comment
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/features/auth/authSelectors';
 
 import DashboardCard from '../../../components/common/DashboardCard/DashboardCard';
+import WatchlistDisplayPage from '../../Watchlist/WatchlistDisplayPage'; // Import the WatchlistDisplayPage
 import './HospitalDashboard.css';
 
 const HospitalDashboard = () => {
@@ -17,12 +18,19 @@ const HospitalDashboard = () => {
 
     return (
         <div className="hospital-dashboard-container">
+            <div className="dashboard-watchlist-banner">
+                <WatchlistDisplayPage/>
+            </div>
             <h2>Hospital Dashboard</h2>
             {currentUser && (
                 <p>
-                    <strong>Welcome, {currentUser.name}</strong> {/* Changed from currentUser.username to currentUser.name */}
+                    <strong>Welcome, {currentUser.name}</strong>
                 </p>
             )}
+
+            {/*<div className="dashboard-watchlist-banner">*/}
+            {/*    <WatchlistDisplayPage />*/}
+            {/*</div>*/}
 
             <div className="dashboard-grid">
 
@@ -44,34 +52,11 @@ const HospitalDashboard = () => {
                     onClick={() => handleNavigation('/hospital/vaccines/stock')}
                 />
 
-                {/*<DashboardCard*/}
-                {/*    title="Approve Vaccinations"*/}
-                {/*    description="Review and approve patient vaccination requests for your hospital."*/}
-                {/*    onClick={() => handleNavigation('/hospital/orders/create')}*/}
-                {/*/>*/}
-
-                {/* UPDATED DashboardCard for Approve Vaccination Orders */}
                 <DashboardCard
-                    title="Approve Vaccination Orders" // Changed title
-                    description="Review and approve patient vaccination requests for your hospital." // Changed description
-                    onClick={() => handleNavigation('/hospital/orders/pending-approval')} // Changed navigation path
+                    title="Approve Vaccination Orders"
+                    description="Review and approve patient vaccination requests for your hospital."
+                    onClick={() => handleNavigation('/hospital/orders/pending-approval')}
                 />
-
-                {/* Keep Create Vaccination Order if Hospital Staff can still create orders for patients,
-                    but based on previous discussion, the patient now creates their own.
-                    If hospital staff should *also* be able to create orders, you would keep this,
-                    but the previous `CreateVaccinationOrderPage` might be renamed to
-                    `HospitalCreateVaccinationOrderPage` to avoid confusion with `PatientCreateVaccinationOrderPage`.
-                    For now, I'm assuming the 'Create' card is removed from hospital dashboard,
-                    as patients create their own, and staff 'approve'.
-                    If hospital staff still needs a dedicated "Create Order" feature for *any* patient,
-                    you'd need to create a new page for that.
-                */}
-                {/* <DashboardCard
-                    title="Create Vaccination Order (Staff)" // Example if staff still needs to create
-                    description="Initiate a new vaccination order for a patient."
-                    onClick={() => handleNavigation('/hospital/orders/create-for-patient')} // New distinct path
-                /> */}
 
                 <DashboardCard
                     title="View Vaccinated List"
@@ -82,7 +67,7 @@ const HospitalDashboard = () => {
                 <DashboardCard
                     title="View Reports"
                     description="Access various reports on patient demographics and vaccination data."
-                    onClick={() => handleNavigation('/reports')} // Navigate to the main reports dashboard
+                    onClick={() => handleNavigation('/reports')}
                 />
             </div>
         </div>
