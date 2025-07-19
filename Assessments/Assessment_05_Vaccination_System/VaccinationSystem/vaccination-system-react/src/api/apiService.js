@@ -53,8 +53,21 @@ const apiService = {
     // Watchlist/Public Data Endpoints (uncomment and implement as needed)
     getWatchlistSummary: () => axiosInstance.get('/api/reports/watchlist-summary'),
 
-    // Example: QR Code related (if handled by backend)
-    // generateQRCodeData: (paymentId) => axiosInstance.get(`/api/payments/${paymentId}/qrcode-data`),
+    // --- NEW: Notification Endpoints ---
+    /**
+     * Sends a QR code email to the patient for a vaccination order payment.
+     * @param {string} orderId The ID of the vaccination order.
+     * @param {string} patientId The ID of the patient.
+     * @param {string} paymentPageUrl The URL for the simulated payment page (used to generate QR).
+     * @returns {Promise} Axios promise resolving to the notification status.
+     */
+    sendQrCodeEmail: (orderId, patientId, paymentPageUrl) => {
+        return axiosInstance.post('/api/notifications/send-qr-email', {
+            orderId,
+            patientId,
+            paymentPageUrl
+        });
+    }
 };
 
 export default apiService;

@@ -37,6 +37,10 @@ const PatientDashboardPage = lazy(() => import('../pages/Patient/PatientDashboar
 const CreatePatientVaccinationOrderPage = lazy(() => import('../pages/Patient/CreateVaccinationOrder/CreatePatientVaccinationOrderPage'));
 const PatientVaccinationOrdersPage = lazy(() => import('../pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage'));
 
+// //////////////////////////////////////////////////////////////////////////////////////////
+// Payment Simulation Page
+const PaymentPage = lazy(() => import('../pages/Payment/PaymentPage')); // NEW IMPORT
+
 
 // //////////////////////////////////////////////////////////////////////////////////////////
 // Watchlist Page
@@ -69,6 +73,10 @@ const AppRoutes = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/" element={<Navigate to="/login" replace />} /> {/* Redirect root to login */}
+
+                {/* Route for QR Code Payment Simulation - No specific role needed as it's a target URL */}
+                <Route path="/pay-qr-simulate" element={<PaymentPage />} />
+
 
                 {/*Hospital Staff Routes (Protected) - HospitalDashboard UNCOMMENTED */}
                 <Route

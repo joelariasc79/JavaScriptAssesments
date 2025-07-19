@@ -24,6 +24,7 @@ const reportRouter = require("./route/reportRoute");
 const notificationRouter = require("./route/notificationRoute");
 
 
+
 const cors = require("cors");
 
 globalThis.rootPath = __dirname;

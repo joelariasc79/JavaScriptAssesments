@@ -1,3 +1,5 @@
+// src/pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage.js
+
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -17,7 +19,7 @@ import {
     selectFetchPatientOrdersStatus,
     selectFetchPatientOrdersError,
     selectMarkPaidStatus,
-    selectMarkPaidError,
+    selectMarkPaidError, // Corrected from `markPaidError`
     selectScheduleAppointmentStatus,
     selectScheduleAppointmentError,
     selectMarkVaccinatedStatus,
@@ -26,24 +28,24 @@ import {
     selectCancelOrderError,
 } from '../../../store/features/vaccinationOrder/vaccinationOrderSelectors';
 import { selectCurrentUser } from '../../../store/features/auth/authSelectors';
+import apiService from '../../../api/apiService';
 
 import Modal from '../../../components/common/Modal/Modal';
 import Button from '../../../components/common/Button/Button';
 import Input from '../../../components/common/Input/Input';
-import { generateQRCodeImage } from '../../../utils/qrCodeGenerator'; // Import the QR code utility
+import { generateQRCodeImage } from '../../../utils/qrCodeGenerator';
 
 import './PatientVaccinationOrdersPage.css';
 
 const PatientVaccinationOrdersPage = () => {
     const dispatch = useDispatch();
     const currentUser = useSelector(selectCurrentUser);
-
     const orders = useSelector(selectPatientOrders);
     const fetchStatus = useSelector(selectFetchPatientOrdersStatus);
     const fetchError = useSelector(selectFetchPatientOrdersError);
 
     const markPaidStatus = useSelector(selectMarkPaidStatus);
-    const markPaidError = useSelector(selectMarkPaidError);
+    const markPaidError = useSelector(selectMarkPaidError); // Corrected
     const scheduleStatus = useSelector(selectScheduleAppointmentStatus);
     const scheduleError = useSelector(selectScheduleAppointmentError);
     const markVaccinatedStatus = useSelector(selectMarkVaccinatedStatus);
@@ -52,18 +54,26 @@ const PatientVaccinationOrdersPage = () => {
     const cancelError = useSelector(selectCancelOrderError);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalContent, setModalContent] = useState({ title: '', message: '' });
+    const [modalContent, setModalContent] = useState({ title: '', type: '' }); // Added 'type' to distinguish modal content
     const [selectedOrderIdForScheduling, setSelectedOrderIdForScheduling] = useState(null);
-    const [appointmentDate, setAppointmentDate] = useState('');
-    const [selectedOrderForPayment, setSelectedOrderForPayment] = useState(null); // State for payment order
-    const [qrCodeDataUrl, setQrCodeDataUrl] = useState(''); // State to store QR code data URL
+    const [appointmentDate, setAppointmentDate] = useState(''); // Holds YYYY-MM-DD or ""
+    const [selectedOrderForPayment, setSelectedOrderForPayment] = useState(null);
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+    const [isSendingQrEmail, setIsSendingQrEmail] = useState(false);
 
     const patientId = currentUser?._id;
 
-    // Fetch orders on component mount
+    const getTodayYYYYMMDD = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     useEffect(() => {
         if (patientId) {
-            dispatch(fetchPatientVaccinationOrders());
+            dispatch(fetchPatientVaccinationOrders(patientId));
         }
         return () => {
             dispatch(clearFetchPatientOrdersStatus());
@@ -74,140 +84,153 @@ const PatientVaccinationOrdersPage = () => {
         };
     }, [dispatch, patientId]);
 
-    // Handle success/failure of actions
     useEffect(() => {
         if (markPaidStatus === 'succeeded') {
-            setModalContent({ title: 'Payment Confirmed!', message: 'Your payment has been successfully processed.' });
+            setModalContent({ title: 'Payment Confirmed!', type: 'info' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearMarkPaidStatus());
-            dispatch(fetchPatientVaccinationOrders()); // Re-fetch orders
-            setSelectedOrderForPayment(null); // Clear selected payment order
-            setQrCodeDataUrl(''); // Clear QR code URL
+            setSelectedOrderForPayment(null);
+            setQrCodeDataUrl('');
         } else if (markPaidStatus === 'failed') {
-            setModalContent({ title: 'Payment Failed', message: markPaidError || 'Failed to process payment.' });
+            setModalContent({ title: 'Payment Failed', type: 'error' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearMarkPaidStatus());
-            setSelectedOrderForPayment(null); // Clear selected payment order
-            setQrCodeDataUrl(''); // Clear QR code URL
+            setSelectedOrderForPayment(null);
+            setQrCodeDataUrl('');
         }
 
         if (scheduleStatus === 'succeeded') {
-            setModalContent({ title: 'Appointment Scheduled!', message: 'Your vaccination appointment has been successfully scheduled.' });
+            setModalContent({ title: 'Appointment Scheduled!', type: 'info' }); // Use type for message
             setIsModalOpen(true);
-            setAppointmentDate('');
             setSelectedOrderIdForScheduling(null);
             dispatch(clearScheduleAppointmentStatus());
-            dispatch(fetchPatientVaccinationOrders());
+            dispatch(fetchPatientVaccinationOrders(patientId));
         } else if (scheduleStatus === 'failed') {
-            setModalContent({ title: 'Scheduling Failed', message: scheduleError || 'Failed to schedule appointment.' });
+            setModalContent({ title: 'Scheduling Failed', type: 'error' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearScheduleAppointmentStatus());
         }
 
         if (markVaccinatedStatus === 'succeeded') {
-            setModalContent({ title: 'Vaccination Confirmed!', message: 'Your vaccination has been successfully recorded.' });
+            setModalContent({ title: 'Vaccination Confirmed!', type: 'info' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearMarkVaccinatedStatus());
-            dispatch(fetchPatientVaccinationOrders());
+            dispatch(fetchPatientVaccinationOrders(patientId));
         } else if (markVaccinatedStatus === 'failed') {
-            setModalContent({ title: 'Vaccination Confirmation Failed', message: markVaccinatedError || 'Failed to confirm vaccination.' });
+            setModalContent({ title: 'Vaccination Confirmation Failed', type: 'error' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearMarkVaccinatedStatus());
         }
 
         if (cancelStatus === 'succeeded') {
-            setModalContent({ title: 'Order Cancelled!', message: 'Your vaccination order has been successfully cancelled.' });
+            setModalContent({ title: 'Order Cancelled!', type: 'info' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearCancelOrderStatus());
-            dispatch(fetchPatientVaccinationOrders());
+            dispatch(fetchPatientVaccinationOrders(patientId));
         } else if (cancelStatus === 'failed') {
-            setModalContent({ title: 'Order Cancellation Failed', message: cancelError || 'Failed to cancel order.' });
+            setModalContent({ title: 'Order Cancellation Failed', type: 'error' }); // Use type for message
             setIsModalOpen(true);
             dispatch(clearCancelOrderStatus());
         }
     }, [
         markPaidStatus, markPaidError, scheduleStatus, scheduleError,
         markVaccinatedStatus, markVaccinatedError, cancelStatus, cancelError,
-        dispatch // Removed fetchPatientVaccinationOrders as it's not a direct dependency for this useEffect
+        dispatch, patientId
     ]);
 
-    // Modified handlePay to open QR modal with loading state
     const handlePay = async (order) => {
         setSelectedOrderForPayment(order);
-        setIsModalOpen(true); // Open modal first
+        setIsModalOpen(true);
 
-        // Set a loading message initially
         setModalContent({
             title: 'Scan to Pay',
-            message: <div className="loading-qr">Generating QR Code...</div>
+            type: 'qr-payment', // Distinguish QR payment modal
+            // message will be set dynamically below
         });
 
-        const qrContent = JSON.stringify({
-            orderId: order._id,
-            amount: order.charge_to_be_paid,
-            vaccine: order.vaccineId?.name,
-            hospital: order.hospitalId?.name
-        });
+        const paymentPageUrl = `${window.location.origin}/pay-qr-simulate?orderId=${order._id}&amount=${order.charge_to_be_paid}`;
 
         try {
-            const url = await generateQRCodeImage(qrContent, 200);
-            setQrCodeDataUrl(url); // Store URL in state
-            setModalContent({
-                title: 'Scan to Pay',
+            // Display initial loading message while QR is generating and email is sending
+            setModalContent(prev => ({
+                ...prev,
+                message: <div className="loading-qr">Generating QR Code and sending email...</div>
+            }));
+
+            const url = await generateQRCodeImage(paymentPageUrl, 200);
+            setQrCodeDataUrl(url);
+
+            // Update modal content with QR code and initial email status
+            setModalContent((prevContent) => ({
+                ...prevContent,
                 message: (
                     <div className="qr-payment-modal-content">
                         <p>Please scan the QR code below to complete your payment of <strong>${order.charge_to_be_paid.toFixed(2)}</strong> for order #...{order._id.substring(order._id.length - 6)}.</p>
+                        <p className="qr-instruction">
+                            (This QR code leads to a simulated payment page. After scanning, return here.)
+                        </p>
                         <img
-                            src={url} // Use the directly generated URL here
+                            src={url}
                             alt="Payment QR Code"
                             className="payment-qr-code"
                         />
-                        <p className="qr-instruction">
-                            (This is a simulated payment. After scanning, click "Confirm Payment".)
-                        </p>
+                        {isSendingQrEmail ? (
+                            <p className="sending-email-status">Sending QR code to your email...</p>
+                        ) : (
+                            <p className="email-status">Sending QR code to your email...</p>
+                        )}
                     </div>
                 )
-            });
+            }));
+
+            setIsSendingQrEmail(true);
+            console.log("Sending request to backend for QR email using apiService...");
+
+            const result = await apiService.sendQrCodeEmail(order._id, patientId, paymentPageUrl);
+
+            console.log('QR code email dispatch result:', result.data.message);
+
+            // Update modal message to confirm email sent successfully
+            setModalContent((prevContent) => ({
+                ...prevContent,
+                message: (
+                    <div className="qr-payment-modal-content">
+                        <p>Please scan the QR code below to complete your payment of <strong>${order.charge_to_be_paid.toFixed(2)}</strong> for order #...{order._id.substring(order._id.length - 6)}.</p>
+                        <p className="qr-instruction">
+                            (This QR code leads to a simulated payment page. After scanning, return here.)
+                        </p>
+                        <img
+                            src={url}
+                            alt="Payment QR Code"
+                            className="payment-qr-code"
+                        />
+                        <p className="email-status success-email-status">QR code sent to your registered email address!</p>
+                    </div>
+                )
+            }));
+
         } catch (error) {
-            console.error("Failed to generate QR code:", error);
+            console.error("Failed to generate QR code or send email:", error);
+            const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred.';
             setModalContent({
                 title: 'Error',
-                message: 'Failed to generate QR code. Please try again.'
+                type: 'error', // Use type for error
+                message: errorMessage
             });
-            setQrCodeDataUrl(''); // Clear on error
-        }
-    };
-
-    // Function to confirm payment after QR scan (simulated)
-    const handleConfirmPayment = () => {
-        if (selectedOrderForPayment) {
-            if (window.confirm('Are you sure you want to confirm this payment?')) {
-                dispatch(markOrderAsPaid(selectedOrderForPayment._id));
-                // Modal will close automatically based on useEffect for markPaidStatus
-            }
+            setQrCodeDataUrl('');
+        } finally {
+            setIsSendingQrEmail(false);
         }
     };
 
     const handleScheduleAppointmentClick = (orderId) => {
         setSelectedOrderIdForScheduling(orderId);
-        setAppointmentDate('');
+        setAppointmentDate(''); // Ensure it's empty on opening
         setIsModalOpen(true);
         setModalContent({
             title: 'Schedule Your Appointment',
-            message: (
-                <>
-                    <p>Please select a date for your vaccination appointment:</p>
-                    <Input
-                        label="Appointment Date"
-                        id="appointmentDate"
-                        type="date"
-                        value={appointmentDate}
-                        onChange={(e) => setAppointmentDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        required
-                    />
-                </>
-            )
+            type: 'schedule-appointment', // New: Distinguish this modal type
+            // Message will be rendered directly in Modal children for reactivity
         });
     };
 
@@ -216,12 +239,19 @@ const PatientVaccinationOrdersPage = () => {
             alert('Please select an appointment date.');
             return;
         }
-        if (new Date(appointmentDate).getTime() < Date.now()) {
+
+        const selectedDate = new Date(appointmentDate);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate.getTime() < today.getTime()) {
             alert('Appointment date cannot be in the past.');
             return;
         }
         dispatch(scheduleAppointment({ orderId: selectedOrderIdForScheduling, appointmentDate }));
-        // Modal will close automatically based on useEffect for scheduleStatus
+        setAppointmentDate(''); // Clear immediately upon dispatch to reset the input
     };
 
     const handleMarkVaccinated = (orderId) => {
@@ -240,9 +270,51 @@ const PatientVaccinationOrdersPage = () => {
         setIsModalOpen(false);
         setSelectedOrderIdForScheduling(null);
         setAppointmentDate('');
-        setSelectedOrderForPayment(null); // Clear selected payment order
-        setQrCodeDataUrl(''); // Clear QR code URL
+
+        if (selectedOrderForPayment) {
+            dispatch(fetchPatientVaccinationOrders(patientId));
+        }
+        setSelectedOrderForPayment(null);
+
+        setQrCodeDataUrl('');
+        setIsSendingQrEmail(false);
+        setModalContent({ title: '', type: '' }); // Reset modal content type and title
     };
+
+    // Helper function to render dynamic modal content based on type
+    const renderModalBody = () => {
+        switch (modalContent.type) {
+            case 'schedule-appointment':
+                return (
+                    <>
+                        <p>Please select a date for your vaccination appointment:</p>
+                        <Input
+                            label="Appointment Date"
+                            id="appointmentDate"
+                            type="date"
+                            value={appointmentDate}
+                            onChange={(e) => {
+                                console.log("e.target.value: " + e.target.value);
+                                setAppointmentDate(e.target.value);
+                                // Log the state after a short delay to see the updated value
+                                setTimeout(() => {
+                                    console.log("appointmentDate (after setState): " + appointmentDate);
+                                }, 0);
+                            }}
+                            min={getTodayYYYYMMDD()}
+                            required
+                        />
+                    </>
+                );
+            case 'qr-payment':
+                return modalContent.message; // Message is already JSX from handlePay
+            case 'info':
+            case 'error':
+            default:
+                return modalContent.message; // For simple info/error messages
+        }
+    };
+
 
     if (fetchStatus === 'loading') {
         return <div className="loading">Loading your approved orders...</div>;
@@ -270,12 +342,11 @@ const PatientVaccinationOrdersPage = () => {
                         const isPendingScheduling = order.appointmentStatus === 'pending_scheduling';
                         const isVaccinated = order.vaccinationStatus === 'vaccinated';
                         const isCancelled = order.vaccinationStatus === 'cancelled';
-                        const isPendingApproval = order.vaccinationStatus === 'pending_approval'; // New condition for pending approval
+                        const isPendingApproval = order.vaccinationStatus === 'pending_approval';
 
                         const appointmentDateObj = order.appointment_date ? new Date(order.appointment_date) : null;
                         const isAppointmentInFuture = appointmentDateObj && appointmentDateObj.getTime() > Date.now();
                         const isAppointmentInPastOrToday = appointmentDateObj && appointmentDateObj.getTime() <= Date.now();
-
                         return (
                             <div key={order._id} className={`order-card ${isCancelled ? 'card-cancelled' : ''} ${isVaccinated ? 'card-vaccinated' : ''}`}>
                                 <h3>Order #{order._id.substring(order._id.length - 6)}</h3>
@@ -294,7 +365,7 @@ const PatientVaccinationOrdersPage = () => {
                                 <div className="order-actions">
                                     {!isPendingApproval && !isPaid && !isCancelled && !isVaccinated && (
                                         <Button
-                                            onClick={() => handlePay(order)} // Pass the full order object
+                                            onClick={() => handlePay(order)}
                                             disabled={markPaidStatus === 'loading'}
                                             variant="primary"
                                         >
@@ -347,20 +418,18 @@ const PatientVaccinationOrdersPage = () => {
                 onClose={closeModal}
                 title={modalContent.title}
                 footer={
-                    selectedOrderForPayment ? ( // If a payment order is selected, show confirm payment button
-                        <Button onClick={handleConfirmPayment} disabled={markPaidStatus === 'loading'}>
-                            {markPaidStatus === 'loading' ? 'Confirming...' : 'Confirm Payment'}
-                        </Button>
-                    ) : selectedOrderIdForScheduling ? ( // If scheduling an appointment
-                        <Button onClick={handleConfirmSchedule} disabled={scheduleStatus === 'loading'}>
-                            {scheduleStatus === 'loading' ? 'Confirm Schedule' : 'Confirm Schedule'}
-                        </Button>
-                    ) : ( // Default close button
-                        <Button onClick={closeModal}>Close</Button>
-                    )
+                    selectedOrderIdForScheduling ?
+                        (
+                            <Button onClick={handleConfirmSchedule} disabled={scheduleStatus === 'loading'}>
+                                {scheduleStatus === 'loading' ? 'Confirm Schedule' : 'Confirm Schedule'}
+                            </Button>
+                        ) : (
+                            <Button onClick={closeModal}>Close</Button>
+                        )
                 }
             >
-                {modalContent.message}
+                {/* Render content dynamically based on modalContent.type */}
+                {renderModalBody()}
             </Modal>
         </div>
     );

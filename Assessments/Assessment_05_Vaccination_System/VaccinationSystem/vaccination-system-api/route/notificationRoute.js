@@ -1,101 +1,71 @@
-// route/notificationRoute.js
+// route/notificationRoute.js (or add to an existing relevant router)
 const express = require('express');
-const notificationRouter = express.Router({ strict: true, caseSensitive: true });
-const NotificationModel = require('../dataModel/notificationDataModel');
-const UserModel = require('../dataModel/userDataModel'); // To get user details for sending
-const mongoose = require('mongoose');
+const router = express.Router();
+const { createAndSendNotification, generateQrCodeBuffer } = require('../services/notificationService');
+const UserModel = require('../dataModel/userDataModel'); // Assuming you use this to get user email
+// const { authenticateToken } = require('../middleware/authMiddleware'); // Your auth middleware
+const { authenticateToken } = require('./userRoute');
 
-const { authenticateToken } = require('./userRoute'); // Adjust path if needed
-const notificationService = require('../services/notificationService'); // Import the notification service
+// Endpoint to send QR code email for a vaccination order
+router.post('/api/notifications/send-qr-email', authenticateToken, async (req, res) => {
+    const { orderId, patientId, paymentPageUrl } = req.body;
 
-/**
- * @route POST /api/notifications/send
- * @description Manually send a notification (for admin/testing purposes).
- * @body {string} userId, {string} type ('SMS'|'Email'|'In-App'), {string} message, {string} recipient, {string} [related_appointment_id]
- * @access Protected (Admin or Hospital Staff)
- */
-notificationRouter.post('/api/notifications/send', authenticateToken, async (req, res) => {
+    if (!orderId || !patientId || !paymentPageUrl) {
+        return res.status(400).json({ message: 'Missing required fields: orderId, patientId, paymentPageUrl' });
+    }
+
     try {
-        if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
-            return res.status(403).json({ message: 'Access denied. Only authorized personnel can send notifications.' });
+        const patient = await UserModel.findById(patientId, null, null);
+
+        if (!patient || !patient.email) {
+            return res.status(404).json({ message: 'Patient not found or email not available.' });
         }
 
-        const { userId, type, message, recipient, related_appointment_id } = req.body;
+        // Generate QR code buffer on the backend
+        const qrCodeBuffer = await generateQrCodeBuffer(paymentPageUrl, 200);
 
-        if (!userId || !type || !message || !recipient) {
-            return res.status(400).json({ message: 'Missing required fields: userId, type, message, recipient.' });
-        }
-        if (!['SMS', 'Email', 'In-App'].includes(type)) {
-            return res.status(400).json({ message: 'Invalid notification type. Must be SMS, Email, or In-App.' });
-        }
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
-        }
-        if (related_appointment_id && !mongoose.Types.ObjectId.isValid(related_appointment_id)) {
-            return res.status(400).json({ message: 'Invalid related appointment ID format.' });
-        }
+        const emailSubject = `Your Vaccination Payment QR Code for Order #${orderId.substring(orderId.length - 6)}`;
+        // Define the full HTML body with the embedded QR code
+        const emailHtmlBody = `
+            <p>Dear ${patient.fullName || patient.username},</p>
+            <p>Thank you for your recent vaccination order. Please find attached your QR code for payment. You can scan this QR code to proceed with the payment for order #...${orderId.substring(orderId.length - 6)}.</p> 
+            <p>Alternatively, you can visit the payment page directly by clicking here: <a href="${paymentPageUrl}">${paymentPageUrl}</a></p> 
+            <p>Best regards,</p>
+            <p>The Vaccination System Team</p>
+            <img src="cid:qrcode_image" alt="QR Code for Payment" width="200" height="200"/> 
+        `;
 
-        const result = await notificationService.createAndSendNotification({
-            userId,
-            type,
-            message,
-            recipient,
-            related_appointment_id
-        });
+        const attachments = [{
+            filename: `qr_code_order_${orderId.substring(orderId.length - 6)}.png`,
+            content: qrCodeBuffer,
+            contentType: 'image/png',
+            cid: 'qrcode_image' // Used for embedding the image inline in the HTML body
+        }];
 
-        if (result.success) {
-            res.status(200).json({ message: 'Notification initiated successfully.', notificationRecord: result.notification });
+        const notificationResult = await createAndSendNotification({
+            userId: patientId,
+            type: 'Email',
+            // --- CHANGE THIS LINE ---
+            message: emailHtmlBody, // Pass the full HTML body here
+            // --- END CHANGE ---
+            recipient: patient.email,
+        related_appointment_id: orderId,
+        emailAttachments: attachments,
+        // --- ADD THIS LINE TO PASS THE SUBJECT EXPLICITLY ---
+        emailSubject: emailSubject // Pass the subject here
+        // --- END ADDITION ---
+    });
+
+        if (notificationResult.success) {
+            res.status(200).json({ message: 'QR code email sent successfully!', notification: notificationResult.notification });
         } else {
-            res.status(500).json({ message: result.message || 'Failed to initiate notification.' });
+            res.status(500).json({ message: notificationResult.message || 'Failed to send QR code email.' });
         }
 
     } catch (error) {
-        console.error('Error sending notification:', error);
-        res.status(500).json({ message: 'Internal server error initiating notification.', error: error.message });
+        console.error('Error sending QR code email:', error);
+        res.status(500).json({ message: 'Internal server error while sending QR code email.' });
     }
 });
 
-/**
- * @route GET /api/notifications/me
- * @description Get notification history for the authenticated user.
- * @access Protected (Any authenticated user)
- */
-notificationRouter.get('/api/notifications/me', authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.userId;
-
-        const notifications = await NotificationModel.find({ userId: userId })
-            .sort({ sent_at: -1 }) // Latest first
-            .limit(50); // Limit to recent 50 notifications
-
-        res.status(200).json(notifications);
-    } catch (error) {
-        console.error('Error fetching user notifications:', error);
-        res.status(500).json({ message: 'Internal server error fetching notifications.', error: error.message });
-    }
-});
-
-/**
- * @route GET /api/notifications
- * @description Get all notification history (Admin only).
- * @access Protected (Admin only)
- */
-notificationRouter.get('/api/notifications', authenticateToken, async (req, res) => {
-    try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Only administrators can view all notifications.' });
-        }
-
-        const notifications = await NotificationModel.find({})
-            .populate('userId', 'username name email') // Populate user details
-            .sort({ sent_at: -1 })
-            .limit(100); // Limit to recent 100 notifications for admin view
-
-        res.status(200).json(notifications);
-    } catch (error) {
-        console.error('Error fetching all notifications:', error);
-        res.status(500).json({ message: 'Internal server error fetching notifications.', error: error.message });
-    }
-});
-
-module.exports = notificationRouter;
+module.exports = router;
