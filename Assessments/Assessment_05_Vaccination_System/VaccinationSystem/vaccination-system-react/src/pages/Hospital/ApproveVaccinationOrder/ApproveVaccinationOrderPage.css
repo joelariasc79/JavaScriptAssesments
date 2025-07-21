@@ -1,7 +1,9 @@
-/* src/pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPageBkp.css */
+/* src/pages/Hospital/ApproveVaccinationOrder/ApproveVaccinationOrder.css */
+
 /* --- General Container Styles --- */
 .approve-orders-container {
-    max-width: 900px; /* Adjusted max-width for card layout as provided by you */
+    /* Max width adjusted for better table readability. Was 900px, but 1200px is better for tables. */
+    max-width: 1200px;
     margin: 40px auto;
     padding: 25px;
     background-color: #f9f9f9;
@@ -34,6 +36,7 @@
 .success-message { background-color: #e8f5e9; color: #388e3c; border: 1px solid #a5d6a7; }
 .info-message { background-color: #fffde7; color: #fbc02d; border: 1px solid #fff59d; }
 
+
 /* --- Controls Section (Search & Sort) --- */
 .orders-controls {
     display: flex;
@@ -48,7 +51,7 @@
     box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Search Input Container with Icon (retained) --- */
+/* --- Search Input Container with Icon --- */
 .search-input-container {
     position: relative;
     flex-grow: 1;
@@ -58,9 +61,9 @@
 }
 
 .search-input {
-    padding: 12px 15px 12px 40px;
+    padding: 12px 15px 12px 40px; /* Left padding for icon */
     border: 1px solid #a0d9ff;
-    border-radius: 25px;
+    border-radius: 25px; /* Pill shape */
     font-size: 1.05em;
     width: 100%;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -78,6 +81,7 @@
     box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
 }
 
+/* Search Icon using pseudo-element */
 .search-input-container::before {
     content: '\1F50D'; /* Unicode search icon (magnifying glass) */
     font-size: 1.2em;
@@ -88,11 +92,11 @@
     z-index: 1;
 }
 
-/* --- Sort Select (retained) --- */
+/* --- Sort Select --- */
 .sort-select {
     padding: 10px 15px;
     border: 1px solid #a0d9ff;
-    border-radius: 25px;
+    border-radius: 25px; /* Match pill shape */
     font-size: 1em;
     background-color: #fff;
     cursor: pointer;
@@ -111,65 +115,77 @@
     box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
 }
 
-/* --- Card Specific Styles (reverted) --- */
-.orders-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    margin-top: 20px; /* Added margin-top for spacing below controls */
-}
-
-.order-card {
-    background-color: #fff;
+/* --- Table Specific Styles --- */
+.orders-table-wrapper {
+    overflow-x: auto; /* Enable horizontal scrolling for small screens */
+    margin-bottom: 20px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease-in-out;
 }
 
-.order-card:hover {
-    transform: translateY(-5px);
+.orders-table {
+    width: 100%;
+    border-collapse: collapse; /* Collapse borders between cells */
+    min-width: 700px; /* Ensure table doesn't get too narrow */
 }
 
-.order-card h3 {
-    color: #007bff;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.4em;
-    border-bottom: 1px dashed #e0e0e0;
-    padding-bottom: 10px;
+.orders-table th, .orders-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.order-card p {
-    margin: 8px 0;
+.orders-table th {
+    background-color: #f2f2f2;
+    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.orders-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.orders-table td {
+    color: #333;
     font-size: 0.95em;
 }
 
-.order-card p strong {
-    color: #555;
+/* Status styling in table cells */
+.orders-table .status-pending_approval {
+    color: #ff9800; /* Orange for pending */
+    font-weight: bold;
+}
+.orders-table .status-pending_vaccination {
+    color: #2196f3; /* Blue for pending vaccination */
+    font-weight: bold;
+}
+.orders-table .status-vaccinated {
+    color: #4caf50; /* Green for vaccinated */
+    font-weight: bold;
+}
+.orders-table .status-cancelled {
+    color: #f44336; /* Red for cancelled */
+    font-weight: bold;
 }
 
-/* Status styling in cards */
-.order-card .status-pending_approval { color: #ff9800; font-weight: bold; }
-.order-card .status-pending_vaccination { color: #2196f3; font-weight: bold; }
-.order-card .status-vaccinated { color: #4caf50; font-weight: bold; }
-.order-card .status-cancelled { color: #f44336; font-weight: bold; }
-
-.order-actions {
-    margin-top: 20px;
+/* Action buttons in table cells */
+.order-actions-cell {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    gap: 8px;
+    justify-content: flex-start; /* Align buttons to the left */
 }
 
 .btn-approve, .btn-reject {
-    padding: 10px 18px;
+    padding: 8px 12px; /* Smaller padding for table buttons */
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.85em; /* Smaller font size */
     transition: background-color 0.3s ease;
+    white-space: nowrap; /* Prevent buttons from wrapping text */
 }
 
 .btn-approve { background-color: #28a745; color: white; }
@@ -183,7 +199,7 @@
     cursor: not-allowed;
 }
 
-/* --- Pagination Controls (retained) --- */
+/* --- Pagination Controls --- */
 .pagination-controls {
     display: flex;
     justify-content: center;

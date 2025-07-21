@@ -1,4 +1,4 @@
-// src/pages/Reports/PopulationCoverageReportPage/PopulationCoverageReportPage.js
+// src/pages/Reports/PopulationCoverageReport/PopulationCoverageReport.js
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

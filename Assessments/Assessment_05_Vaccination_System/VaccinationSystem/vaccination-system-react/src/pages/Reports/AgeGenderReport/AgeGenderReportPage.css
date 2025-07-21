@@ -1,4 +1,4 @@
-/* src/pages/Reports/AgeGenderReportPage/AgeGenderReportPage.css */
+/* src/pages/Reports/AgeGenderReport/AgeGenderReport.css */
 .report-header-section {
     display: flex; /* Enables flexbox */
     justify-content: space-between; /* This pushes the first item (H2) to the left and the last item (Button) to the right */

@@ -1,4 +1,4 @@
-// src/pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage.js
+// src/pages/Hospital/HospitalVaccinatedList/HospitalVaccinatedList.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {

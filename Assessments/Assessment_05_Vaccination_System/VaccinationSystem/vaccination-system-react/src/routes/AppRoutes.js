@@ -13,12 +13,12 @@ import RegisterPage from '../pages/Auth/RegisterPatient/RegisterPage';
 // //////////////////////////////////////////////////////////////////////////////////////////
 // Lazy load Hospital related page components
 const HospitalDashboard = lazy(() => import('../pages/Hospital/HospitalDashboard/HospitalDashboard'));
-const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalListPage/HospitalListPage'));
-const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccinePage/RegisterVaccinePage'));
+const HospitalListPage = lazy(() => import('../pages/Hospital/HospitalList/HospitalListPage'));
+const RegisterVaccinePage = lazy(() => import('../pages/Hospital/ManageVaccines/SaveVaccine/SaveVaccinePage'));
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
-const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPage')); // You need to create this file
-const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage'));
-const ManageVaccinesPage = lazy(() => import('../pages/Hospital/ManageVaccinesPage/ManageVaccinesPage'));
+const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrder/ApproveVaccinationOrderPage')); // You need to create this file
+const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedList/HospitalVaccinatedListPage'));
+const ManageVaccinesPage = lazy(() => import('../pages/Hospital/ManageVaccines/VaccinationDashboard/VaccinationDashboardPage'));
 
 // Create a CreateVaccinationOrderPage on Behalf of the Patient
 // const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
@@ -27,10 +27,10 @@ const ManageVaccinesPage = lazy(() => import('../pages/Hospital/ManageVaccinesPa
 
 // //////////////////////////////////////////////////////////////////////////////////////////
 // Reports Pages
-const ReportsDashboard = lazy(() => import('../pages/Reports/ReportsDashboard/ReportsDashboard.js'));
-const AgeGenderReportPage = lazy(() => import('../pages/Reports/AgeGenderReportPage/AgeGenderReportPage'));
-const DosesAdministeredReportPage = lazy(() => import('../pages/Reports/DosesAdministeredReportPage/DosesAdministeredReportPage'));
-const PopulationCoverageReportPage = lazy(() => import('../pages/Reports/PopulationCoverageReportPage/PopulationCoverageReportPage'));
+const ReportsDashboard = lazy(() => import('../pages/Reports/ReportsDashboard/ReportsDashboardPage.js'));
+const AgeGenderReportPage = lazy(() => import('../pages/Reports/AgeGenderReport/AgeGenderReportPage'));
+const DosesAdministeredReportPage = lazy(() => import('../pages/Reports/DosesAdministeredReport/DosesAdministeredReportPage'));
+const PopulationCoverageReportPage = lazy(() => import('../pages/Reports/PopulationCoverageReport/PopulationCoverageReportPage'));
 
 
 // //////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ const AppRoutes = () => {
                 />
 
                 {/* Other hospital routes are still commented out as their components don't exist yet: */}
-                {/* Admin-only routes (UNCOMMENT HospitalListPage route) */}
+                {/* Admin-only routes (UNCOMMENT HospitalList route) */}
                 <Route
                     path="/hospital/hospitals"
                     element={
@@ -123,7 +123,7 @@ const AppRoutes = () => {
                 {/* path="/hospital/vaccines/register"*/}
                 {/* element={*/}
                 {/* <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>*/}
-                {/* <RegisterVaccinePage />*/}
+                {/* <SaveVaccine />*/}
                 {/* </PrivateRoute>*/}
                 {/* }*/}
                 {/*/>*/}
@@ -170,7 +170,7 @@ const AppRoutes = () => {
                     path="/admin/hospitals" // Admin-specific route for overall hospital management
                     element={
                         <PrivateRoute allowedRoles={['admin']}>
-                            <HospitalListPage />
+                            <HospitalList />
                         </PrivateRoute>
                     }
                 />
@@ -249,12 +249,12 @@ const AppRoutes = () => {
                 />
 
 
-                {/*/!* Admin-only routes (if HospitalListPage is for admin) *!/*/}
+                {/*/!* Admin-only routes (if HospitalList is for admin) *!/*/}
                 {/*<Route*/}
                 {/*    path="/admin/hospitals" // Admin-specific route for overall hospital management*/}
                 {/*    element={*/}
                 {/*        <PrivateRoute allowedRoles={['admin']}>*/}
-                {/*            <HospitalListPage />*/}
+                {/*            <HospitalList />*/}
                 {/*        </PrivateRoute>*/}
                 {/*    }*/}
                 {/*/>*/}

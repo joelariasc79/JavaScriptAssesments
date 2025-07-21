@@ -1,5 +1,5 @@
-// // src/pages/Reports/AgeGenderReportPage/AgeGenderReportPage.js
-// src/pages/Reports/AgeGenderReportPage/AgeGenderReportPage.js
+// // src/pages/Reports/AgeGenderReport/AgeGenderReport.js
+// src/pages/Reports/AgeGenderReport/AgeGenderReport.js
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

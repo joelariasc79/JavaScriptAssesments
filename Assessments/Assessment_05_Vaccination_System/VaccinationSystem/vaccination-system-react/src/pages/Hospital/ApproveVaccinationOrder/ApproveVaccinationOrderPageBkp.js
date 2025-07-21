@@ -1,4 +1,4 @@
-// src/pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPageBpk.js
+// src/pages/Hospital/ApproveVaccinationOrder/ApproveVaccinationOrderPageBpk.js
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {

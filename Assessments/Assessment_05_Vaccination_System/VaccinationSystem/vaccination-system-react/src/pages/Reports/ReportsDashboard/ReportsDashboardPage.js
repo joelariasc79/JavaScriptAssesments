@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../../components/common/DashboardCard/DashboardCard';
 import Button from '../../../components/common/Button/Button'; // Import the Button component
-import './ReportsDashboard.css'; // Import the CSS for this page
+import './ReportsDashboardPage.css'; // Import the CSS for this page
 
-const ReportsDashboard = () => {
+const ReportsDashboardPage = () => {
     const navigate = useNavigate();
 
     const handleNavigation = (path) => {
@@ -58,15 +58,15 @@ const ReportsDashboard = () => {
     );
 };
 
-export default ReportsDashboard;
+export default ReportsDashboardPage;
 
 
 // import React from 'react';
 // import { useNavigate } from 'react-router-dom';
 // import DashboardCard from '../../../components/common/DashboardCard/DashboardCard';
-// import './ReportsDashboard.css'; // Import the CSS for this page
+// import './ReportsDashboardPage.css'; // Import the CSS for this page
 //
-// const ReportsDashboard = () => {
+// const ReportsDashboardPage = () => {
 //     const navigate = useNavigate();
 //
 //     const handleNavigation = (path) => {
@@ -109,4 +109,4 @@ export default ReportsDashboard;
 //     );
 // };
 //
-// export default ReportsDashboard;
+// export default ReportsDashboardPage;

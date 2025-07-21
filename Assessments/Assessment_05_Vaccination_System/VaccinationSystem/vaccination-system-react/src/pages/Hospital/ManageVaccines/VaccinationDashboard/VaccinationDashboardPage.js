@@ -1,4 +1,4 @@
-// src/pages/Hospital/ManageVaccinesPage/ManageVaccinesPage.js
+// src/pages/Hospital/VaccinationDashboardPage/VaccinationDashboardPage.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -7,19 +7,19 @@ import {
     deleteVaccine,
     clearDeleteStatus, // For clearing delete success/error messages
     clearFetchStatus,  // For clearing fetch status if needed on unmount
-} from '../../../store/features/vaccines/vaccineSlice';
+} from '../../../../store/features/vaccines/vaccineSlice';
 import {
     selectAllVaccines,
     selectFetchVaccinesStatus,
     selectFetchVaccinesError,
     selectDeleteVaccineStatus,
     selectDeleteVaccineError,
-} from '../../../store/features/vaccines/vaccineSelectors';
+} from '../../../../store/features/vaccines/vaccineSelectors';
 
-import Button from '../../../components/common/Button/Button';
-import './ManageVaccinesPage.css'; // You'll create this CSS file for styling
+import Button from '../../../../components/common/Button/Button';
+import './VaccinationDashboardPage.css'; // You'll create this CSS file for styling
 
-const ManageVaccinesPage = () => {
+const VaccinationDashboardPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -134,4 +134,4 @@ const ManageVaccinesPage = () => {
     );
 };
 
-export default ManageVaccinesPage;
+export default VaccinationDashboardPage;

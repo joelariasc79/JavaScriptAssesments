@@ -1,4 +1,4 @@
-/* src/pages/Reports/DosesAdministeredReportPage/DosesAdministeredReportPage.css */
+/* src/pages/Reports/PopulationCoverageReport/PopulationCoverageReport.css */
 
 .report-page-container {
     padding: var(--spacing-xl);
@@ -20,6 +20,8 @@
     margin: 0; /* Remove default H2 margin for clean alignment */
 }
 
+/* If you uncomment the report-controls section in the JS, uncomment these: */
+/*
 .report-controls {
     display: flex;
     align-items: center;
@@ -51,6 +53,7 @@
     border-color: var(--color-primary);
     box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
 }
+*/
 
 .report-content {
     background-color: var(--color-white);

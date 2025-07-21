@@ -38,7 +38,7 @@ const Header = () => {
                         {currentUser && currentUser.role === 'PATIENT' && (
                             <Link to="/patient/dashboard" className="nav-link">Patient Dashboard</Link>
                         )}
-                        {/* You mentioned HospitalListPage is for admin, but its route was /hospital/hospitals.
+                        {/* You mentioned HospitalList is for admin, but its route was /hospital/hospitals.
                             If an admin is supposed to see it from the header, the path and role need to match.
                             Adjust the path and role check below as per your final routing logic. */}
                         {currentUser && currentUser.role === 'ADMIN' && (
