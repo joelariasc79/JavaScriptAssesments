@@ -41,9 +41,9 @@ const HospitalDashboard = () => {
                 />
 
                 <DashboardCard
-                    title="Register New Vaccine Type"
-                    description="Add new vaccine types available at your hospital (if allowed)."
-                    onClick={() => handleNavigation('/hospital/vaccines/register')}
+                    title="Manage Vaccine Types"
+                    description="View, add, update, or delete vaccine types available at your hospital."
+                    onClick={() => handleNavigation('/hospital/vaccines')}
                 />
 
                 <DashboardCard

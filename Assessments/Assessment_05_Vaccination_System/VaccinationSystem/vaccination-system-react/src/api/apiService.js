@@ -20,6 +20,10 @@ const apiService = {
     getAllHospitals: () => axiosInstance.get('/api/hospitals'),
     registerVaccine: (vaccineData) => axiosInstance.post('/api/vaccines', vaccineData),
     getAllVaccines: () => axiosInstance.get('/api/vaccines'),
+
+    getVaccineById: (vaccineId) => axiosInstance.get(`/api/vaccines/${vaccineId}`),
+    updateVaccine: (vaccineId, vaccineData) => axiosInstance.put(`/api/vaccines/${vaccineId}`, vaccineData),
+    deleteVaccine: (vaccineId) => axiosInstance.delete(`/api/vaccines/${vaccineId}`),
     getVaccineStock: (hospitalId, vaccineId) => axiosInstance.get(`/api/vaccine-stock/${hospitalId}/${vaccineId}`),
     updateVaccineStock: (hospitalId, vaccineId, changeQty) =>
         axiosInstance.patch(`/api/vaccine-stock/${hospitalId}/${vaccineId}`, { changeQty }),

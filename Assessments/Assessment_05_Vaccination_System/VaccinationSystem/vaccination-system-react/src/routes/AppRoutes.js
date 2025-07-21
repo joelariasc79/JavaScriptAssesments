@@ -18,6 +18,8 @@ const RegisterVaccinePage = lazy(() => import('../pages/Hospital/RegisterVaccine
 const UpdateVaccineStockPage = lazy(() => import('../pages/Hospital/VaccinesStock/VaccinesStockPage'));
 const ApproveVaccinationOrderPage = lazy(() => import('../pages/Hospital/ApproveVaccinationOrderPage/ApproveVaccinationOrderPage')); // You need to create this file
 const HospitalVaccinatedListPage = lazy(() => import('../pages/Hospital/HospitalVaccinatedListPage/HospitalVaccinatedListPage'));
+const ManageVaccinesPage = lazy(() => import('../pages/Hospital/ManageVaccinesPage/ManageVaccinesPage'));
+
 // Create a CreateVaccinationOrderPage on Behalf of the Patient
 // const CreateVaccinationOrderPage = lazy(() => import('../pages/Hospital/CreateVaccinationOrder/CreateVaccinationOrderPage'));
 
@@ -100,13 +102,31 @@ const AppRoutes = () => {
                 />
 
                 <Route
-                 path="/hospital/vaccines/register"
-                 element={
-                 <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
-                 <RegisterVaccinePage />
-                 </PrivateRoute>
-                 }
+                    path="/hospital/vaccines"
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <ManageVaccinesPage />
+                        </PrivateRoute>
+                    }
                 />
+
+                <Route
+                    path="/hospital/vaccines/register/:vaccineId?" // Added optional :vaccineId parameter
+                    element={
+                        <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>
+                            <RegisterVaccinePage />
+                        </PrivateRoute>
+                    }
+                />
+
+                {/*<Route*/}
+                {/* path="/hospital/vaccines/register"*/}
+                {/* element={*/}
+                {/* <PrivateRoute allowedRoles={['admin', 'hospital_staff']}>*/}
+                {/* <RegisterVaccinePage />*/}
+                {/* </PrivateRoute>*/}
+                {/* }*/}
+                {/*/>*/}
 
                 <Route
                  path="/hospital/vaccines/stock"

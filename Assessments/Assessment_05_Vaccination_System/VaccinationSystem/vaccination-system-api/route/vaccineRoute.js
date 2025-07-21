@@ -66,45 +66,6 @@ vaccineRouter.post('/api/vaccines', authenticateToken, async (req, res) => {
     }
 });
 
-/**
- * @route GET /api/vaccines
- * @description Get all vaccines. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
- */
-vaccineRouter.get('/api/vaccines', authenticateToken, async (req, res) => {
-    try {
-        const vaccines = await VaccineModel.find({});
-        res.status(200).json(vaccines);
-    } catch (error) {
-        console.error('Error fetching vaccines:', error);
-        res.status(500).json({ message: 'Internal server error fetching vaccines.', error: error.message });
-    }
-});
-
-/**
- * @route GET /api/vaccines/:id
- * @description Get a single vaccine by ID. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
- */
-vaccineRouter.get('/api/vaccines/:id', authenticateToken, async (req, res) => {
-    try {
-        const vaccineId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(vaccineId)) {
-            return res.status(400).json({ message: 'Invalid vaccine ID format.' });
-        }
-
-        const vaccine = await VaccineModel.findById(vaccineId);
-
-        if (!vaccine) {
-            return res.status(404).json({ message: 'Vaccine not found.' });
-        }
-        res.status(200).json(vaccine);
-    } catch (error) {
-        console.error('Error fetching vaccine:', error);
-        res.status(500).json({ message: 'Internal server error fetching vaccine.', error: error.message });
-    }
-});
 
 /**
  * @route PUT /api/vaccines/:id
@@ -114,8 +75,8 @@ vaccineRouter.get('/api/vaccines/:id', authenticateToken, async (req, res) => {
  */
 vaccineRouter.put('/api/vaccines/:id', authenticateToken, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Only administrators can update vaccines.' });
+        if (!['admin', 'hospital_staff'].includes(req.user.role)) {
+            return res.status(403).json({ message: 'Access denied. Only administrators can create vaccines.' });
         }
 
         const vaccineId = req.params.id;
@@ -153,8 +114,8 @@ vaccineRouter.put('/api/vaccines/:id', authenticateToken, async (req, res) => {
  */
 vaccineRouter.delete('/api/vaccines/:id', authenticateToken, async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Access denied. Only administrators can delete vaccines.' });
+        if (!['admin', 'hospital_staff'].includes(req.user.role)) {
+            return res.status(403).json({ message: 'Access denied. Only administrators can create vaccines.' });
         }
 
         const vaccineId = req.params.id;
@@ -174,6 +135,46 @@ vaccineRouter.delete('/api/vaccines/:id', authenticateToken, async (req, res) =>
     } catch (error) {
         console.error('Error deleting vaccine:', error);
         res.status(500).json({ message: 'Internal server error deleting vaccine.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/vaccines
+ * @description Get all vaccines. Accessible to all authenticated users.
+ * @access Protected (Any authenticated user)
+ */
+vaccineRouter.get('/api/vaccines', authenticateToken, async (req, res) => {
+    try {
+        const vaccines = await VaccineModel.find({});
+        res.status(200).json(vaccines);
+    } catch (error) {
+        console.error('Error fetching vaccines:', error);
+        res.status(500).json({ message: 'Internal server error fetching vaccines.', error: error.message });
+    }
+});
+
+/**
+ * @route GET /api/vaccines/:id
+ * @description Get a single vaccine by ID. Accessible to all authenticated users.
+ * @access Protected (Any authenticated user)
+ */
+vaccineRouter.get('/api/vaccines/:id', authenticateToken, async (req, res) => {
+    try {
+        const vaccineId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(vaccineId)) {
+            return res.status(400).json({ message: 'Invalid vaccine ID format.' });
+        }
+
+        const vaccine = await VaccineModel.findById(vaccineId);
+
+        if (!vaccine) {
+            return res.status(404).json({ message: 'Vaccine not found.' });
+        }
+        res.status(200).json(vaccine);
+    } catch (error) {
+        console.error('Error fetching vaccine:', error);
+        res.status(500).json({ message: 'Internal server error fetching vaccine.', error: error.message });
     }
 });
 
