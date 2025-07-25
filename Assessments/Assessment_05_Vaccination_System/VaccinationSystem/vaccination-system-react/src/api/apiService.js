@@ -42,9 +42,16 @@ const apiService = {
     getPatientVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders/patient'),
     schedulePatientAppointment: (orderId, appointmentData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/schedule-appointment`, appointmentData),
     getPatientApprovedAppointments: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}/scheduled`),
-    markOrderAsVaccinated: (orderId, vaccinationDate) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-vaccinated`, { vaccination_date: vaccinationDate }),
+    // markOrderAsVaccinated: (orderId, vaccinationDate) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-vaccinated`, { vaccination_date: vaccinationDate }),
+    markOrderAsVaccinated: (orderId, vaccinationDate) => {
+        // Ensure vaccinationDate is formatted as an ISO string for consistent backend parsing
+        const dateToSend = vaccinationDate instanceof Date ? vaccinationDate.toISOString() : vaccinationDate;
+        return axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-vaccinated`, { vaccination_date: dateToSend });
+    },
     markOrderAsPaid: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-as-paid`),
     cancelOrderByPatient: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/cancel-by-patient`),
+    sendVaccinationCertificateEmail: (orderId) => axiosInstance.get(`/api/vaccination-orders/${orderId}/certificate`),
+
 
 
     // //////////////////////////////////////////////////////////////////////////////////////////

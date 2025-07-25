@@ -1,6 +1,10 @@
 // src/backend/routes/vaccinationOrderRoute.js
 const express = require('express');
 const mongoose = require('mongoose'); // For ObjectId validation
+const PDFDocument = require('pdfkit'); // Import PDFDocument for PDF generation
+const fs = require('fs'); // For file system operations (optional, for saving to disk)
+const cloudinary = require('cloudinary').v2; // Import Cloudinary SDK
+const streamifier = require('streamifier'); // To convert buffer to stream for Cloudinary upload
 
 const vaccinationOrderRouter = express.Router({ strict: true, caseSensitive: true });
 const VaccinationOrderModel = require('../dataModel/vaccinationOrderModel'); // Adjust path as needed
@@ -9,11 +13,21 @@ const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // NEW:
 const UserModel = require('../dataModel/userDataModel'); // For checking if user (patient) exists
 const VaccineModel = require('../dataModel/vaccineDataModel'); // For checking if vaccine exists
 const HospitalModel = require('../dataModel/hospitalDataModel'); // For checking if hospital exists
+const { generateAndEmailCertificate } = require('../services/certificateService'); // NEW IMPORT
+
 
 
 // Assuming authenticateToken is exported from userRoute.js or authMiddleware.js
 // const { authenticateToken } = require('../middleware/authMiddleware'); // Adjust path if needed
 const { authenticateToken } = require('./userRoute'); // Adjust path if needed
+
+// --- Cloudinary Configuration ---
+// IMPORTANT: Use environment variables for these credentials in production!
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 /**
  * @route POST /api/vaccination-orders
@@ -690,7 +704,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
  * @body {string} [vaccination_date] - Optional: The actual date of vaccination. Defaults to now.
  * @access Protected (Admin, Hospital Staff, or Patient - owner of the order)
  */
-vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', authenticateToken, async (req, res) => {
+vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated1', authenticateToken, async (req, res) => {
     try {
         const orderId = req.params.id;
         const loggedInUser = req.user; // The logged-in user (admin, hospital_staff, or patient)
@@ -805,6 +819,228 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
             return res.status(409).json({ message: 'A vaccination record for this order already exists.' });
         }
         res.status(500).json({ message: 'Internal server error marking vaccination order as vaccinated.', error: error.message });
+    }
+});
+
+/**
+ * @route PATCH /api/vaccination-orders/:id/mark-vaccinated
+ * @description Marks a vaccination order as 'vaccinated', creates a VaccinationRecord, and decrements vaccine stock.
+ * This API can be called by the patient (owner of the order) or authorized staff.
+ * @param {string} id - The ID of the vaccination order to mark as vaccinated.
+ * @body {string} [vaccination_date] - Optional: The actual date of vaccination in ISO string format (e.g., "2025-07-24T10:00:00.000Z"). Defaults to now.
+ * @access Protected (Admin, Hospital Staff, or Patient - owner of the order)
+ */
+vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', authenticateToken, async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const loggedInUser = req.user;
+        const { vaccination_date } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({ message: 'Invalid order ID format.' });
+        }
+
+        const order = await VaccinationOrderModel.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Vaccination order not found.' });
+        }
+
+        const isPatientOwner = order.userId.toString() === loggedInUser.userId;
+        const isAdminOrHospitalStaff = loggedInUser.role === 'admin' || loggedInUser.role === 'hospital_staff';
+
+        if (!isPatientOwner && !isAdminOrHospitalStaff) {
+            return res.status(403).json({ message: 'Access denied. You are not authorized to mark this vaccination order as vaccinated.' });
+        }
+
+        if (loggedInUser.role === 'hospital_staff' && order.hospitalId && loggedInUser.hospitalId.toString() !== order.hospitalId.toString()) {
+            return res.status(403).json({ message: 'Access denied. Hospital staff can only mark orders as vaccinated for their assigned hospital.' });
+        }
+
+        // --- PRIMARY IDEMPOTENCY CHECK: If already fully marked as vaccinated and linked ---
+        if (order.vaccinationStatus === 'vaccinated' && order.vaccinationRecordId) {
+            const populatedOrder = await VaccinationOrderModel.findById(order._id)
+                .populate('userId', 'username name email')
+                .populate('hospitalId', 'name')
+                .populate('vaccineId', 'name type')
+                .populate('vaccinationRecordId');
+
+            return res.status(200).json({
+                message: 'Vaccination order is already marked as vaccinated and certificate processed.',
+                order: populatedOrder,
+                record: populatedOrder.vaccinationRecordId,
+                emailStatus: 'sent', // Assume email was sent with the original marking
+                emailMessage: 'Certificate email was already sent for this vaccination.'
+            });
+        }
+
+        // --- SECONDARY IDEMPOTENCY CHECK / RECONCILIATION ---
+        // This handles cases where a VaccinationRecord exists but the order's
+        // vaccinationRecordId field wasn't updated (e.g., partial failure),
+        // or if VaccinationRecord has other unique indices (e.g., on user/vaccine/dose).
+        let savedVaccinationRecord = null; // Will hold the new or existing record
+        let populatedOrder = null; // Will hold the final populated order for response
+
+        // 1. Try to find an existing VaccinationRecord linked to this specific order ID first
+        let existingRecordInDb = await VaccinationRecordModel.findOne({ vaccinationOrderId: order._id });
+        console.log("existingRecordInDb: ", existingRecordInDb);
+
+        // 2. If not found by orderId, try to find by user, vaccine, and dose number.
+        //    This addresses potential unique indexes on VaccinationRecord like {userId, vaccineId, dose_number}
+        //    that might prevent a new record creation even if vaccinationOrderId isn't linked yet.
+        if (!existingRecordInDb) {
+            existingRecordInDb = await VaccinationRecordModel.findOne({
+                userId: order.userId,
+                vaccineId: order.vaccineId,
+                dose_number: order.dose_number
+            });
+        }
+
+        if (existingRecordInDb) {
+            // A VaccinationRecord for this order (or this user/vaccine/dose) already exists.
+            // This means the vaccination was recorded, but the order document itself
+            // might not have been fully updated or linked. Reconcile the order document.
+            console.warn(`Reconciling order ${order._id}: Found existing VaccinationRecord (${existingRecordInDb._id}) for order/user/vaccine/dose. Correcting order status.`);
+            savedVaccinationRecord = existingRecordInDb;
+
+            // Update the Vaccination Order document to reflect the existing record
+            // Ensure we only update if the order is still 'pending_vaccination' or not linked
+            if (order.vaccinationStatus === 'pending_vaccination' || !order.vaccinationRecordId) {
+                order.vaccinationStatus = 'vaccinated';
+                order.appointmentStatus = 'completed';
+                order.vaccinationRecordId = savedVaccinationRecord._id;
+                await order.save(); // Save the corrected order
+            }
+
+            // Populate the order for response
+            populatedOrder = await VaccinationOrderModel.findById(order._id)
+                .populate('userId', 'username name email')
+                .populate('hospitalId', 'name')
+                .populate('vaccineId', 'name type')
+                .populate('vaccinationRecordId');
+
+            // Assume the certificate was sent during the initial successful record creation.
+            return res.status(200).json({
+                message: 'Vaccination order reconciled and marked as vaccinated. Certificate was likely processed.',
+                order: populatedOrder,
+                record: savedVaccinationRecord,
+                emailStatus: 'sent',
+                emailMessage: 'Certificate email was previously sent for this vaccination.'
+            });
+
+        } else {
+            // No existing VaccinationRecord found for this order ID or user/vaccine/dose.
+            // Proceed with the normal flow of creating a new record.
+
+            // --- Status Checks before proceeding with NEW vaccination ---
+            if (order.vaccinationStatus !== 'pending_vaccination') {
+                return res.status(400).json({ message: `Cannot mark as vaccinated. Vaccination status is '${order.vaccinationStatus}'. Must be 'pending_vaccination'.` });
+            }
+            if (order.paymentStatus !== 'paid') {
+                return res.status(400).json({ message: `Cannot mark as vaccinated. Payment status is '${order.paymentStatus}'. Order must be paid.` });
+            }
+            if (order.appointmentStatus !== 'scheduled') {
+                return res.status(400).json({ message: `Cannot mark as vaccinated. Appointment status is '${order.appointmentStatus}'. Must be 'scheduled'.` });
+            }
+            if (!order.appointment_date) {
+                return res.status(400).json({ message: 'Cannot mark as vaccinated. Appointment date is not set.' });
+            }
+
+            if (order.appointment_date.getTime() > Date.now()) {
+                return res.status(400).json({ message: `Cannot mark as vaccinated. Appointment date (${order.appointment_date.toISOString().split('T')[0]}) is in the future.` });
+            }
+
+            // --- Transaction-like operation: Decrement stock and create record ---
+            if (isAdminOrHospitalStaff) {
+                const updatedStock = await VaccineStockModel.findOneAndUpdate(
+                    { hospital: order.hospitalId, vaccine: order.vaccineId },
+                    { $inc: { quantity: -1 }, $set: { lastUpdated: Date.now() } },
+                    { new: true, runValidators: true }
+                );
+
+                if (!updatedStock || updatedStock.quantity < 0) {
+                    return res.status(400).json({ message: 'Failed to decrement vaccine stock. Not enough vaccine available or stock record issue. Please contact administration if you are a patient trying to confirm.' });
+                }
+            } else {
+                console.warn(`Patient (${loggedInUser.userId}) is marking order ${orderId} as vaccinated. Stock will not be decremented by this action.`);
+            }
+
+            // 2. Create Vaccination Record (Only if no existing record found)
+            const administeredById = isAdminOrHospitalStaff ? loggedInUser.userId : null;
+
+            const newVaccinationRecord = new VaccinationRecordModel({
+                userId: order.userId,
+                hospitalId: order.hospitalId,
+                vaccineId: order.vaccineId,
+                vaccinationOrderId: order._id,
+                dose_number: order.dose_number,
+                vaccination_date: vaccination_date ? new Date(vaccination_date) : new Date(),
+                administeredBy: administeredById
+            });
+            savedVaccinationRecord = await newVaccinationRecord.save();
+
+            // 3. Update Vaccination Order status and link to record
+            order.vaccinationStatus = 'vaccinated';
+            order.appointmentStatus = 'completed';
+            order.vaccinationRecordId = savedVaccinationRecord._id;
+            const updatedOrder = await order.save();
+
+            // Populate essential fields for response (for the newly created case)
+            populatedOrder = await VaccinationOrderModel.findById(updatedOrder._id)
+                .populate('userId', 'username name email')
+                .populate('hospitalId', 'name')
+                .populate('vaccineId', 'name type')
+                .populate('vaccinationRecordId');
+
+
+            // --- Trigger certificate email after marking as vaccinated ---
+            let emailStatus = 'not_attempted';
+            let emailMessage = 'Certificate email not attempted.';
+
+            try {
+                const emailResult = await generateAndEmailCertificate(updatedOrder._id); // Use updatedOrder._id
+                if (emailResult.success) {
+                    emailStatus = 'sent';
+                    emailMessage = 'Certificate email sent successfully.';
+                    console.log(`Certificate email sent for order ${updatedOrder._id}`);
+                } else {
+                    emailStatus = 'failed';
+                    emailMessage = `Failed to send certificate email: ${emailResult.message}`;
+                    console.error(`Failed to send certificate email for order ${updatedOrder._id}: ${emailResult.message}`);
+                }
+            } catch (emailError) {
+                emailStatus = 'failed';
+                emailMessage = `An unexpected error occurred while trying to send certificate email: ${emailError.message}`;
+                console.error(`Unexpected error during certificate email for order ${updatedOrder._id}: ${emailError.message}`);
+            }
+
+            // Respond for the newly created case
+            return res.status(200).json({
+                message: 'Vaccination order marked as vaccinated successfully!',
+                order: populatedOrder,
+                record: savedVaccinationRecord,
+                emailStatus: emailStatus,
+                emailMessage: emailMessage
+            });
+        }
+
+    } catch (error) {
+        console.error('Error marking vaccination order as vaccinated:', error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: error.message });
+        }
+        // This general 11000 check remains for any other unique index violations
+        // that might occur (e.g., if the VaccinationOrder model has other unique indices not related
+        // to vaccinationRecordId, or if the primary idempotency checks failed for some reason).
+        if (error.code === 11000) {
+            return res.status(409).json({ message: 'A duplicate entry already exists in the database (e.g., another unique index violation).' });
+        }
+        res.status(500).json({
+            message: 'Internal server error marking vaccination order as vaccinated.',
+            error: error.message,
+            emailStatus: 'failed',
+            emailMessage: 'Email not sent due to server error during vaccination marking.'
+        });
     }
 });
 
@@ -969,5 +1205,304 @@ vaccinationOrderRouter.get('/api/vaccination-records/hospital/:hospitalId/vaccin
         res.status(500).json({ message: 'Internal server error fetching vaccinated persons information.', error: error.message });
     }
 });
+
+/**
+ * @route GET /api/vaccination-orders/:id/certificate
+ * @description Generates and emails a vaccination certificate PDF for a completed vaccination order.
+ * This endpoint *does not* provide a direct download.
+ * @param {string} id - The ID of the vaccination order.
+ * @access Protected (Patient - owner of the order, Admin, Hospital Staff - for their hospital's orders)
+ */
+vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authenticateToken, async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const loggedInUser = req.user;
+
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            return res.status(400).json({ message: 'Invalid order ID format.' });
+        }
+
+        // Find the vaccination order and populate all necessary details
+        const order = await VaccinationOrderModel.findById(orderId)
+        .populate('userId', 'name email username age gender contact_number address')
+        .populate('hospitalId', 'name address contact_number')
+        .populate('vaccineId', 'name manufacturer type doses_required')
+        .populate('vaccinationRecordId', 'vaccination_date administeredBy'); // Populate the linked vaccination record
+
+        if (!order) {
+            return res.status(404).json({ message: 'Vaccination order not found.' });
+        }
+
+        // --- Authorization Check ---
+        const isPatientOwner = order.userId._id.toString() === loggedInUser.userId;
+        const isAdmin = loggedInUser.role === 'admin';
+        const isHospitalStaff = loggedInUser.role === 'hospital_staff';
+
+        if (!isPatientOwner && !isAdmin && !(isHospitalStaff && order.hospitalId._id.toString() === loggedInUser.hospitalId.toString())) {
+            return res.status(403).json({ message: 'Access denied. You are not authorized to view this vaccination certificate.' });
+        }
+
+        // --- Status Check: Only generate certificate for 'vaccinated' orders ---
+            if (order.vaccinationStatus !== 'vaccinated') {
+            return res.status(400).json({ message: `Cannot generate certificate. Vaccination status is '${order.vaccinationStatus}'. A certificate can only be generated for 'vaccinated' orders.` });
+        }
+
+        if (!order.vaccinationRecordId) {
+            return res.status(400).json({ message: 'Vaccination record not found for this order. Cannot generate certificate.' });
+        }
+
+        // Call the service function to generate and email the certificate
+        const emailResult = await generateAndEmailCertificate(orderId); // NEW: Use the service directly
+
+        if (emailResult.success) {
+            res.status(200).json({ message: 'Vaccination certificate email sent successfully!', emailStatus: 'sent' });
+        } else {
+            res.status(500).json({ message: `Failed to send vaccination certificate email: ${emailResult.message}`, emailStatus: 'failed' });
+        }
+
+        } catch (error) { 
+        console.error('Error generating vaccination certificate:', error); 
+        // Ensure that a response is always sent, even if an error occurs during PDF generation or email sending
+        if (!res.headersSent) { 
+            res.status(500).json({ message: 'Internal server error generating vaccination certificate.', error: error.message }); 
+        }
+    }
+});
+
+
+// /**
+//  * @route GET /api/vaccination-orders/:id/certificate
+//  * @description Generates a vaccination certificate PDF for a completed vaccination order and uploads it to Cloudinary.
+//  * Returns the Cloudinary URL.
+//  * @param {string} id - The ID of the vaccination order.
+//  * @access Protected (Patient - owner of the order, Admin, Hospital Staff - for their hospital's orders)
+//  */
+// vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authenticateToken, async (req, res) => {
+//     try {
+//         const orderId = req.params.id;
+//         const loggedInUser = req.user;
+//
+//         if (!mongoose.Types.ObjectId.isValid(orderId)) {
+//             return res.status(400).json({ message: 'Invalid order ID format.' });
+//         }
+//
+//         // Find the vaccination order and populate all necessary details
+//         const order = await VaccinationOrderModel.findById(orderId)
+//             .populate('userId', 'name email username age gender contact_number address')
+//             .populate('hospitalId', 'name address contact_number')
+//             .populate('vaccineId', 'name manufacturer type doses_required')
+//             .populate('vaccinationRecordId', 'vaccination_date administeredBy'); // Populate the linked vaccination record
+//
+//         if (!order) {
+//             return res.status(404).json({ message: 'Vaccination order not found.' });
+//         }
+//
+//         // --- Authorization Check ---
+//         const isPatientOwner = order.userId._id.toString() === loggedInUser.userId;
+//         const isAdmin = loggedInUser.role === 'admin';
+//         const isHospitalStaff = loggedInUser.role === 'hospital_staff';
+//
+//         if (!isPatientOwner && !isAdmin && !(isHospitalStaff && order.hospitalId._id.toString() === loggedInUser.hospitalId.toString())) {
+//             return res.status(403).json({ message: 'Access denied. You are not authorized to view this vaccination certificate.' });
+//         }
+//
+//         // --- Status Check: Only generate certificate for 'vaccinated' orders ---
+//         if (order.vaccinationStatus !== 'vaccinated') {
+//             return res.status(400).json({ message: `Cannot generate certificate. Vaccination status is '${order.vaccinationStatus}'. A certificate can only be generated for 'vaccinated' orders.` });
+//         }
+//
+//         if (!order.vaccinationRecordId) {
+//             return res.status(400).json({ message: 'Vaccination record not found for this order. Cannot generate certificate.' });
+//         }
+//
+//         // Extract data for the PDF
+//         const patient = order.userId;
+//         const hospital = order.hospitalId;
+//         const vaccine = order.vaccineId;
+//         const vaccinationRecord = order.vaccinationRecordId;
+//
+//         const doc = new PDFDocument();
+//         let buffers = [];
+//
+//         doc.on('data', buffers.push.bind(buffers));
+//         doc.on('end', async () => {
+//             let pdfBuffer = Buffer.concat(buffers);
+//
+//             // Upload to Cloudinary
+//             cloudinary.uploader.upload_stream(
+//                 {
+//                     resource_type: 'raw', // Treat as a raw file (PDF)
+//                     folder: 'vaccination_certificates', // Optional: folder in Cloudinary
+//                     public_id: `certificate_${orderId}`, // Unique ID for the file
+//                     format: 'pdf' // Ensure it's stored as PDF
+//                 },
+//                 (error, result) => {
+//                     if (error) {
+//                         console.error('Cloudinary upload error:', error);
+//                         return res.status(500).json({ message: 'Failed to upload certificate to Cloudinary.', error: error.message });
+//                     }
+//                     // Return the Cloudinary URL
+//                     res.status(200).json({
+//                         message: 'Vaccination certificate generated and uploaded successfully!',
+//                         certificateUrl: result.secure_url // Use secure_url for HTTPS
+//                     });
+//                 }
+//             ).end(pdfBuffer);
+//         });
+//
+//         // --- PDF Content ---
+//         doc.info.Title = 'Vaccination Certificate';
+//         doc.info.Author = 'Vaccination System';
+//
+//         doc.fontSize(24).text('Vaccination Certificate', { align: 'center' });
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('This certifies that:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Name: ${patient.name}`)
+//             .text(`Email: ${patient.email}`)
+//             .text(`Gender: ${patient.gender || 'N/A'}`)
+//             .text(`Contact: ${patient.contact_number || 'N/A'}`)
+//             .text(`Address: ${patient.address.street || ''}, ${patient.address.city || ''}, ${patient.address.state || ''}, ${patient.address.zipCode || ''}, ${patient.address.country || ''}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('Has received the following vaccination:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Vaccine: ${vaccine.name} (${vaccine.manufacturer})`)
+//             .text(`Type: ${vaccine.type}`)
+//             .text(`Dose Number: ${order.dose_number} of ${vaccine.doses_required}`)
+//             .text(`Vaccination Date: ${new Date(vaccinationRecord.vaccination_date).toLocaleDateString()}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('Administered at:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Hospital: ${hospital.name}`)
+//             .text(`Address: ${hospital.address.street}, ${hospital.address.city}, ${hospital.address.state}, ${hospital.address.zipCode}, ${hospital.address.country}`)
+//             .text(`Contact: ${hospital.contact_number}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(12).text(`Order ID: ${order._id}`, { align: 'right' });
+//         doc.fontSize(12).text(`Charge Paid: $${order.charge_to_be_paid.toFixed(2)}`, { align: 'right' });
+//         doc.moveDown();
+//
+//         doc.fontSize(10).text('This certificate is for informational purposes only and may be subject to verification.', { align: 'center' });
+//
+//         doc.end(); // Finalize the PDF generation, triggering the 'end' event
+//     } catch (error) {
+//         console.error('Error generating or uploading vaccination certificate:', error);
+//         res.status(500).json({ message: 'Internal server error generating or uploading vaccination certificate.', error: error.message });
+//     }
+// });
+
+
+// Delete:
+// vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authenticateToken, async (req, res) => {
+//     try {
+//         const orderId = req.params.id;
+//         const loggedInUser = req.user;
+//
+//         if (!mongoose.Types.ObjectId.isValid(orderId)) {
+//             return res.status(400).json({ message: 'Invalid order ID format.' });
+//         }
+//
+//         // Find the vaccination order and populate all necessary details
+//         const order = await VaccinationOrderModel.findById(orderId)
+//             .populate('userId', 'name email username age gender contact_number address')
+//             .populate('hospitalId', 'name address contact_number')
+//             .populate('vaccineId', 'name manufacturer type doses_required')
+//             .populate('vaccinationRecordId', 'vaccination_date administeredBy'); // Populate the linked vaccination record
+//
+//         if (!order) {
+//             return res.status(404).json({ message: 'Vaccination order not found.' });
+//         }
+//
+//         // --- Authorization Check ---
+//         const isPatientOwner = order.userId._id.toString() === loggedInUser.userId;
+//         const isAdmin = loggedInUser.role === 'admin';
+//         const isHospitalStaff = loggedInUser.role === 'hospital_staff';
+//
+//         if (!isPatientOwner && !isAdmin && !(isHospitalStaff && order.hospitalId._id.toString() === loggedInUser.hospitalId.toString())) {
+//             return res.status(403).json({ message: 'Access denied. You are not authorized to view this vaccination certificate.' });
+//         }
+//
+//         // --- Status Check: Only generate certificate for 'vaccinated' orders ---
+//         if (order.vaccinationStatus !== 'vaccinated') {
+//             return res.status(400).json({ message: `Cannot generate certificate. Vaccination status is '${order.vaccinationStatus}'. A certificate can only be generated for 'vaccinated' orders.` });
+//         }
+//
+//         if (!order.vaccinationRecordId) {
+//             return res.status(400).json({ message: 'Vaccination record not found for this order. Cannot generate certificate.' });
+//         }
+//
+//         // Extract data for the PDF
+//         const patient = order.userId;
+//         const hospital = order.hospitalId;
+//         const vaccine = order.vaccineId;
+//         const vaccinationRecord = order.vaccinationRecordId;
+//
+//         const doc = new PDFDocument();
+//         const filename = `Vaccination_Certificate_${patient.username}_${orderId.substring(orderId.length - 6)}.pdf`;
+//
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+//
+//         doc.pipe(res); // Pipe the PDF to the response stream
+//
+//         // --- PDF Content ---
+//         doc.info.Title = 'Vaccination Certificate';
+//         doc.info.Author = 'Vaccination System';
+//
+//         doc.fontSize(24).text('Vaccination Certificate', { align: 'center' });
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('This certifies that:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Name: ${patient.name}`)
+//             .text(`Email: ${patient.email}`)
+//             .text(`Gender: ${patient.gender || 'N/A'}`)
+//             .text(`Contact: ${patient.contact_number || 'N/A'}`)
+//             .text(`Address: ${patient.address.street || ''}, ${patient.address.city || ''}, ${patient.address.state || ''}, ${patient.address.zipCode || ''}, ${patient.address.country || ''}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('Has received the following vaccination:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Vaccine: ${vaccine.name} (${vaccine.manufacturer})`)
+//             .text(`Type: ${vaccine.type}`)
+//             .text(`Dose Number: ${order.dose_number} of ${vaccine.doses_required}`)
+//             .text(`Vaccination Date: ${new Date(vaccinationRecord.vaccination_date).toLocaleDateString()}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(16).text('Administered at:', { align: 'left' });
+//         doc.moveDown(0.5);
+//
+//         doc.fontSize(14)
+//             .text(`Hospital: ${hospital.name}`)
+//             .text(`Address: ${hospital.address.street}, ${hospital.address.city}, ${hospital.address.state}, ${hospital.address.zipCode}, ${hospital.address.country}`)
+//             .text(`Contact: ${hospital.contact_number}`);
+//         doc.moveDown();
+//
+//         doc.fontSize(12).text(`Order ID: ${order._id}`, { align: 'right' });
+//         doc.fontSize(12).text(`Charge Paid: $${order.charge_to_be_paid.toFixed(2)}`, { align: 'right' });
+//         doc.moveDown();
+//
+//         doc.fontSize(10).text('This certificate is for informational purposes only and may be subject to verification.', { align: 'center' });
+//
+//         doc.end(); // Finalize the PDF and send it
+//
+//     } catch (error) {
+//         console.error('Error generating vaccination certificate:', error);
+//         res.status(500).json({ message: 'Internal server error generating vaccination certificate.', error: error.message });
+//     }
+// });
 
 module.exports = vaccinationOrderRouter;
