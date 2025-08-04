@@ -35,11 +35,13 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.10.0",
+    "bootstrap": "^5.3.7",
     "d3": "^7.9.0",
     "prop-types": "^15.8.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0",
     "react-redux": "^9.2.0",
     "react-responsive-carousel": "^3.2.23",

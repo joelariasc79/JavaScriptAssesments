@@ -1,8 +1,7 @@
 // OnlineStoreAPI/servers.js
+
 require('dotenv').config();
-
 let express = require('express');
-
 const http = require('http'); // Import http and Socket.IO Server
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
@@ -10,28 +9,47 @@ const bodyParser = require('body-parser');
 const cors = require("cors");
 // const path = require('path'); // Needed for serving static files (if you serve React build)
 
+const app = express();
+
+
+
+
+// *******************************************************************************************
+// GET ROUTES
+// *******************************************************************************************
+
+// const notification = require('./DataModel/notificationDataModel'); // Corrected path based on your folder structure
+
 // Correctly import userRouter and authenticateToken from the userRoute module
 const { userRouter, authenticateToken } = require("./route/userRoute")
 const productRoute = require("./route/productRoute")
 const cartRoute = require("./route/cartRoute")
 const orderRoute = require('./route/orderRoute');
 const couponRoute = require('./route/couponRoute');
-const setupScheduledTasks = require('./utils/cronJobs'); // Assuming this path is correct
-const notification = require('./DataModel/notificationDataModel'); // Corrected path based on your folder structure
 const notificationService = require('./services/notificationService'); // Corrected path based on your folder structure
+const setupScheduledTasks = require('./utils/cronJobs'); // Assuming this path is correct
 
-const app = express();
-// Middleware
+
+
+
+// ******************************************************************************************
+// MIDDLEWARE
+// *******************************************************************************************
+
 app.use(bodyParser.json()); // For parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(express.json({limit:'2mb', extended:false})); // json middle-ware for setting request content type to json in body
-// allowing the cross origin resource sharing
+
+// *******************************************************************************************
+
+// Allowing the cross origin resource sharing
 // Ensure this CORS config matches your frontend's URL (e.g., http://localhost:3000 for React dev server)
 app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:9000'], // Add your React dev server URL here
     methods: ['GET', 'POST', 'PUT', 'DELETE'] // Add all methods your API uses
 }));
 
+// *******************************************************************************************
 
 // MongoDB Connection (ensure this is only done once)
 mongoose.connect('mongodb://localhost:27017/shoppingcartdb', {
@@ -43,11 +61,13 @@ mongoose.connect('mongodb://localhost:27017/shoppingcartdb', {
 
 globalThis.rootPath = __dirname;
 
+// *******************************************************************************************
 
+// IF YOU ARE GENERATING THE FRONT END FROM EXPRESS:
 // setting up the middleware static to handle all the static files we need to serve to client
-// Serve static React build files in production (uncomment if you build and serve frontend from here)
 // app.use(express.static(path.join(__dirname, '../frontend/build')));
 
+// *******************************************************************************************
 
 // Use the routers
 app.use(productRoute);
@@ -55,7 +75,22 @@ app.use(cartRoute);
 app.use(userRouter);
 app.use(orderRoute);
 app.use(couponRoute);
+
+
+
+
+// *******************************************************************************************
+// JOBS:
+// *******************************************************************************************
+
 setupScheduledTasks();
+
+
+
+
+// *******************************************************************************************
+// AUTHENTICATION:
+// *******************************************************************************************
 
 // Example of a protected route using the authenticateToken middleware
 // This route will only be accessible if a valid JWT is provided in the Authorization header.
@@ -65,11 +100,25 @@ app.get('/api/protected-data', authenticateToken, (req, res) => {
 });
 
 
+
+
+// *******************************************************************************************
+// DEFAULT ROUTE
+// *******************************************************************************************
+
 // Basic route for testing
 app.get('/', (req, res) => {
     res.send('Shopping cart API is running!');
 });
 
+
+
+
+
+
+// *******************************************************************************************
+// WEBSOCKET
+// *******************************************************************************************
 
 // --- Socket.IO Integration ---
 const server = http.createServer(app); // Create an HTTP server from your Express app
@@ -85,7 +134,13 @@ const io = new Server(server, {
 // Store connected users (socket.id -> userId string)
 const connectedUsers = new Map();
 
+
+
+// *******************************************************************************************
+// NOTIFICATION SERVICE
 // Initialize notification service with the Socket.IO instance and the connectedUsers map
+// *******************************************************************************************
+
 notificationService.init(io, connectedUsers);
 
 io.on('connection', (socket) => {
@@ -120,7 +175,11 @@ io.on('connection', (socket) => {
 });
 
 
+
+// *******************************************************************************************
 // --- API Endpoints for Notifications (for Frontend to fetch) ---
+// *******************************************************************************************
+
 
 // Get all notifications for a specific user
 app.get('/api/notifications/:userId', authenticateToken, async (req, res) => {
@@ -205,7 +264,9 @@ app.delete('/api/notifications/:userId', authenticateToken, async (req, res) => 
 });
 
 
+// *******************************************************************************************
 // --- REST API Endpoints to Trigger Notifications (for Testing or Internal Use) ---
+// *******************************************************************************************
 
 // Endpoint to broadcast a general notification to all connected clients
 app.post('/api/notify/broadcast', async (req, res) => {
@@ -223,7 +284,13 @@ app.post('/api/notify/user/:userId', async (req, res) => {
 });
 
 
+
+
+// *******************************************************************************************
 // Start the server, listening on the specified port
+// *******************************************************************************************
+
+
 const PORT = process.env.PORT || 9000; // Use your existing port 9000
 server.listen(PORT, () => {
     console.log(`Express and Socket.IO server listening on http://localhost:${PORT}`);

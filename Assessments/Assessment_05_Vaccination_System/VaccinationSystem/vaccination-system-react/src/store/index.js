@@ -9,11 +9,7 @@ import vaccinationOrderReducer from './features/vaccinationOrder/vaccinationOrde
 import usersReducer from './features/users/usersSlice';
 import pendingOrdersReducer from './features/pendingOrders/pendingOrdersSlice';
 import reportsReducer from './features/reports/reportsSlice';
-
-
-// import bookingsReducer from './features/bookings/bookingsSlice';
-// import paymentsReducer from './features/payments/paymentsSlice';
-// import reportsReducer from './features/reports/reportsSlice';
+import suggestionsReducer from './features/vaccineSuggestions/vaccineSuggestionsSlice';
 
 export const store = configureStore({
     reducer: {
@@ -22,6 +18,7 @@ export const store = configureStore({
         vaccines: vaccinesReducer,
         vaccineStock: vaccineStockReducer,
         patients: patientsReducer,
+        suggestions: suggestionsReducer,
         vaccinationOrder: vaccinationOrderReducer,
         users: usersReducer,
         pendingOrders: pendingOrdersReducer,

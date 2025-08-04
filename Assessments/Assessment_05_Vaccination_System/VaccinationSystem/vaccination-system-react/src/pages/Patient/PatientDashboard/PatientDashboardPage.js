@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/features/auth/authSelectors';
 
+import VaccineSuggestions from '../../../components/common/VaccineSuggestions/VaccineSuggestions';
 import DashboardCard from '../../../components/common/DashboardCard/DashboardCard';
 import './PatientDashboardPage.css'; // Make sure to create this CSS file
 
@@ -23,6 +24,8 @@ const PatientDashboardPage = () => {
                     <strong>Welcome, {currentUser.name || currentUser.username}!</strong>
                 </p>
             )}
+
+            <VaccineSuggestions />
 
             <div className="dashboard-grid">
 

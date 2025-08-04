@@ -43,3 +43,5 @@ export const selectCurrentUserRole = createSelector(
     selectCurrentUser,
     (user) => user?.role || null
 );
+
+// export const selectAuthToken = (state) => state.auth.token;

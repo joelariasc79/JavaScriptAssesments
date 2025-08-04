@@ -52,6 +52,12 @@ const apiService = {
     cancelOrderByPatient: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/cancel-by-patient`),
     sendVaccinationCertificateEmail: (orderId) => axiosInstance.get(`/api/vaccination-orders/${orderId}/certificate`),
 
+    /**
+     * Fetches a list of vaccines suggested for a patient based on age and vaccination history.
+     * @param {string} patientId The ID of the patient.
+     * @returns {Promise} Axios promise resolving to the list of suggested vaccines.
+     */
+    getVaccineSuggestions: (patientId) => axiosInstance.get(`/api/patients/${patientId}/vaccine-suggestions`),
 
 
     // //////////////////////////////////////////////////////////////////////////////////////////

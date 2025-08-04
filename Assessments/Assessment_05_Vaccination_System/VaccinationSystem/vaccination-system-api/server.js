@@ -22,6 +22,7 @@ const vaccinationOrderRouter = require('./route/vaccinationOrderRoute');
 
 const reportRouter = require("./route/reportRoute");
 const notificationRouter = require("./route/notificationRoute");
+const patientRouter = require('./route/patientRoute');
 
 
 
@@ -60,8 +61,10 @@ app.use(appointmentRouter);
 app.use(vaccinationOrderRouter);
 app.use(reportRouter);
 app.use(notificationRouter);
+app.use(patientRouter);
 
 
+// protected-data api:
 app.get('/api/protected-data', authenticateToken, (req, res) => {
     res.status(200).json({ message: `Access granted! Welcome, ${req.user.username}. This is protected data.` });
 });

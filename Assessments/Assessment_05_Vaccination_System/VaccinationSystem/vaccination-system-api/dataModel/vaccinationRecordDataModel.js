@@ -1,4 +1,4 @@
-// src/backend/dataModel/vaccinationRecordDataModel.js
+// /dataModel/vaccinationRecordDataModel.js
 const mongoose = require('mongoose');
 
 const vaccinationRecordSchema = new mongoose.Schema({

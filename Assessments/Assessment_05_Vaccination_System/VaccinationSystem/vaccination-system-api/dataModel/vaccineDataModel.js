@@ -5,12 +5,12 @@ const VaccineSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true, // Vaccine names should ideally be unique
+        unique: true,
         trim: true
     },
-    manufacturer: { // NEW FIELD ADDED: Manufacturer of the vaccine
+    manufacturer: {
         type: String,
-        required: true, // Assuming it's required
+        required: true,
         trim: true
     },
     type: { // e.g., 'mRNA', 'Viral Vector', 'Inactivated'
@@ -26,25 +26,35 @@ const VaccineSchema = new mongoose.Schema({
     side_effect: {
         type: String,
         trim: true,
-        default: 'Mild fever, fatigue, headache, muscle pain, chills, nausea.' // Common side effects
+        default: 'Mild fever, fatigue, headache, muscle pain, chills, nausea.'
     },
-    origin: { // Country or region of origin (distinct from manufacturer)
+    origin: {
         type: String,
         trim: true
     },
     doses_required: {
         type: Number,
         required: true,
-        min: 1 // At least 1 dose required
+        min: 1
     },
     time_between_doses_days: { // Applicable if doses_required > 1
         type: Number,
         min: 0,
         default: null // Can be null for single-dose vaccines
     },
+    min_age_months: {
+        type: Number,
+        min: 0,
+        default: null // Can be null if no specific minimum age (e.g., "all ages")
+    },
+    max_age_years: { // Maximum age for vaccine application, in years
+        type: Number,
+        min: 0,
+        default: null // Can be null if no specific maximum age (e.g., "and older")
+    },
     other_info: {
-        type: String,
-        trim: true
+      type: String,
+       trim: true
     },
     strains_covered: { // E.g., 'Alpha, Delta, Omicron variants'
         type: String,
