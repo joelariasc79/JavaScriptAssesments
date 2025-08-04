@@ -111,31 +111,33 @@ const VaccineSuggestions = () => {
                 </Card.Body>
             </Card>
 
-            {Array.isArray(data) && data.length > 0 && (
-                <Modal show={showModal} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>New Vaccine Suggestions!</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p>Based on your profile, we have some new vaccine suggestions for you. Would you like to create an order now?</p>
-                        <ListGroup>
-                            {data.map(suggestion => (
-                                <ListGroup.Item key={suggestion.vaccineDetails._id}>
-                                    <strong>{suggestion.vaccineDetails.name}</strong> ({suggestion.dosesStatus.required - suggestion.dosesStatus.taken} dose(s) needed)
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Maybe Later
-                        </Button>
-                        <Button variant="primary" onClick={handleCreateOrder}>
-                            Create Order
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-            )}
+            {/*This is commented because is always displayed with the dashboard is loaded*/}
+            {/*It shoudl be loaded only after the patient is logged*/}
+            {/*{Array.isArray(data) && data.length > 0 && (*/}
+            {/*    <Modal show={showModal} onHide={handleCloseModal}>*/}
+            {/*        <Modal.Header closeButton>*/}
+            {/*            <Modal.Title>New Vaccine Suggestions!</Modal.Title>*/}
+            {/*        </Modal.Header>*/}
+            {/*        <Modal.Body>*/}
+            {/*            <p>Based on your profile, we have some new vaccine suggestions for you. Would you like to create an order now?</p>*/}
+            {/*            <ListGroup>*/}
+            {/*                {data.map(suggestion => (*/}
+            {/*                    <ListGroup.Item key={suggestion.vaccineDetails._id}>*/}
+            {/*                        <strong>{suggestion.vaccineDetails.name}</strong> ({suggestion.dosesStatus.required - suggestion.dosesStatus.taken} dose(s) needed)*/}
+            {/*                    </ListGroup.Item>*/}
+            {/*                ))}*/}
+            {/*            </ListGroup>*/}
+            {/*        </Modal.Body>*/}
+            {/*        <Modal.Footer>*/}
+            {/*            <Button variant="secondary" onClick={handleCloseModal}>*/}
+            {/*                Maybe Later*/}
+            {/*            </Button>*/}
+            {/*            <Button variant="primary" onClick={handleCreateOrder}>*/}
+            {/*                Create Order*/}
+            {/*            </Button>*/}
+            {/*        </Modal.Footer>*/}
+            {/*    </Modal>*/}
+            {/*)}*/}
         </div>
     );
 };

@@ -21,7 +21,7 @@ export const approveVaccinationOrder = createAsyncThunk(
     'pendingOrders/approveVaccinationOrder',
     async (orderId, { rejectWithValue }) => {
         try {
-            const response = await apiService.patch(`/api/vaccination-orders/${orderId}/approve`); // Assuming apiService.patch exists, otherwise adjust
+            const response = await apiService.updateVaccinationOrder(`/api/vaccination-orders/${orderId}/approve`); // Assuming apiService.patch exists, otherwise adjust
             return response.data.order;
         } catch (error) {
             const message = error.response?.data?.message || error.message;
@@ -35,7 +35,7 @@ export const rejectVaccinationOrder = createAsyncThunk(
     'pendingOrders/rejectVaccinationOrder',
     async (orderId, { rejectWithValue }) => {
         try {
-            const response = await apiService.patch(`/api/vaccination-orders/${orderId}/reject`); // Assuming apiService.patch exists, otherwise adjust
+            const response = await apiService.updateVaccinationOrder(`/api/vaccination-orders/${orderId}/reject`); // Assuming apiService.patch exists, otherwise adjust
             return response.data.order;
         } catch (error) {
             const message = error.response?.data?.message || error.message;

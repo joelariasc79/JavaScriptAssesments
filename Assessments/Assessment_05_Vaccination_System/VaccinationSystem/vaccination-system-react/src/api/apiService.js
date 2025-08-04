@@ -16,33 +16,33 @@ const apiService = {
     getProfile: (userId) => axiosInstance.get(`/api/users/${userId}`),
     getAllUsers: () => axiosInstance.get('/api/users'),
 
-    // Admin/Hospital Endpoints (uncomment and implement as needed)
+    // Admin And Hospital Endpoints
     getAllHospitals: () => axiosInstance.get('/api/hospitals'),
     registerVaccine: (vaccineData) => axiosInstance.post('/api/vaccines', vaccineData),
     getAllVaccines: () => axiosInstance.get('/api/vaccines'),
-
     getVaccineById: (vaccineId) => axiosInstance.get(`/api/vaccines/${vaccineId}`),
     updateVaccine: (vaccineId, vaccineData) => axiosInstance.put(`/api/vaccines/${vaccineId}`, vaccineData),
     deleteVaccine: (vaccineId) => axiosInstance.delete(`/api/vaccines/${vaccineId}`),
+
+    // Only Hospital Endpoints
     getVaccineStock: (hospitalId, vaccineId) => axiosInstance.get(`/api/vaccine-stock/${hospitalId}/${vaccineId}`),
     updateVaccineStock: (hospitalId, vaccineId, changeQty) =>
         axiosInstance.patch(`/api/vaccine-stock/${hospitalId}/${vaccineId}`, { changeQty }),
     createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
     getPendingApprovalVaccinationOrders: (hospitalId) =>
         axiosInstance.get(`/api/vaccination-orders/hospital/${hospitalId}/pending-approval`),
-    // //////////////////////////////////////////////////////////////////////////////////////////
-    // This is used by approveVaccineOrderPage, update name from patch to approveVaccineStock
-    patch: (url, data) => axiosInstance.patch(url, data),
-    // //////////////////////////////////////////////////////////////////////////////////////////
+    /* url is sent by the slice, they could be:
+    /api/vaccination-orders/${orderId}/approve or
+    /api/vaccination-orders/${orderId}/reject */
+    updateVaccinationOrder: (url, data) => axiosInstance.patch(url, data),
     getVaccinatedPersonsByHospital: (hospitalId) => axiosInstance.get(`/api/vaccination-records/hospital/${hospitalId}/vaccinated-persons`),
 
 
-    // Patient Endpoints (Updated and New)
+    // Patient Endpoints
     getPatientDashboard: (patientId) => axiosInstance.get(`/api/patients/${patientId}/dashboard`),
     getPatientVaccinationOrders: () => axiosInstance.get('/api/vaccination-orders/patient'),
     schedulePatientAppointment: (orderId, appointmentData) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/schedule-appointment`, appointmentData),
     getPatientApprovedAppointments: (patientId) => axiosInstance.get(`/api/vaccination-orders/user/${patientId}/scheduled`),
-    // markOrderAsVaccinated: (orderId, vaccinationDate) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-vaccinated`, { vaccination_date: vaccinationDate }),
     markOrderAsVaccinated: (orderId, vaccinationDate) => {
         // Ensure vaccinationDate is formatted as an ISO string for consistent backend parsing
         const dateToSend = vaccinationDate instanceof Date ? vaccinationDate.toISOString() : vaccinationDate;
@@ -50,27 +50,26 @@ const apiService = {
     },
     markOrderAsPaid: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/mark-as-paid`),
     cancelOrderByPatient: (orderId) => axiosInstance.patch(`/api/vaccination-orders/${orderId}/cancel-by-patient`),
-    sendVaccinationCertificateEmail: (orderId) => axiosInstance.get(`/api/vaccination-orders/${orderId}/certificate`),
-
     /**
      * Fetches a list of vaccines suggested for a patient based on age and vaccination history.
      * @param {string} patientId The ID of the patient.
      * @returns {Promise} Axios promise resolving to the list of suggested vaccines.
      */
     getVaccineSuggestions: (patientId) => axiosInstance.get(`/api/patients/${patientId}/vaccine-suggestions`),
+    sendVaccinationCertificateEmail: (orderId) => axiosInstance.get(`/api/vaccination-orders/${orderId}/certificate`),
 
 
-    // //////////////////////////////////////////////////////////////////////////////////////////
     // Reporting endpoints:
     getUserDemographicsReport: (groupBy) => axiosInstance.get('/api/reports/user-demographics', { params: { groupBy } }),
     getDosesDailyReport: (filters) => axiosInstance.get('/api/reports/doses-daily', { params: filters }),
     getPopulationCoverageReport: (filters) => axiosInstance.get('/api/reports/population-coverage', { params: filters }),
 
 
-    // Watchlist/Public Data Endpoints (uncomment and implement as needed)
+    // Watchlist/Public Data Endpoints
     getWatchlistSummary: () => axiosInstance.get('/api/reports/watchlist-summary'),
 
-    // --- NEW: Notification Endpoints ---
+
+    // Notification Endpoints
     /**
      * Sends a QR code email to the patient for a vaccination order payment.
      * @param {string} orderId The ID of the vaccination order.
