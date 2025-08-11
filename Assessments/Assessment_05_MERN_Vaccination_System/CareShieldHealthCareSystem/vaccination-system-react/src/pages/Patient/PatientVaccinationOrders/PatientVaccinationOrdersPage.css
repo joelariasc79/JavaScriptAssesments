@@ -1,0 +1,171 @@
+/* src/pages/Patient/PatientVaccinationOrders/PatientVaccinationOrdersPage.css */
+
+.patient-approved-orders-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.patient-approved-orders-container h2 {
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+}
+
+.loading, .error-message, .info-message {
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 1.1em;
+}
+
+.loading {
+    background-color: #e0f7fa;
+    color: #007bb5;
+    border: 1px solid #b3e5fc;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ef9a9a;
+}
+
+.info-message {
+    background-color: #fffde7;
+    color: #fbc02d;
+    border: 1px solid #fff59d;
+}
+
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.order-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.order-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.order-card h3 {
+    color: #007bff;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.6em;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.order-card p {
+    margin: 8px 0;
+    font-size: 0.98em;
+    line-height: 1.5;
+}
+
+.order-card p strong {
+    color: #555;
+    font-weight: 600;
+}
+
+/* Status styling */
+.status-pending_payment { color: #ff9800; font-weight: bold; } /* Orange */
+.status-paid { color: #4caf50; font-weight: bold; } /* Green */
+.status-refunded { color: #9e9e9e; font-weight: bold; } /* Grey */
+.status-cancelled { color: #f44336; font-weight: bold; } /* Red */
+.status-pending_scheduling { color: #2196f3; font-weight: bold; } /* Blue */
+.status-scheduled { color: #00bcd4; font-weight: bold; } /* Cyan */
+.status-pending_approval { color: #ffeb3b; font-weight: bold; } /* Yellow */
+.status-pending_vaccination { color: #673ab7; font-weight: bold; } /* Deep Purple */
+.status-vaccinated { color: #3f51b5; font-weight: bold; } /* Indigo */
+.status-not_vaccinated { color: #795548; font-weight: bold; } /* Brown */
+.status-missed { color: #ff5722; font-weight: bold; } /* Deep Orange */
+.status-completed { color: #8bc34a; font-weight: bold; } /* Light Green */
+
+
+.order-actions {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap */
+    gap: 10px;
+    justify-content: flex-start; /* Align buttons to the start */
+    padding-top: 15px;
+    border-top: 1px dashed #f0f0f0;
+}
+
+/* Button styles (assuming common Button component, but defining here for clarity) */
+.btn-primary, .btn-secondary, .btn-success, .btn-danger {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-grow: 1; /* Allow buttons to grow and fill space */
+    text-align: center;
+}
+
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover:not(:disabled) { background-color: #0056b3; transform: translateY(-2px); }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover:not(:disabled) { background-color: #5a6268; transform: translateY(-2px); }
+
+.btn-success { background-color: #28a745; color: white; }
+.btn-success:hover:not(:disabled) { background-color: #218838; transform: translateY(-2px); }
+
+.btn-danger { background-color: #dc3545; color: white; }
+.btn-danger:hover:not(:disabled) { background-color: #c82333; transform: translateY(-2px); }
+
+.btn-primary:disabled, .btn-secondary:disabled, .btn-success:disabled, .btn-danger:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.appointment-info {
+    font-style: italic;
+    color: #007bff;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Styles for cancelled/vaccinated cards */
+.card-cancelled {
+    opacity: 0.7;
+    border-color: #f44336;
+    background-color: #ffebee;
+}
+.card-vaccinated {
+    opacity: 0.9;
+    border-color: #4caf50;
+    background-color: #e8f5e9;
+}
+
+/* Modal specific styles (assuming your Modal component takes care of basic layout) */
+/* If you need specific styles for the modal content within this page: */
+.modal-content-date-input {
+    margin-top: 20px;
+}

@@ -1,0 +1,108 @@
+/* src/pages/Auth/RegisterPage.css */
+
+.register-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height)); /* Adjust for header/footer if present */
+    padding: var(--spacing-xl);
+    background-color: var(--color-background-light); /* Light background for pages */
+    font-family: var(--font-family-primary);
+    color: var(--color-text-primary);
+}
+
+.register-page-card {
+    background-color: var(--color-white);
+    padding: var(--spacing-xxl); /* More padding for a substantial card */
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium); /* Consistent shadow */
+    width: 100%;
+    max-width: 550px; /* Slightly wider for the form content */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.register-page-card h2 {
+    font-size: var(--font-size-h2);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    font-weight: 700;
+}
+
+.register-page-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md); /* Spacing between form groups */
+}
+
+.register-page-form h3 {
+    font-size: var(--font-size-h5);
+    color: var(--color-text-primary);
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+.register-page-form .input-group {
+    margin-bottom: 0; /* Reset default margin from Input.css as we use gap */
+}
+
+.register-page-form .input-field,
+.register-page-form select {
+    /* Ensure consistent styling for all form fields */
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-medium-gray);
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    transition: border-color var(--transition-ease);
+    box-sizing: border-box; /* Important for consistent width */
+}
+
+.register-page-form .input-field:focus,
+.register-page-form select:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 2px rgba(var(--color-secondary-rgb), 0.2);
+}
+
+.register-page-form .button {
+    margin-top: var(--spacing-lg); /* Space above the submit button */
+    width: 100%; /* Make button full width */
+}
+
+.register-page-container .login-link-text {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    color: var(--color-text-secondary);
+}
+
+.register-page-container .login-link-text button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    color: var(--color-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color var(--transition-ease);
+}
+
+.register-page-container .login-link-text button:hover {
+    color: var(--color-secondary-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .register-page-card {
+        padding: var(--spacing-lg);
+        max-width: 95%; /* Allow it to take more width on small screens */
+    }
+
+    .register-page-card h2 {
+        font-size: var(--font-size-h3);
+        margin-bottom: var(--spacing-lg);
+    }
+}

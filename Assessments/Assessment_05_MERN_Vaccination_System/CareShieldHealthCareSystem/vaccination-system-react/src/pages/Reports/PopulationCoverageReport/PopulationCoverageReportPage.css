@@ -1,0 +1,92 @@
+/* src/pages/Reports/PopulationCoverageReport/PopulationCoverageReport.css */
+
+.report-page-container {
+    padding: var(--spacing-xl);
+    background-color: var(--color-background-light);
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+    color: var(--color-text-primary);
+}
+
+.report-header-section {
+    display: flex;
+    justify-content: space-between; /* Pushes title to left, button to right */
+    align-items: center; /* Vertically aligns them */
+    margin-bottom: var(--spacing-lg); /* Space below the header */
+}
+
+.report-header-section h2 {
+    font-size: var(--font-size-h2);
+    color: var(--color-primary-dark);
+    margin: 0; /* Remove default H2 margin for clean alignment */
+}
+
+/* If you uncomment the report-controls section in the JS, uncomment these: */
+/*
+.report-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-white);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.report-controls label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.report-controls select {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-medium-gray);
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-base);
+    background-color: var(--color-white);
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.report-controls select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+*/
+
+.report-content {
+    background-color: var(--color-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-medium);
+    margin-bottom: var(--spacing-xl);
+}
+
+.report-content h3 {
+    margin-top: 0;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-secondary-dark);
+    border-bottom: 1px solid var(--color-light-gray);
+    padding-bottom: var(--spacing-xs);
+}
+
+.report-status,
+.report-error,
+.no-data-message {
+    text-align: center;
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.report-error {
+    color: var(--color-error);
+    font-weight: 600;
+}
+
+.no-data-message {
+    color: var(--color-text-secondary);
+}

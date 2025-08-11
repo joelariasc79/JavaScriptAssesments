@@ -1,0 +1,46 @@
+/* src/components/charts/BarChart/BarChart.css */
+
+.bar-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto; /* Allow horizontal scroll for many bars */
+    padding: var(--spacing-sm);
+}
+
+.bar-chart-container svg {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.bar {
+    fill: var(--color-secondary); /* Use a consistent color from your variables */
+    transition: fill 0.3s ease;
+}
+
+.bar:hover {
+    fill: var(--color-secondary-dark);
+}
+
+.x-axis path,
+.y-axis path {
+    stroke: var(--color-medium-gray);
+}
+
+.x-axis line,
+.y-axis line {
+    stroke: var(--color-light-gray);
+}
+
+.x-axis text,
+.y-axis text {
+    fill: var(--color-text-secondary);
+    font-size: var(--font-size-small);
+}
+
+.y-axis-label {
+    fill: var(--color-text-primary);
+    font-size: var(--font-size-base);
+    font-weight: bold;
+}
