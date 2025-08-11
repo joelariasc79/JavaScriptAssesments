@@ -8,8 +8,7 @@ const HospitalModel = require('../dataModel/hospitalDataModel');
 const UserModel = require('../dataModel/userDataModel');
 const mongoose = require('mongoose');
 const QRCode = require('qrcode'); // Import the qrcode library
-
-const { authenticateToken } = require('./userRoute');
+const { authenticateToken } = require('../middleware/authMiddleware');
 const notificationService = require('../services/notificationService'); // Import the notification service
 
 /**

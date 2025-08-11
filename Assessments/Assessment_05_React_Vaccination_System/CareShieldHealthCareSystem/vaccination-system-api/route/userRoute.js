@@ -1,35 +1,23 @@
 const express = require('express');
 const userRouter = express.Router({ strict: true, caseSensitive: true });
-const bcrypt = require('bcryptjs'); // Import bcryptjs for password hashing and comparison
+
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 const UserModel = require('../dataModel/userDataModel'); // Import the Mongoose User model
-const HospitalModel = require('../dataModel/hospitalDataModel'); // Make sure this is imported
+// const HospitalModel = require('../dataModel/hospitalDataModel'); // Make sure this is imported
 const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel'); // Make sure this is imported
-
 const mongoose = require('mongoose'); // Import mongoose to use its Types.ObjectId.isValid and other utilities
+// const bcrypt = require('bcryptjs'); // Import bcryptjs for password hashing and comparison
+const { authenticateToken } = require('../middleware/authMiddleware');
 
-// --- IMPORTANT: JWT Secret Key ---
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_please_change_this_in_production';
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h'; // Token expiration time
 
-// --- Middleware for JWT Authentication ---
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) {
-        return res.status(401).json({ message: 'Authentication token required.' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            console.error('JWT verification failed:', err.message);
-            return res.status(403).json({ message: 'Invalid or expired authentication token.' });
-        }
-        req.user = user;
-        next();
-    });
+// Check if the JWT_SECRET is set
+if (!JWT_SECRET) {
+    console.error("FATAL ERROR: JWT_SECRET is not defined. Please set it in your .env file.");
+    process.exit(1); // Exit the process with a failure code
 }
+
 
 // --- Patient Registration Endpoint ---
 userRouter.post('/api/auth/register', async (req, res) => {

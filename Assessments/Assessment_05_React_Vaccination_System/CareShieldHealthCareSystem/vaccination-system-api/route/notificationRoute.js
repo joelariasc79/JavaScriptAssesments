@@ -5,8 +5,7 @@ const { createAndSendNotification, generateQrCodeBuffer } = require('../services
 
 const UserModel = require('../dataModel/userDataModel'); // Assuming you use this to get user email
 const VaccinationOrderModel = require('../dataModel/vaccinationOrderModel');
-// const { authenticateToken } = require('../middleware/authMiddleware'); // Your auth middleware
-const { authenticateToken } = require('./userRoute');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 // Endpoint to send QR code email for a vaccination order
 router.post('/api/notifications/send-qr-email', authenticateToken, async (req, res) => {

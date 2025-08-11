@@ -2,13 +2,8 @@
 const express = require('express');
 const vaccineStockRouter = express.Router({ strict: true, caseSensitive: true });
 const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // Import the VaccineStock model
-const VaccineModel = require('../dataModel/vaccineDataModel'); // Import the Vaccine model for validation
-const HospitalModel = require('../dataModel/hospitalDataModel'); // Import the Hospital model for validation
 const mongoose = require('mongoose'); // Import mongoose for ObjectId validation
-
-const { authenticateToken } = require('./userRoute'); // Adjust path if needed
-
-// Removed the POST /api/vaccine-stock route as PATCH with upsert:true handles both scenarios.
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 /**
  * @route GET /api/vaccine-stock

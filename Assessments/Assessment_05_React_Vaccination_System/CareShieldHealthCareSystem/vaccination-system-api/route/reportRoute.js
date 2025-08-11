@@ -1,14 +1,15 @@
 // route/reportRoute.js
 const express = require('express');
 const reportRouter = express.Router({ strict: true, caseSensitive: true });
-// const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel');
+const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel');
 const UserModel = require('../dataModel/userDataModel');
 const VaccineModel = require('../dataModel/vaccineDataModel');
 const HospitalModel = require('../dataModel/hospitalDataModel');
 const mongoose = require('mongoose');
-
 // Assuming authenticateToken is exported from userRoute.js
-const { authenticateToken } = require('./userRoute'); // Adjust path if needed
+const { authenticateToken } = require('../middleware/authMiddleware');
+// const { authenticateToken } = require('./userRoute'); // Adjust path if needed
+
 
 // Helper function to determine age group (already present, keeping for context)
 const getAgeGroup = (age) => {

@@ -31,10 +31,10 @@ const apiService = {
     createVaccinationOrder: (orderData) => axiosInstance.post('/api/vaccination-orders', orderData),
     getPendingApprovalVaccinationOrders: (hospitalId) =>
         axiosInstance.get(`/api/vaccination-orders/hospital/${hospitalId}/pending-approval`),
-    /* url is sent by the slice, they could be:
-    /api/vaccination-orders/${orderId}/approve or
-    /api/vaccination-orders/${orderId}/reject */
-    updateVaccinationOrder: (url, data) => axiosInstance.patch(url, data),
+    /* update the slice and apiService to send the url from the apiService
+    * */
+    approveVaccinationOrder: (url, data) => axiosInstance.patch(url, data),
+    rejectVaccinationOrder: (url, data) => axiosInstance.patch(url, data),
     getVaccinatedPersonsByHospital: (hospitalId) => axiosInstance.get(`/api/vaccination-records/hospital/${hospitalId}/vaccinated-persons`),
 
 

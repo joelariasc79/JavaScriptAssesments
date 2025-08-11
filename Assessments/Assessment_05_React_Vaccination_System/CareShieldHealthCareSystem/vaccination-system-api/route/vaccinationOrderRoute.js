@@ -1,10 +1,14 @@
 // src/backend/routes/vaccinationOrderRoute.js
 const express = require('express');
 const mongoose = require('mongoose'); // For ObjectId validation
-const PDFDocument = require('pdfkit'); // Import PDFDocument for PDF generation
-const fs = require('fs'); // For file system operations (optional, for saving to disk)
+// const PDFDocument = require('pdfkit'); // Import PDFDocument for PDF generation
+// const fs = require('fs'); // For file system operations (optional, for saving to disk)
+// Cloudinary: Working In Progress:
 const cloudinary = require('cloudinary').v2; // Import Cloudinary SDK
-const streamifier = require('streamifier'); // To convert buffer to stream for Cloudinary upload
+// To convert buffer to stream for Cloudinary upload
+const streamifier = require('streamifier');
+const { authenticateToken } = require('../middleware/authMiddleware');
+const { generateAndEmailCertificate } = require('../services/certificateService');
 
 const vaccinationOrderRouter = express.Router({ strict: true, caseSensitive: true });
 const VaccinationOrderModel = require('../dataModel/vaccinationOrderModel'); // Adjust path as needed
@@ -13,13 +17,7 @@ const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // NEW:
 const UserModel = require('../dataModel/userDataModel'); // For checking if user (patient) exists
 const VaccineModel = require('../dataModel/vaccineDataModel'); // For checking if vaccine exists
 const HospitalModel = require('../dataModel/hospitalDataModel'); // For checking if hospital exists
-const { generateAndEmailCertificate } = require('../services/certificateService'); // NEW IMPORT
 
-
-
-// Assuming authenticateToken is exported from userRoute.js or authMiddleware.js
-// const { authenticateToken } = require('../middleware/authMiddleware'); // Adjust path if needed
-const { authenticateToken } = require('./userRoute'); // Adjust path if needed
 
 // --- Cloudinary Configuration ---
 // IMPORTANT: Use environment variables for these credentials in production!

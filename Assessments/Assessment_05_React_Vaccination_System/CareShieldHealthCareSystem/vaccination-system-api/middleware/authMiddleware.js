@@ -1,7 +1,13 @@
 // /middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Check if the JWT_SECRET is set
+if (!JWT_SECRET) {
+    console.error("FATAL ERROR: JWT_SECRET is not defined. Please set it in your .env file.");
+    process.exit(1); // Exit the process with a failure code
+}
 
 const authenticateToken = (req, res, next) => {
     // Get token from header

@@ -1,6 +1,5 @@
 // src/services/notificationService.js
 const NotificationModel = require('../dataModel/notificationDataModel');
-const UserModel = require('../dataModel/userDataModel'); // To get user's contact info
 const QRCode = require('qrcode'); // Already installed via `npm install qrcode`
 const nodemailer = require('nodemailer'); // Install this: npm install nodemailer
 

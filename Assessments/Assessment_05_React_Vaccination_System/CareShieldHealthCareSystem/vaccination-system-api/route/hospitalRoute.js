@@ -3,9 +3,7 @@ const express = require('express');
 const hospitalRouter = express.Router({ strict: true, caseSensitive: true });
 const HospitalModel = require('../dataModel/hospitalDataModel'); // Import the Mongoose Hospital model
 const mongoose = require('mongoose'); // Import mongoose for ObjectId validation
-
-// Assuming authenticateToken is exported from userRoute.js
-const { authenticateToken } = require('./userRoute'); // Adjust path if needed
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 /**
  * @route POST /api/hospitals
