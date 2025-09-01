@@ -18,6 +18,14 @@ const ProductForm = () => {
         category: '',
     });
 
+    // The useEffect hook runs its code whenever the values in its dependency array change?
+
+    // This useEffect hook in a React component is designed to manage the display of status messages—specifically,
+    // it makes a success or error message disappear after a certain period of time. It's a common pattern
+    // for creating a good user experience.
+    // The code essentially says: "Anytime a success or error message appears, start a 5-second countdown.
+    // When the countdown finishes, clear the message. But if a new message arrives before the countdown is over,
+    // cancel the old countdown and start a brand new one."
     useEffect(() => {
         const timer = setTimeout(() => {
             if (successMessage || error) {
@@ -25,11 +33,31 @@ const ProductForm = () => {
             }
         }, 5000);
 
+        // When the countdown finishes, clear the message.
+        // This is the cleanup function for the useEffect hook. It's crucial for preventing memory leaks and unwanted behavior.
+        // This function runs in two scenarios:
+        //      1. When the component unmounts: It clears the timer, so the action to hide the message isn't called
+        //      on a component that no longer exists.
+        //      2. Before the next effect runs: If successMessage or error changes before the 5-second timer is up
+        //          (e.g., the user submits a form again), this function will first clear the old timer,
+        //          so you don't end up with multiple timers racing each other. This ensures that the
+        //          new message stays on screen for the full 5 seconds.
         return () => clearTimeout(timer);
     }, [successMessage, error, dispatch]);
 
+    // This code says: "Whenever a successMessage appears, check if the name input field exists.
+    // If it does, automatically put the cursor in that field so the user can start typing right away."
+    // The code inside this useEffect will only execute when the successMessage state changes.
     useEffect(() => {
+
+        // nameInputRef.current: This part uses a React Ref (useRef). A ref is a way to get a direct reference
+        // to a DOM element (like an input field). The .current property holds the actual DOM node.
+        // This check ensures that the input field exists and has been rendered in the UI.
         if (successMessage && nameInputRef.current) {
+
+            // This line uses the focus() method to programmatically set the cursor inside the nameInputRef input field
+            // This is a common practice to improve user experience, as it allows the user to immediately start
+            // typing in the field after a successful action (e.g., submitting a form).
             nameInputRef.current.focus();
         }
     }, [successMessage]);

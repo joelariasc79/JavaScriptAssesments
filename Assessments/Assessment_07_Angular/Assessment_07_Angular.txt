@@ -1,0 +1,316 @@
+// **************************************************************************
+// Angular assessment - Basic knowledge questions 29th August 2025
+// **************************************************************************
+
+
+// **************************************************************************
+// 1. What is Angular and what are its key features?
+// **************************************************************************
+
+Angular is a powerful, open-source framework for building dynamic, single-page web applications.
+Developed and maintained by Google, it provides a structured and opinionated approach to creating
+scalable and maintainable applications that run efficiently in a web browser
+
+Key Features of Angular
+
+	• Component-based Architecture: Applications are built as a tree of self-contained, reusable components.
+	Each component manages its own logic, data, and view.
+	• TypeScript: Angular is built on TypeScript, a superset of JavaScript that adds static typing and other features.
+	• Data Binding: This feature allows for automatic synchronization of data between the model and the view.
+	Angular supports two primary types of data binding:
+		○ One-way data binding for properties and events.
+		○ Two-way data binding with ngModel to instantly sync data between the component and the template.
+	• Dependency Injection (DI): Angular uses a built-in DI system to provide components and services
+	 with the dependencies they need.
+	• Angular CLI (Command Line Interface): The CLI is a powerful tool for generating, serving, and
+	testing Angular applications. It automates common development tasks, such as creating new components,
+	services, and modules, with simple commands.
+	• Routing: Angular's router manages navigation between different views or components within the application.
+	• Directives: Directives are markers on DOM elements that tell Angular to attach specific behavior to that element.
+	The two main types are structural directives (like *ngIf and *ngFor)
+	and attribute directives (like ngClass and ngStyle).
+	• Standalone Components: While historically Angular relied on NgModules to organize components,
+	services, and pipes, modern Angular development encourages the use of standalone components.
+	This simplifies the project structure by making components self-contained and reducing boilerplate code.
+
+
+
+// **************************************************************************
+// 2. Explain the concept of components in Angular.
+// **************************************************************************
+
+In Angular, a component is the most fundamental building block of a user interface. Think of it as a reusable,
+self-contained, and encapsulated unit that controls a specific part of your application's screen.
+
+Each component is made up of three essential parts that work together:
+
+	1. A Template (HTML): This defines the component's view—what the user sees on the screen.
+	It's a standard HTML file that can also include Angular-specific syntax for things like
+	data binding and structural directives.
+	2. A Class (TypeScript): This contains the component's logic and data. It's where you'll write the code
+	to handle user input, fetch data from a server, and prepare data for the template.
+	3. Styles (CSS): This defines the component's appearance. By default, the styles you define here are scoped
+	to the component, so they won't accidentally affect other elements on the page.
+
+
+The @Component Decorator
+
+The glue that holds these three parts together is the @Component decorator.It's a special function that
+attaches metadata to a TypeScript class, telling Angular that this class is, in fact, a component.
+The metadata includes key properties:
+	• selector: A CSS selector that tells Angular where to insert this component in an HTML template.
+	• templateUrl or template: A path to the component's HTML file or an inline string of HTML.
+	• styleUrls or styles: An array of paths to the component's CSS files or an inline array of CSS strings.
+
+
+Components often need to share data and interact with each other:
+	• @Input(): Allows a parent component to pass data down to a child component.
+	• @Output(): Allows a child component to send data or events up to its parent.
+
+
+
+// **************************************************************************
+// 3. What is data binding in Angular? Describe the different types of data binding.
+// **************************************************************************
+
+
+Data binding is a core concept in Angular that allows you to establish a connection between your application's
+logic (the component) and its visual representation (the template). It's what makes your web application dynamic
+and interactive, ensuring the user interface always reflects the latest state of the data.
+
+// ***************************
+*** One-Way Data Binding ***
+// ***************************
+
+In one-way data binding, data flows in a single direction. There are three primary types:
+
+***  1. Interpolation ({{ }}) ***
+
+
+This is the simplest form of data binding. It allows you to display a component's property value in the template.
+The data flows from the component to the view.
+
+	• Syntax: Double curly braces {{ propertyName }}
+	• Use case: Displaying text, a number, or any other value.
+
+<!-- In the template (.html) -->
+<p>Welcome, {{ username }}!</p>
+
+// In the component (.ts)
+username = 'JaneDoe';
+
+
+
+*** 2. Property Binding ([ ]) ***
+
+Property binding lets you set a property of an HTML element to the value of a component's property. The data also
+flows from the component to the view.
+
+	• Syntax: Square brackets [property-name]
+	• Use case: Dynamically setting attributes like src for images, disabled for buttons, or href for links.
+
+<!-- In the template (.html) -->
+<button [disabled]="isButtonDisabled">Click Me</button>
+
+// In the component (.ts)
+isButtonDisabled = true;
+
+
+
+***  3. Event Binding (( )) ***
+
+Event binding allows you to respond to events that happen in the template, like a click, a keypress, or a form
+submission. When the event occurs, Angular executes a method in the component. The data flows from the view to the component.
+
+	• Syntax: Parentheses (event-name)
+	• Use case: Calling a function when a button is clicked or a form is submitted.
+
+<!-- In the template (.html) -->
+<button (click)="saveData()">Save</button>
+
+// In the component (.ts)
+saveData() {
+  console.log('Data saved!');
+}
+
+
+// ***************************
+*** Two-Way Data Binding ***
+// ***************************
+
+
+Two-way data binding allows for data to flow in both directions simultaneously—from the component to the view and
+from the view back to the component. This is particularly useful for form elements where the user can change the data.
+
+[(ngModel)]
+
+This special directive combines property binding and event binding. It listens for changes in the view and
+automatically updates the component's property. Simultaneously, if the component's property changes, it updates the view.
+
+	• Syntax: A combination of parentheses and square brackets, also known as the "banana in a box" syntax [( )]
+	• Use case: Creating interactive forms where the value of an input field needs to be constantly synchronized with a variable in the component.
+
+<!-- In the template (.html) -->
+<input [(ngModel)]="searchQuery" placeholder="Search...">
+<p>You are searching for: {{ searchQuery }}</p>
+
+// In the component (.ts)
+searchQuery = '';
+
+
+
+// **************************************************************************
+// 4. How does Angular handle dependency injection?
+// **************************************************************************
+
+
+Dependency Injection (DI) is a design pattern used to make code more flexible, testable, and maintainable.
+In Angular, it is a built-in framework that handles the creation and management of objects, allowing components
+and other services to receive their dependencies rather than creating them themselves.
+
+DI Concepts:
+
+
+*** 1. Injectors ***
+
+An injector is a runtime mechanism that finds a service provider and creates an instance of the service.
+Angular creates a hierarchy of injectors, starting with the root injector for the entire application.
+
+	• Root Injector: Provides a single, global instance of a service for the entire application. This is the
+	default behavior when you use providedIn: 'root'.
+	• Component Injector: Each component has its own injector. This allows you to create a separate instance of
+	a service for that specific component and its children.
+
+
+
+*** 2. Providers ***
+
+A provider is a configuration that tells an injector how to create a service. When you ask for a service,
+the injector looks for a provider for that service.
+The most common way to provide a service is by using the @Injectable() decorator with providedIn: 'root'.
+
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root' // This makes the service available everywhere.
+})
+export class LoggerService {
+  log(message: string) {
+    console.log(`[LOG]: ${message}`);
+  }
+}
+
+By setting providedIn: 'root', you are telling Angular to create a single, shared instance of LoggerService that
+can be injected anywhere in your application. This is known as a singleton.
+
+
+
+*** 3. Services ***
+
+A service is a class that contains business logic, data, or shared functionality. Services are meant to be injected
+into components or other services. They are often marked with the @Injectable() decorator to signal
+that they can be injected.
+
+
+
+*** 4. The constructor ***
+
+The constructor is where a component or service requests the dependencies it needs. Angular's DI system reads
+the types of the constructor parameters and automatically provides an instance of the corresponding service.
+
+Here's an example of a component that uses dependency injection to get an instance of our LoggerService:
+
+
+import { Component } from '@angular/core';
+import { LoggerService } from './logger.service'; // Adjust path as needed
+
+@Component({
+  selector: 'app-home',
+  template: `<button (click)="logMessage()">Log a message</button>`
+})
+
+export class HomeComponent {
+
+  // Angular automatically provides an instance of LoggerService
+  // because we've declared it as a dependency in the constructor.
+  constructor(private logger: LoggerService) {}
+
+  logMessage() {
+    this.logger.log('The button was clicked!');
+  }
+}
+
+
+// **************************************************************************
+// 5. What are directives in Angular? Provide examples of built-in directives.
+// **************************************************************************
+
+In Angular, a directive is a class that adds new behavior to elements in the HTML template.
+It's a fundamental concept that allows you to extend the functionality of HTML and make your application's
+user interface dynamic and interactive.
+Directives are essentially markers on a DOM element that tell Angular to do something to it.
+Instead of manually manipulating the DOM, you let Angular handle the work by simply placing a
+directive on an element in your template.
+
+
+The Three Types of Directives
+
+Angular has three main categories of directives, each serving a different purpose:
+
+	1. Component Directives: These are the most common and powerful directives. As discussed in a previous response,
+	a component is essentially a directive with a template. The @Component decorator is a directive
+	that tells Angular to render the associated template and logic.
+	2. Structural Directives: These directives are used to modify the structure of the DOM. They add, remove,
+	or replace elements in the DOM tree based on a condition or a data source. They are always prefixed with an asterisk (*).
+
+	*ngIf: Conditionally adds or removes an element from the DOM.
+		<p *ngIf="isLoggedIn">Welcome, user!</p>
+
+	*ngFor: Renders a list of items by iterating over a collection.
+		<ul>
+		  <li *ngFor="let item of items">{{ item }}</li>
+		</ul>
+
+	*ngSwitch: Displays one of several elements based on a condition. It works in conjunction with
+	*ngSwitchCase and *ngSwitchDefault.
+		<div [ngSwitch]="status">
+		  <p *ngSwitchCase="'pending'">Status: Pending</p>
+		  <p *ngSwitchCase="'completed'">Status: Completed</p>
+		  <p *ngSwitchDefault>Status: Unknown</p>
+		</div>
+
+
+	3. Attribute Directives: These directives change the appearance or behavior of an element, component,
+	or another directive. They don't change the DOM structure.
+
+	ngClass: Adds or removes CSS classes from an element based on conditions.
+		<div [ngClass]="{ 'highlight': isUrgent, 'inactive': !isActive }">
+		  This element's style will change dynamically.
+		</div>
+
+
+	ngStyle: Sets CSS styles for an element based on component properties.
+		<h1 [ngStyle]="{ 'background-color': backgroundColor, 'font-size.px': fontSize }">
+		  Dynamic Styles
+		</h1>
+
+
+
+// **************************************************************************
+// 6. Explain the difference between Angular modules and components.
+// **************************************************************************
+	• A component is a single, reusable part of the user interface that you see on the screen.
+	It's a visual block, like a login form, a button, or a navigation bar.
+	• A module (specifically, an NgModule) is a container that groups related components, services, and pipes.
+	It's like a logical blueprint that defines how a particular feature of your application works.
+
+
+
+// **************************************************************************
+// 7. Create a simple Angular component that displays a list of items and allows users to add new items to the list.
+// **************************************************************************
+
+
+
+

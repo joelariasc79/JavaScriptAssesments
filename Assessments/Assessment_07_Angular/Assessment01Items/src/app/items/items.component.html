@@ -1,0 +1,24 @@
+<div>
+  <div class="flex items-center gap-2">
+    <input #itemInput name="item" class="border rounded px-2 py-1 flex-1" placeholder="Enter item name">
+    <button (click)="addItem(itemInput.value); itemInput.value = ''" class="bg-blue-500 text-white rounded px-4 py-1 hover:bg-blue-600 transition-colors">
+      Add
+    </button>
+  </div>
+
+  <div>
+    <h3>Item List:</h3>
+    @if (items.length > 0){
+      <ul>
+        @for (item of items; track item.name) {
+          <li>
+            <span>{{ item.name }}</span>
+          </li>
+        }
+      </ul>
+    }
+    @else {
+      <p class="text-gray-500 text-center">No items to display.</p>
+    }
+  </div>
+</div>

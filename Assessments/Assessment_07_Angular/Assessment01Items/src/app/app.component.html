@@ -1,0 +1,6 @@
+<main class="w-full min-h-screen flex justify-center items-start">
+  <div class="p-6">
+    <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Items</h1>
+    <app-items [items]="shopItems()" (addItemEvent)="addNewItem($event)"></app-items>
+  </div>
+</main>
