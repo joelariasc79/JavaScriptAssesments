@@ -1,7 +1,7 @@
 // backend/routes/couponRouter.js
 const express = require('express');
 const couponRouter = express.Router();
-const CouponDataModel = require('../DataModel/couponDataModel'); // Import the new model
+const CouponDataModel = require('../DataModel/couponDataModel'); // Import the new models
 
 
 /**

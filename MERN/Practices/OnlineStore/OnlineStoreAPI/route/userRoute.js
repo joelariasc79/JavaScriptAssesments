@@ -1,6 +1,6 @@
 const express = require('express');
 const userRouter = express.Router({strict:true, caseSensitive: true});
-const userDataModel = require('../DataModel/userDataModel'); // Import the new User model
+const userDataModel = require('../DataModel/userDataModel'); // Import the new User models
 
 /**
  * @route POST /api/users

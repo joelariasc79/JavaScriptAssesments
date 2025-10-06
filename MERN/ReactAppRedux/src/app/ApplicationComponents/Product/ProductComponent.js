@@ -32,7 +32,7 @@ let ProductComponent = (props) => {
     }, [])
 
     let saveProductClick = (evt)=>{
-        //creating product data model to be saved in db using product api
+        //creating product data models to be saved in db using product api
         let productToSave = {
             name : name.current.value,
             price : price.current.value,

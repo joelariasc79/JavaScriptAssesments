@@ -1,0 +1,95 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="min-h-screen bg-gray-100 p-4 sm:p-8 font-sans">
+  <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-gray-900 mb-2">
+    Disease Administration Panel
+  </h1>
+  <p class="text-center text-gray-600 mb-8">
+    Application to manage disease data.
+  </p>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-1 gap-8">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-200">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Existing diseases</h2>
+        <button
+          (click)="onCreateClick()"
+          class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>Create disease</span>
+        </button>
+      </div>
+      <div *ngIf="loading()" class="text-center text-gray-500">
+        <p>Loading diseases...</p>
+      </div>
+
+      <div *ngIf="diseases().length > 0 && !loading()" class="overflow-x-auto">
+        <table class="min-w-full table-auto">
+          <thead>
+          <tr class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
+            <th class="py-3 px-6 text-left">Name</th>
+            <th class="py-3 px-6 text-left hidden sm:table-cell">Specialty</th>
+            <th class="py-3 px-6 text-center">Actions</th>
+          </tr>
+          </thead>
+          <tbody class="text-gray-600 text-sm font-light">
+          <tr *ngFor="let disease of diseases()" class="border-b border-gray-200 hover:bg-gray-100">
+            <td class="py-3 px-6 text-left whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2h2V1a1 1 0 112 0v2h2a2 2 0 012 2v15a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm3 2a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <span class="font-medium">{{ disease.name }}</span>
+              </div>
+            </td>
+            <!-- Access specialty.name -->
+            <td class="py-3 px-6 text-left hidden sm:table-cell">{{ disease.specialty.name }}</td>
+            <td class="py-3 px-6 text-center">
+              <div class="flex item-center justify-center space-x-2">
+                <button (click)="onUpdateClick(disease)" class="transform hover:scale-110">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <!-- Added null check for _id -->
+                <button (click)="disease._id && onDeleteClick(disease._id)" class="transform hover:scale-110">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="diseases().length === 0 && !loading()" class="text-center text-gray-500">
+        <p>No diseases were found. Add a new one to get started!</p>
+      </div>
+      <!-- Display any component-level messages/errors -->
+      <p *ngIf="message()" class="mt-4 text-center p-3 rounded-lg"
+         [class.bg-red-100]="error()" [class.text-red-800]="error()"
+         [class.bg-green-100]="!error()" [class.text-green-800]="!error()">
+        {{ message() }}
+      </p>
+    </div>
+  </div>
+</div>

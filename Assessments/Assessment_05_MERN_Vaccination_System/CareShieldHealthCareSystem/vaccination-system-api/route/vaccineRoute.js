@@ -1,7 +1,7 @@
 // route/vaccineRoute.js
 const express = require('express');
 const vaccineRouter = express.Router({ strict: true, caseSensitive: true });
-const VaccineModel = require('../dataModel/vaccineDataModel'); // Import the Mongoose Vaccine model
+const VaccineModel = require('../dataModel/vaccineDataModel'); // Import the Mongoose Vaccine models
 const mongoose = require('mongoose'); // Import mongoose for ObjectId validation
 const { authenticateToken } = require('../middleware/authMiddleware');
 

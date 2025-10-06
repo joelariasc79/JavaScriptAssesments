@@ -1,0 +1,83 @@
+<header class="bg-white dark:bg-gray-800 shadow-md">
+  <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+    <div class="flex items-center space-x-3">
+      <!-- Icon placeholder (using basic circle/info icon for example) -->
+      <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 15h2v2h-2v-2zm0-10h2v8h-2V7z" />
+      </svg>
+      <a routerLink="/" class="text-xl font-bold text-gray-900 dark:text-white">Health System</a>
+    </div>
+
+
+    <!-- Role Selector for Demo purposes -->
+<!--    <div class="flex items-center space-x-4">-->
+<!--      <select (change)="changeRole($event)" class="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm dark:bg-gray-700 dark:text-white">-->
+<!--        <option value="none" [selected]="userRole() === null">Guest (Sign In)</option>-->
+<!--        <option value="admin" [selected]="userRole() === 'admin'">Admin</option>-->
+<!--        <option value="hospital" [selected]="userRole() === 'hospital'">Hospital</option>-->
+<!--        <option value="patient" [selected]="userRole() === 'patient'">Patient</option>-->
+<!--      </select>-->
+<!--    </div>-->
+
+
+    <nav class="flex flex-grow justify-center md:justify-end">
+      <ul class="flex flex-col md:flex-row items-center md:space-x-6 space-y-2 md:space-y-0 text-lg">
+
+        @if (userRole() === 'admin') {
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/hospital-management/hospital-dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">Hospital Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/patient-management" routerLinkActive="active" ariaCurrentWhenActive="page">Patients Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/doctor-management" routerLinkActive="active" ariaCurrentWhenActive="page">Doctors Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/disease-management" routerLinkActive="active" ariaCurrentWhenActive="page">Diseases Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/admin/patients" routerLinkActive="active" ariaCurrentWhenActive="page">Prescriptions Management</a>
+          </li>
+        }
+
+        @if (userRole() === 'hospital') {
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/hospital/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">Hospital Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/hospital/patients" routerLinkActive="active" ariaCurrentWhenActive="page">My Patients</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/hospital/register-patient" routerLinkActive="active" ariaCurrentWhenActive="page">Register Patient</a>
+          </li>
+        }
+
+        @if (userRole() === 'patient') {
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/patient/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">Patient Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="/patient/records" routerLinkActive="active" ariaCurrentWhenActive="page">My Records</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" routerLink="patient/patient-screening-management" routerLinkActive="active" ariaCurrentWhenActive="page">Screenings</a>
+          </li>
+        }
+
+        <!-- Logout Button (visible only if a user is logged in) -->
+        @if (userRole()) {
+          <li class="nav-item ml-4">
+            <button (click)="onLogout()" class="nav-link text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors flex items-center space-x-1 font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <!-- Display the logged-in user's name next to logout -->
+              <span>Logout ({{ loggedInUser() }})</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

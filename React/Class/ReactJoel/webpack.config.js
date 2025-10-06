@@ -3,7 +3,7 @@
 // once - minification, transpilation, reference resolution, bundling is done
 // output path and the name of the file <bundle.js>
 // default output path is distribution folder => dist/
-// all modules that webpack is dependent on is termed as loaders needed
+// all models that webpack is dependent on is termed as loaders needed
 
 let path = require("path"), //path module of node framework
     HtmlWebpackPlugin = require('html-webpack-plugin'), //to load the index html file on request

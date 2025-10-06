@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const vaccineStockSchema = new mongoose.Schema({
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Hospital', // Reference to the Hospital model
+        ref: 'Hospital', // Reference to the Hospital models
         required: true,
     },
     vaccine: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Vaccine', // Reference to the Vaccine model
+        ref: 'Vaccine', // Reference to the Vaccine models
         required: true,
     },
     quantity: {

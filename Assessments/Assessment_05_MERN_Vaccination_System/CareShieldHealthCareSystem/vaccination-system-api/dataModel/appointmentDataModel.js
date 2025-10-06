@@ -4,17 +4,17 @@ const mongoose = require('mongoose');
 const AppointmentSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // References the User model
+        ref: 'User', // References the User models
         required: true
     },
     hospitalId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Hospital', // References the Hospital model
+        ref: 'Hospital', // References the Hospital models
         required: true
     },
     vaccineId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Vaccine', // References the Vaccine model
+        ref: 'Vaccine', // References the Vaccine models
         required: true
     },
     appointment_date: {

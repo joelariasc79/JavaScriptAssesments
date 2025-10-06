@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema({
     // --- ADD THIS NEW FIELD TO LINK TO HOSPITAL ---
     hospital: {
         type: Schema.Types.ObjectId, // This specifies it's an ID from another document
-        ref: 'Hospital', // This tells Mongoose which model the ID refers to
+        ref: 'Hospital', // This tells Mongoose which models the ID refers to
         // required: false // It's optional because not all users (like patients or global admins) need a hospital link
         required: function() { return this.role === 'hospital_staff'; } // Required only if role is hospital_staff
     },

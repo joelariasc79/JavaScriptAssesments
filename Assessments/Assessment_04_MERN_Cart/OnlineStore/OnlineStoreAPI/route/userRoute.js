@@ -1,6 +1,6 @@
 const express = require('express');
 const userRouter = express.Router({ strict: true, caseSensitive: true });
-const UserModel = require('../DataModel/userDataModel'); // Import the corrected User model
+const UserModel = require('../DataModel/userDataModel'); // Import the corrected User models
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
 // bcrypt is used via the UserModel, so no direct import here is strictly needed for these routes
 
@@ -59,7 +59,7 @@ userRouter.post('/api/auth/register', async (req, res) => {
             return res.status(409).json({ message: 'User with that userId, username, or email already exists.' });
         }
 
-        // Create new user. The pre-save hook in the model will hash the password.
+        // Create new user. The pre-save hook in the models will hash the password.
         const newUser = new UserModel({ userId, username, email, password, address });
         const savedUser = await newUser.save();
 
@@ -134,7 +134,7 @@ userRouter.post('/api/auth/login', async (req, res) => {
 userRouter.post('/api/users', async (req, res) => {
     try {
         // If password is not provided, this will still trigger the Mongoose schema's 'required' validation.
-        // If you intend for this route to *not* handle passwords directly, you need a different user model or logic.
+        // If you intend for this route to *not* handle passwords directly, you need a different user models or logic.
         const newUser = new UserModel(req.body);
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);

@@ -28,7 +28,7 @@ module.exports = (env, argv) => { // Use function to access env and argv if need
             hot: true, // Enable Hot Module Replacement (HMR) for faster development
         },
 
-        // Define how different types of modules are treated
+        // Define how different types of models are treated
         module: {
             rules: [
                 {
@@ -102,7 +102,7 @@ module.exports = (env, argv) => { // Use function to access env and argv if need
 
         // Configure module resolution
         resolve: {
-            // Allows you to import modules without specifying their extensions
+            // Allows you to import models without specifying their extensions
             extensions: ['.js', '.jsx'],
             // You can also add aliases here for easier imports, e.g.,
             // alias: {

@@ -200,7 +200,7 @@ async function getUnreadNotificationCount(userIdString) {
         }
         const userIdObjectId = user._id;
 
-        // CRITICAL FIX: Ensure the retrieved _id is a valid ObjectId before querying the Notification model.
+        // CRITICAL FIX: Ensure the retrieved _id is a valid ObjectId before querying the Notification models.
         if (!mongoose.Types.ObjectId.isValid(userIdObjectId)) {
             console.error(`Invalid ObjectId derived from user._id: ${userIdObjectId} for user string ID: ${userIdString}. Cannot fetch unread notification count.`);
             return 0; // Return 0 if the user's _id is malformed

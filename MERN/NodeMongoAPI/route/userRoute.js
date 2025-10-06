@@ -1,5 +1,5 @@
 //all user api's will come here starting with sign-in and sign-up
-//we import userData model and create object to connect with user collection
+//we import userData models and create object to connect with user collection
 
 let expressObj = require("express")
 

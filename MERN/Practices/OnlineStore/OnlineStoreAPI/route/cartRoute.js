@@ -132,7 +132,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
     }
 
     try {
-        // 1. Find the User document to get its ObjectId (_id) for the Order model
+        // 1. Find the User document to get its ObjectId (_id) for the Order models
         // This resolves the 'userId: Cast to ObjectId failed' if that was still an issue.
         const user = await userDataModel.findOne({ userId: stringUserId });
         if (!user) {
@@ -171,7 +171,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
                 return res.status(400).json({ message: `Invalid quantity for item '${item.productId.name || 'N/A'}'.` });
             }
 
-            // Use the populated price from the Product model
+            // Use the populated price from the Product models
             const price = Number(item.productId.price);
             if (isNaN(price) || price < 0) {
                 console.warn(`Invalid price for populated product: ${item.productId.name || 'N/A'}. Price: ${item.productId.price}`);

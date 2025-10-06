@@ -1,0 +1,78 @@
+<div style="border: 1px solid gray; padding: 10px; margin: 10px;">
+<p>home works!</p>
+<!-- <div class="home-counter">
+    <button (click)="count = count + 1">Increment</button>
+    <b> Current Count: {{ count }} </b>
+    <button (click)="count = count - 1">Decrement</button>
+</div>
+
+<hr/>
+
+<div class="home-counter">
+    <button (click)="handleDecrement()">Decrement</button>
+    <b> Current Count: {{ count2 }} </b>
+    <button (click)="handleIncrement()">Increment</button>
+</div>
+
+<p><b>Input Counter Value: {{ inputCounter }} </b></p> -->
+
+    <div class="home-counter">
+        <button (click)="handleDecrement()">Decrement</button>
+            <p><b>Input Counter Value: {{ numberData }} </b></p>
+        <button (click)="handleIncrement()">Increment</button>
+    </div>
+</div>
+
+<ul>
+    <li *ngFor="let item of items">{{ item }}</li>
+</ul>
+
+
+<h2 class="text-xl font-semibold text-gray-700 mb-4">Existing Users</h2>
+<ul>AngularApp05
+    <li *ngFor="let user of users">
+        {{ user.userName }},  {{ user.street }},  {{ user.mobile }}
+    </li>
+</ul>
+
+<hr>
+<hr>
+<!-- Form for adding a new user -->
+<div class="mb-8">
+  <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New User</h2>
+  <form (ngSubmit)="addUser()">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <input type="text" [(ngModel)]="newUser.userName" name="userName" placeholder="Username" required
+             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+      <input type="password" [(ngModel)]="newUser.password" name="password" placeholder="Password" required
+             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+      <input type="text" [(ngModel)]="newUser.street" name="street" placeholder="Street" required
+             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+      <input type="text" [(ngModel)]="newUser.mobile" name="mobile" placeholder="Mobile" required
+             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+    </div>
+    <button type="submit"
+            class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+      Add User
+    </button>
+  </form>
+</div>
+
+<hr>
+
+<!-- User list -->
+<div>
+  <h2 class="text-xl font-semibold text-gray-700 mb-4">Existing Users</h2>
+  <ul *ngIf="users.length > 0; else noUsers" class="space-y-4">
+    @for (user of users; track user.userName) {
+      <li class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200">
+        <p class="font-medium text-gray-900">{{ user.userName }}</p>
+        <p class="text-sm text-gray-600">Street: {{ user.street }}</p>
+        <p class="text-sm text-gray-600">Mobile: {{ user.mobile }}</p>
+      </li>
+    }
+  </ul>
+  <ng-template #noUsers>
+    <p class="text-center text-gray-500">No users found.</p>
+  </ng-template>
+</div>

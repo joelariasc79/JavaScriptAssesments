@@ -1028,7 +1028,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
             return res.status(400).json({ message: error.message });
         }
         // This general 11000 check remains for any other unique index violations
-        // that might occur (e.g., if the VaccinationOrder model has other unique indices not related
+        // that might occur (e.g., if the VaccinationOrder models has other unique indices not related
         // to vaccinationRecordId, or if the primary idempotency checks failed for some reason).
         if (error.code === 11000) {
             return res.status(409).json({ message: 'A duplicate entry already exists in the database (e.g., another unique index violation).' });

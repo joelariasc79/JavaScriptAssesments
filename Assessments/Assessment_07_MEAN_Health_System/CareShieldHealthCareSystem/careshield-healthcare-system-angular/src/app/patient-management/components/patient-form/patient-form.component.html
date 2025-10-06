@@ -1,0 +1,167 @@
+<div class="min-h-screen bg-gray-100 p-8 font-sans">
+  <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-2">
+    Patient Administration Panel
+  </h1>
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-1 gap-8">
+    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ isUpdateMode() ? 'Update Patient' : 'Create New Patient' }}</h2>
+      <form (ngSubmit)="submitPatient()">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+          <!--Username-->
+          <div class="flex flex-col">
+            <label for="username" class="text-sm font-medium text-gray-700 mb-1">Username <span class="text-red-500">*</span></label>
+            <input id="username" type="text" [ngModel]="newPatient().username" (ngModelChange)="updateField('username', $event)" name="username"
+                   class="input-field" placeholder="e.g., jhon_doe" required />
+            <span *ngIf="formSubmitted() && !isUserNameValid()" class="text-red-500 text-xs mt-1">The username is required.</span>
+          </div>
+
+          <!--Password-->
+          <div class="flex flex-col">
+            <label for="password" class="text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+            <input id="password" type="password" [ngModel]="newPatient().password" (ngModelChange)="updateField('password', $event)" name="password"
+                   class="input-field" placeholder="e.g., ••••••••" required />
+            <span *ngIf="formSubmitted() && !isPasswordValid()" class="text-red-500 text-xs mt-1">The password is required.</span>
+          </div>
+
+          <!--Email-->
+          <div class="flex flex-col">
+            <label for="email" class="text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+            <input id="email" type="email" [ngModel]="newPatient().email" (ngModelChange)="updateField('email', $event)" name="email"
+                   class="input-field" placeholder="e.g., john@example.com" required />
+            <span *ngIf="formSubmitted() && !isEmailValid()" class="text-red-500 text-xs mt-1">The email is required.</span>
+          </div>
+
+          <!--Full Name-->
+          <div class="flex flex-col">
+            <label for="name" class="text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+            <input id="name" type="text" [ngModel]="newPatient().name" (ngModelChange)="updateField('name', $event)" name="name"
+                   class="input-field" placeholder="e.g., John Doe" required />
+            <span *ngIf="formSubmitted() && !isNameValid()" class="text-red-500 text-xs mt-1">The name is required.</span>
+          </div>
+
+          <!--Age-->
+          <div class="flex flex-col">
+            <label for="age" class="text-sm font-medium text-gray-700 mb-1">Age <span class="text-red-500">*</span></label>
+            <input id="age" type="number" [ngModel]="newPatient().age" (ngModelChange)="updateField('age', $event)" name="age"
+                   class="input-field" placeholder="e.g., 35" required min="1" />
+            <span *ngIf="formSubmitted() && !isAgeValid()" class="text-red-500 text-xs mt-1">Age must be greater than 0.</span>
+          </div>
+
+          <!--Profession-->
+          <div class="flex flex-col">
+            <label for="profession" class="text-sm font-medium text-gray-700 mb-1">Profession</label>
+            <input id="profession" type="text" [ngModel]="newPatient().profession" (ngModelChange)="updateField('profession', $event)" name="profession"
+                   class="input-field" placeholder="e.g., Engineer" />
+          </div>
+
+          <!--Gender-->
+          <div class="flex flex-col">
+            <label for="gender" class="text-sm font-medium text-gray-700 mb-1">Gender <span class="text-red-500">*</span></label>
+            <select id="gender" [ngModel]="newPatient().gender" (ngModelChange)="updateField('gender', $event)" name="gender"
+                    class="input-field" required>
+              <option [ngValue]="" disabled>Select a gender</option>
+              <option *ngFor="let g of genders" [value]="g">{{ g }}</option>
+            </select>
+            <span *ngIf="formSubmitted() && !isGenderValid()" class="text-red-500 text-xs mt-1">Gender is required.</span>
+          </div>
+
+          <!--Contact Number-->
+          <div class="flex flex-col">
+            <label for="contact_number" class="text-sm font-medium text-gray-700 mb-1">Contact Number <span class="text-red-500">*</span></label>
+            <input id="contact_number" type="tel" [ngModel]="newPatient().contact_number" (ngModelChange)="updateField('contact_number', $event)" name="contact_number" class="input-field" placeholder="e.g., 123-456-7890" required [appMaskedInput]="'###-###-####'" />
+            <span *ngIf="newPatient().contact_number && !isPhoneValid()" class="text-red-500 text-xs mt-1">Please enter a valid phone number.</span>
+          </div>
+
+          <!--Street-->
+          <div class="flex flex-col">
+            <label for="street" class="text-sm font-medium text-gray-700 mb-1">Street <span class="text-red-500">*</span></label>
+            <input id="street" type="text" [ngModel]="newPatient().address.street" (ngModelChange)="updateAddressField('street', $event)" name="street"
+                   class="input-field" placeholder="e.g., 123 Main St" required />
+            <span *ngIf="formSubmitted() && !isStreetValid()" class="text-red-500 text-xs mt-1">Street is required.</span>
+          </div>
+
+          <!--City-->
+          <div class="flex flex-col">
+            <label for="city" class="text-sm font-medium text-gray-700 mb-1">City <span class="text-red-500">*</span></label>
+            <input id="city" type="text" [ngModel]="newPatient().address.city" (ngModelChange)="updateAddressField('city', $event)" name="city"
+                   class="input-field" placeholder="e.g., Anytown" required />
+            <span *ngIf="formSubmitted() && !isCityValid()" class="text-red-500 text-xs mt-1">City is required.</span>
+          </div>
+
+          <!--State-->
+          <div class="flex flex-col">
+            <label for="state" class="text-sm font-medium text-gray-700 mb-1">State <span class="text-red-500">*</span></label>
+            <select id="state" [ngModel]="newPatient().address.state" (ngModelChange)="updateAddressField('state', $event)" name="state"
+                    class="input-field" required>
+              <option value="" disabled selected>Select a state</option>
+              <option *ngFor="let state of usStates" [value]="state">{{ state }}</option>
+            </select>
+            <span *ngIf="formSubmitted() && !isStateValid()" class="text-red-500 text-xs mt-1">State is required.</span>
+          </div>
+
+          <!--Zip Code-->
+          <div class="flex flex-col">
+            <label for="zipCode" class="text-sm font-medium text-gray-700 mb-1">Zip Code <span class="text-red-500">*</span></label>
+            <input id="zipCode" type="text" [ngModel]="newPatient().address.zipCode" (ngModelChange)="updateAddressField('zipCode', $event)" name="zipCode"
+                   class="input-field" placeholder="e.g., 12345" maxlength="5" minlength="5" required />
+            <span *ngIf="formSubmitted() && !isZipCodeValid()" class="text-red-500 text-xs mt-1">The zip code is required.</span>
+          </div>
+
+          <!--Country-->
+          <div class="flex flex-col">
+            <label for="country" class="text-sm font-medium text-gray-700 mb-1">Country <span class="text-red-500">*</span></label>
+            <input id="country" type="text" [ngModel]="newPatient().address.country" (ngModelChange)="updateAddressField('country', $event)" name="country"
+                   class="input-field" placeholder="e.g., United States" required />
+            <span *ngIf="formSubmitted() && !isCountryValid()" class="text-red-500 text-xs mt-1">Country is required.</span>
+          </div>
+
+          <!--Pre-existing Diseases-->
+          <div class="flex flex-col sm:col-span-2">
+            <label for="pre_existing_disease" class="text-sm font-medium text-gray-700 mb-1">Pre-existing Diseases</label>
+            <input id="pre_existing_disease" type="text" [ngModel]="newPatient().pre_existing_disease.join(', ')" (ngModelChange)="updatePreExistingDiseaseField($event)" name="pre_existing_disease"
+                   class="input-field" placeholder="e.g., diabetes, hypertension" />
+            <span class="text-gray-500 text-xs mt-1">Enter a comma-separated list of diseases.</span>
+          </div>
+
+          <!--Hospitals-->
+          <div class="flex flex-col sm:col-span-2">
+            <label class="text-sm font-medium text-gray-700 mb-1">Hospitals</label>
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div *ngFor="let hospital of hospitals()" class="flex items-center">
+                <input
+                  type="checkbox"
+                  [id]="'hospital-' + hospital._id"
+                  [value]="hospital._id"
+                  [checked]="newPatient().hospital.includes(hospital._id!)"
+                  (change)="onHospitalSelection($event, hospital._id!)"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label [for]="'hospital-' + hospital._id" class="ml-2 text-sm text-gray-700">{{ hospital.name }}</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!--Update Patient / Create Patient-->
+        <button type="submit" [disabled]="!isFormValid() || loading()"
+                class="mt-8 w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading() ? 'Processing...' : (isUpdateMode() ? 'Update Patient' : 'Create Patient') }}
+        </button>
+
+        <!--Cancel Update-->
+        <button *ngIf="isUpdateMode()" type="button" (click)="cancelUpdate()"
+                class="mt-4 w-full px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg shadow-md hover:bg-gray-500 transition-colors">
+          Cancel Update
+        </button>
+
+        <!--Error Message-->
+        <p *ngIf="message()" class="mt-4 text-center"
+           [class.text-green-600]="!error()" [class.text-red-600]="error()">
+          {{ message() }}
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

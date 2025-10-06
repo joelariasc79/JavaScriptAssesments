@@ -1,7 +1,7 @@
 // src/backend/routes/vaccineStockRoutes.js
 const express = require('express');
 const vaccineStockRouter = express.Router({ strict: true, caseSensitive: true });
-const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // Import the VaccineStock model
+const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // Import the VaccineStock models
 const mongoose = require('mongoose'); // Import mongoose for ObjectId validation
 const { authenticateToken } = require('../middleware/authMiddleware');
 
@@ -178,9 +178,9 @@ module.exports = vaccineStockRouter;
 // // src/backend/routes/vaccineStockRoutes.js
 // const express = require('express');
 // const vaccineStockRouter = express.Router({ strict: true, caseSensitive: true });
-// const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // Import the VaccineStock model
-// const VaccineModel = require('../dataModel/vaccineDataModel'); // Import the Vaccine model for validation
-// const HospitalModel = require('../dataModel/hospitalDataModel'); // Import the Hospital model for validation
+// const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // Import the VaccineStock models
+// const VaccineModel = require('../dataModel/vaccineDataModel'); // Import the Vaccine models for validation
+// const HospitalModel = require('../dataModel/hospitalDataModel'); // Import the Hospital models for validation
 // const mongoose = require('mongoose'); // Import mongoose for ObjectId validation
 //
 // const { authenticateToken } = require('./userRoute'); // Adjust path if needed

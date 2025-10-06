@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const notificationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId, // Assuming users have ObjectId as _id
-        ref: 'User', // Reference to your User model
+        ref: 'User', // Reference to your User models
         required: false // Notifications can be general (null userId) or specific to a user
     },
     message: {

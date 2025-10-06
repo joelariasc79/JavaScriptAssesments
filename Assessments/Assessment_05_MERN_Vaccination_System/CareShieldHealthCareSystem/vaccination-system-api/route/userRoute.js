@@ -2,7 +2,7 @@ const express = require('express');
 const userRouter = express.Router({ strict: true, caseSensitive: true });
 
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
-const UserModel = require('../dataModel/userDataModel'); // Import the Mongoose User model
+const UserModel = require('../dataModel/userDataModel'); // Import the Mongoose User models
 // const HospitalModel = require('../dataModel/hospitalDataModel'); // Make sure this is imported
 const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel'); // Make sure this is imported
 const mongoose = require('mongoose'); // Import mongoose to use its Types.ObjectId.isValid and other utilities
@@ -59,7 +59,7 @@ userRouter.post('/api/auth/register', async (req, res) => {
             return res.status(409).json({ message: 'User with that username or email already exists.' });
         }
 
-        // Create new user. The pre-save hook in the model will hash the password.
+        // Create new user. The pre-save hook in the models will hash the password.
         const newUser = new UserModel({
             username,
             email,
@@ -248,7 +248,7 @@ userRouter.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ message: 'Username/Email and password are required.' });
         }
 
-        // Find the user. If you have a specific user model field for `hospital`
+        // Find the user. If you have a specific user models field for `hospital`
         // that's a direct reference, you might want to `populate` it if you need
         // more hospital details in the future, but for just the ID, `findOne` is fine.
         const user = await UserModel.findOne({
@@ -592,7 +592,7 @@ userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeRep
             },
             {
                 $lookup: {
-                    from: UserModel.collection.name, // The collection name of the User model
+                    from: UserModel.collection.name, // The collection name of the User models
                     localField: "_id",
                     foreignField: "_id",
                     as: "userDetails"
@@ -718,7 +718,7 @@ userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeRep
         // Sort by count descending (optional but good for charts)
         aggregationPipeline.push({ $sort: { count: -1 } });
 
-        // Execute the aggregation pipeline on VaccinationRecordModel model
+        // Execute the aggregation pipeline on VaccinationRecordModel models
         const reportData = await VaccinationRecordModel.aggregate(aggregationPipeline);
         res.status(200).json(reportData);
 

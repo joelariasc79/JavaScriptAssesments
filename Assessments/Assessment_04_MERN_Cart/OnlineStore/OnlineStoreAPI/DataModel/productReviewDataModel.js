@@ -5,7 +5,7 @@ const ProductReviewSchema = new mongoose.Schema({
     // Link to the Product being reviewed
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product', // 'Product' refers to the model name of your product (ProductModel)
+        ref: 'Product', // 'Product' refers to the models name of your product (ProductModel)
         required: true,
     },
     // The rating given (e.g., 1 to 5 stars)
@@ -21,7 +21,7 @@ const ProductReviewSchema = new mongoose.Schema({
         trim: true, // Remove whitespace from both ends
         maxlength: 1000, // Limit comment length
     },
-    // (Optional) If you have a User model, link to the user who made the review
+    // (Optional) If you have a User models, link to the user who made the review
     // For now, we'll use a simple reviewer name/email.
     reviewerName: {
         type: String,

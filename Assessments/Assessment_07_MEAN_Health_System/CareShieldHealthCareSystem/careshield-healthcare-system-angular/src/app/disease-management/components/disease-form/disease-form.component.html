@@ -1,0 +1,134 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="min-h-screen bg-gray-100 p-4 sm:p-8 font-sans">
+  <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-gray-900 mb-2">
+    Disease Administration Panel
+  </h1>
+  <p class="text-center text-gray-600 mb-8">
+    {{ isUpdateMode() ? 'Edit an existing disease record.' : 'Create a new disease record.' }}
+  </p>
+
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl border border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
+        {{ isUpdateMode() ? 'Update Disease' : 'Create New Disease' }}
+      </h2>
+
+      <form (ngSubmit)="submitDisease()">
+
+        <!-- Form Fields Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+          <!-- Name -->
+          <div class="flex flex-col">
+            <label for="name" class="text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+            <input
+              id="name"
+              type="text"
+              [ngModel]="newDisease().name"
+              (ngModelChange)="updateField('name', $event)"
+              name="name"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
+              placeholder="e.g., Asthma"
+              required
+            />
+            <span *ngIf="formSubmitted() && !isNameValid()" class="text-red-500 text-xs mt-1">The name is required.</span>
+          </div>
+
+          <!-- Specialty -->
+          <div class="flex flex-col">
+            <label for="specialty" class="text-sm font-medium text-gray-700 mb-1">Specialty <span class="text-red-500">*</span></label>
+            <!-- FIX 1: Added [compareWith] to correctly select the object instance based on _id -->
+            <select
+              id="specialty"
+              [ngModel]="newDisease().specialty"
+              (ngModelChange)="updateField('specialty', $event)"
+              name="specialty"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm appearance-none"
+              required
+              [compareWith]="compareSpecialty">
+              <option [ngValue]="{ _id: '', name: '' }" disabled>Select a specialty</option>
+              <option *ngFor="let specialty of specialties()" [ngValue]="specialty">{{ specialty.name }}</option>
+            </select>
+            <span *ngIf="formSubmitted() && !isSpecialtyValid()" class="text-red-500 text-xs mt-1">Specialty is required.</span>
+          </div>
+
+          <!-- Treatment Procedures (Full Width) -->
+          <div class="flex flex-col sm:col-span-2">
+            <label for="treatmentProcedures" class="text-sm font-medium text-gray-700 mb-1">Treatment Procedures (JSON Array String)<span class="text-red-500">*</span></label>
+            <!-- FIX 2: Bound to the new treatmentProceduresString signal and used dedicated handler -->
+            <textarea
+              id="treatmentProcedures"
+              rows="5"
+              [ngModel]="treatmentProceduresString()"
+              (ngModelChange)="updateTreatmentProceduresString($event)"
+              name="treatmentProcedures"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm font-mono"
+              placeholder="Enter treatment details here as a JSON array (e.g., [{'name':'Consultation', 'cost': 100}])."
+              required></textarea>
+            <span *ngIf="formSubmitted() && !areTreatmentProceduresValid()" class="text-red-500 text-xs mt-1">At least one treatment procedure is required. (Ensure input is valid JSON)</span>
+          </div>
+
+          <!-- Estimated Duration -->
+          <div class="flex flex-col">
+            <label for="estimatedDuration" class="text-sm font-medium text-gray-700 mb-1">Estimated Duration<span class="text-red-500">*</span></label>
+            <input
+              id="estimatedDuration"
+              type="text"
+              [ngModel]="newDisease().estimatedDuration"
+              (ngModelChange)="updateField('estimatedDuration', $event)"
+              name="estimatedDuration"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
+              placeholder="e.g., 2 weeks"
+              required
+            />
+            <span *ngIf="formSubmitted() && !isEstimatedDurationValid()" class="text-red-500 text-xs mt-1">The Estimated Duration is required.</span>
+          </div>
+
+          <!-- Estimated Cost -->
+          <div class="flex flex-col">
+            <label for="estimatedCost" class="text-sm font-medium text-gray-700 mb-1">Estimated Cost ($) <span class="text-red-500">*</span></label>
+            <input
+              id="estimatedCost"
+              type="number"
+              [ngModel]="newDisease().estimatedCost"
+              (ngModelChange)="updateField('estimatedCost', $event)"
+              name="estimatedCost"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-600 focus:border-blue-600 sm:text-sm"
+              placeholder="e.g., 500"
+              required
+              min="0"
+            />
+            <span *ngIf="formSubmitted() && !isEstimatedCostValid()" class="text-red-500 text-xs mt-1">Estimated Cost must be greater than 0.</span>
+          </div>
+
+        </div>
+
+        <!-- Submission Button -->
+        <button
+          type="submit"
+          [disabled]="!isFormValid() || loading()"
+          class="mt-8 w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.01]"
+        >
+          {{ loading() ? 'Processing...' : (isUpdateMode() ? 'Update Disease Record' : 'Create Disease Record') }}
+        </button>
+
+        <!-- Cancel Button (Consolidated from the source pattern) -->
+        <button
+          type="button"
+          (click)="cancel()"
+          class="mt-4 w-full px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg shadow-md hover:bg-gray-500 transition-colors"
+        >
+          Cancel
+        </button>
+
+        <!-- Message/Error Display -->
+        <p *ngIf="message()" class="mt-4 text-center p-3 rounded-lg"
+           [class.bg-green-100]="!error()" [class.text-green-800]="!error()"
+           [class.bg-red-100]="error()" [class.text-red-800]="error()">
+          {{ message() }}
+        </p>
+
+      </form>
+    </div>
+  </div>
+</div>

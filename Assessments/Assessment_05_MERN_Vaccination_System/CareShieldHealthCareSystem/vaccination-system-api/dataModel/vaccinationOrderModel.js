@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const vaccinationOrderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // References the User model (the patient)
+        ref: 'User', // References the User models (the patient)
         required: true
     },
     hospitalId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Hospital', // References the Hospital model where the order is placed
+        ref: 'Hospital', // References the Hospital models where the order is placed
         required: true
     },
     vaccineId: {
@@ -69,5 +69,5 @@ vaccinationOrderSchema.index(
 );
 
 
-// Apply the model overwrite fix
+// Apply the models overwrite fix
 module.exports = mongoose.models.VaccinationOrder || mongoose.model('VaccinationOrder', vaccinationOrderSchema);
