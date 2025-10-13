@@ -63,11 +63,11 @@ router.get('/CreateUser', (req, res) => {
                 return handleError(res, "Error parsing existing data file. The file may be corrupted.  Overwriting with empty data.", 500);
             }
         }
-        existingData.push(newUser); // Append the new user data
+        existingData.push(newUser); // Append the new patient data
 
         // Write the updated data back to the file
         fs.writeFileSync(dataFilePath, JSON.stringify(existingData, null, 2), 'utf8'); //pretty print json
-        res.status(200).json(newUser); // Send back the newly created user
+        res.status(200).json(newUser); // Send back the newly created patient
     } catch (err) {
         // Handle file writing errors (e.g., disk full, permissions)
         return handleError(res, `Error writing to data file: ${err.message}`, 500);

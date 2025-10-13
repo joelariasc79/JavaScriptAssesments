@@ -41,7 +41,7 @@ function CartComponent() {
         if (checkoutOrderDetails) {
             const orderId = checkoutOrderDetails.orderId;
             const paymentData = {
-                paymentMethod: 'Credit Card', // Example, would come from user input in a real app
+                paymentMethod: 'Credit Card', // Example, would come from patient input in a real app
                 transactionId: 'mock_txn_' + Date.now(), // Generate a unique transaction ID
                 amountPaid: checkoutOrderDetails.totalAmount, // Use the total amount from checkout
                 userId: userId // Pass userId for refetching cart
@@ -389,7 +389,7 @@ export default CartComponent;
 //         if (checkoutOrderDetails) {
 //             const orderId = checkoutOrderDetails.orderId;
 //             const paymentData = {
-//                 paymentMethod: 'Credit Card', // Example, would come from user input in a real app
+//                 paymentMethod: 'Credit Card', // Example, would come from patient input in a real app
 //                 transactionId: 'mock_txn_' + Date.now(), // Generate a unique transaction ID
 //                 amountPaid: checkoutOrderDetails.totalAmount, // Use the total amount from checkout
 //                 userId: userId // Pass userId for refetching cart

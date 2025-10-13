@@ -8,7 +8,7 @@
  * Interface representing a doctor's weekly shift schedule, defining when a doctor is generally available.
  * Note: MongoDB ObjectIds are typically handled as strings in the Angular application.
  */
-export interface WeeklyScheduleModel {
+export interface WeeklySchedule {
   // Unique MongoDB ID (optional as it might not be present until saved)
   _id?: string;
 

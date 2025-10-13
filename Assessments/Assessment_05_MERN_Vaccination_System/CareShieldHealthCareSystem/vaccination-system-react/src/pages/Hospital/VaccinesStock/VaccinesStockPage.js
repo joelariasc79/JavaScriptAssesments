@@ -49,7 +49,7 @@ const VaccinesStockPage = () => {
 
     const hospitalId = currentUser?.hospital?._id;
 
-    // 1. Fetch user profile to ensure hospital data is available
+    // 1. Fetch patient profile to ensure hospital data is available
     useEffect(() => {
         if (currentUser && currentUser.userId && !currentUser.hospital) {
             dispatch(fetchUserProfile(currentUser.userId));

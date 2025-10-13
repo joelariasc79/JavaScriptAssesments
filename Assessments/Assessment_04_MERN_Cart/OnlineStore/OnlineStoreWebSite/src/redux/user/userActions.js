@@ -26,7 +26,7 @@ export const fetchUserFailure = (error) => ({ type: FETCH_USER_FAILURE, payload:
 
 // Create User
 export const createUserRequest = () => ({ type: CREATE_USER_REQUEST });
-export const createUserSuccess = (data) => ({ type: CREATE_USER_SUCCESS, payload: data }); // Payload now includes message and user
+export const createUserSuccess = (data) => ({ type: CREATE_USER_SUCCESS, payload: data }); // Payload now includes message and patient
 export const createUserFailure = (error) => ({ type: CREATE_USER_FAILURE, payload: error });
 
 // Login User
@@ -43,9 +43,9 @@ export const clearUserStatus = () => ({ type: CLEAR_USER_STATUS });
 const API_BASE_URL = 'http://localhost:9000/api';
 
 /**
- * Fetches a single user's details by their custom userId.
+ * Fetches a single patient's details by their custom userId.
  * This route is now protected, so it requires a JWT token.
- * @param {string} userId - The custom user ID (e.g., "user123").
+ * @param {string} userId - The custom patient ID (e.g., "user123").
  * @param {string} token - The JWT token for authentication.
  */
 export const fetchUser = (userId, token) => {
@@ -66,15 +66,15 @@ export const fetchUser = (userId, token) => {
 };
 
 /**
- * Registers a new user in the database.
- * @param {object} userData - Object containing user details (userId, username, email, password, address object)
+ * Registers a new patient in the database.
+ * @param {object} userData - Object containing patient details (userId, username, email, password, address object)
  */
 export const createUser = (userData) => {
     return async (dispatch) => {
         dispatch(createUserRequest());
         try {
             const response = await axios.post(`${API_BASE_URL}/auth/register`, userData); // Use /auth/register
-            dispatch(createUserSuccess(response.data)); // Response includes message and user data
+            dispatch(createUserSuccess(response.data)); // Response includes message and patient data
             setTimeout(() => dispatch(clearUserStatus()), 3000);
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
@@ -85,7 +85,7 @@ export const createUser = (userData) => {
 };
 
 /**
- * Logs in a user and dispatches the received JWT token.
+ * Logs in a patient and dispatches the received JWT token.
  * @param {object} credentials - Object containing usernameOrEmail and password.
  */
 export const loginUser = (credentials) => {

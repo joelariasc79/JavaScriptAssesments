@@ -1,5 +1,4 @@
 // server.js
-// import diseaseRouter from './route/disease.routes.js';
 
 const express = require('express');
 const app = express();
@@ -22,15 +21,16 @@ const patientScreeningRouter = require("./route/patientScreeningRoute");
 const weeklyScheduleRouter = require("./route/weeklyScheduleRoute");
 const doctorBlockoutRouter = require("./route/doctorBlockoutRoute");
 const doctorAvailabilityRouter = require("./route/doctorAvailabiltyRoute");
-// const appointmentRouter = require("./route/appointmentRoute");
-
-
+const appointmentRouter = require("./route/appointmentRoute");
+const paymentRouter = require("./route/paymentRoute");
+const clinicalEncounterRouter = require("./route/clinicalEncounterRoute");
+const doctorFeedbackRouter = require("./route/doctorFeedbackRoute");
 // Importing ES Module default export into a CommonJS file using destructuring
 const { default: diseaseRouter } = require("./route/disease.routes");
 const { default: specialtyRouter } = require("./route/specialty.routes");
 
+
 // const reportRouter = require("./route/reportRoute");
-// const notificationRouter = require("./route/notificationRoute");
 // const patientRouter = require('./route/patientRoute');
 
 
@@ -66,17 +66,17 @@ app.use(hospitalRouter);
 app.use('/api/patients/patientScreening', patientScreeningRouter);
 app.use(weeklyScheduleRouter);
 app.use(doctorBlockoutRouter);
+app.use(appointmentRouter);
 app.use('/api/doctors/availability', doctorAvailabilityRouter);
-// app.use(appointmentRouter);
+app.use('/api/payments', paymentRouter);
+app.use(clinicalEncounterRouter);
+app.use('/api/doctor-feedback', doctorFeedbackRouter);
 
 // app.use(diseaseRouter);
 app.use('/api/diseases', diseaseRouter);
 app.use('/api/specialties', specialtyRouter);
 
-
-
 // app.use(reportRouter);
-// app.use(notificationRouter);
 // app.use(patientRouter);
 
 

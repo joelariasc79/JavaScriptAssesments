@@ -9,10 +9,10 @@ const insertAdminUser = async () => {
         await mongoose.connect(mongoURI);
         console.log('MongoDB connected successfully.');
 
-        // Check if an admin user already exists to prevent duplicates
+        // Check if an admin patient already exists to prevent duplicates
         const existingAdmin = await UserModel.findOne({ username: 'admin' });
         if (existingAdmin) {
-            console.log('Admin user already exists. No new user was created.');
+            console.log('Admin patient already exists. No new patient was created.');
             mongoose.disconnect();
             return;
         }
@@ -28,10 +28,10 @@ const insertAdminUser = async () => {
         });
 
         const savedUser = await adminUser.save();
-        console.log('Admin user successfully created and saved to the database:', savedUser);
+        console.log('Admin patient successfully created and saved to the database:', savedUser);
 
     } catch (error) {
-        console.error('Error inserting admin user:', error);
+        console.error('Error inserting admin patient:', error);
     } finally {
         mongoose.disconnect();
     }

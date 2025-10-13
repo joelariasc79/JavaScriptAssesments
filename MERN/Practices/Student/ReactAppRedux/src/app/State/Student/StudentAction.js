@@ -26,7 +26,7 @@ export const SaveStudentToDBUsingFetch = (studentObj)=>{
             .then((response)=>response.json())
             .then((studentData)=>{
                 console.log(studentData)
-                //dispatch or send saved/signin user to reducer
+                //dispatch or send saved/signin patient to reducer
                 dispatch(AddStudentToStore(studentData))
             })
             .catch((error)=>console.log(error))
@@ -34,20 +34,20 @@ export const SaveStudentToDBUsingFetch = (studentObj)=>{
 }
 
 
-//save user to db for signup or signin purpose
-// user object and we need to send this as request body to node api by using ajax call
+//save patient to db for signup or signin purpose
+// patient object and we need to send this as request body to node api by using ajax call
 // axios - can be used to make call or react.fetch can also be used to do the same
 //get, put, post, update, delete
 
-// export const SaveUserToDB = (user)=>{
+// export const SaveUserToDB = (patient)=>{
 //
 //     return (dispatch)=>{
 //         axios.post("http://localhost:9000/user/api/signinup",//uri or end point of singninup api
-//             user // the user state object we dispatch from the user component
+//             patient // the patient state object we dispatch from the patient component
 //         ).then((axiosResponseData)=>{
 //             console.log("Sigin Success ", axiosResponseData)
 //
-//             //we need to read specific user data from complete response object
+//             //we need to read specific patient data from complete response object
 //             let userData = axiosResponseData.data;
 //
 //             //this is now going to be dispatched to store and update the redux values

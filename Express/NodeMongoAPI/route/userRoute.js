@@ -1,5 +1,5 @@
-//all user api's will come here starting with sign-in and sign-up
-//we import userData models and create object to connect with user collection
+//all patient api's will come here starting with sign-in and sign-up
+//we import userData models and create object to connect with patient collection
 
 let expressObj = require("express")
 
@@ -9,11 +9,11 @@ let userDataModel = require("../DataModel/userDataModel");
 
 
 userRouter.post("/api/signinup",(req, res)=>{
-    let userData = req.body; //this will be the user object inserted by end user at fron end
+    let userData = req.body; //this will be the patient object inserted by end patient at fron end
     console.log(userData)
     userDataModel.findOne({userName:req.body.userName}).then((existingUser)=>{
         
-        if(existingUser){//user exists so send the user details - sign in
+        if(existingUser){//patient exists so send the patient details - sign in
             
             res.send(existingUser)            
         }
@@ -34,11 +34,11 @@ userRouter.post("/api/signinup",(req, res)=>{
 })
 
 
-// New API to explicitly create a new user
+// New API to explicitly create a new patient
 userRouter.post("/api/createuser", (req, res) => {
     let userData = req.body;
 
-    // First, check if a user with the same userName already exists to prevent duplicates
+    // First, check if a patient with the same userName already exists to prevent duplicates
     userDataModel.findOne({ userName: userData.userName })
         .then((existingUser) => {
             if (existingUser) {
@@ -46,20 +46,20 @@ userRouter.post("/api/createuser", (req, res) => {
                 return res.status(409).send("User with this username already exists.");
             }
 
-            // If the user doesn't exist, create and save the new user
+            // If the patient doesn't exist, create and save the new patient
             let newUser = new userDataModel(userData);
             newUser.save()
                 .then((createdUser) => {
-                    console.log("New user created successfully:", createdUser.userName);
+                    console.log("New patient created successfully:", createdUser.userName);
                     res.status(201).send(createdUser);
                 })
                 .catch((err) => {
-                    console.log("Error creating new user:", err);
-                    res.status(500).send("Error creating new user.");
+                    console.log("Error creating new patient:", err);
+                    res.status(500).send("Error creating new patient.");
                 });
         })
         .catch((err) => {
-            console.log("Error checking for existing user:", err);
+            console.log("Error checking for existing patient:", err);
             res.status(500).send("Internal server error.");
         });
 });

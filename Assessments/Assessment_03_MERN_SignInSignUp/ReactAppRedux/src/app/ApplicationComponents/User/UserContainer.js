@@ -7,7 +7,7 @@ import { AddUserToStore } from "../../State/User/UserAction";
 //subscribing from store - mapStateToProps - allows to access the store data in react component as props
 let mapStateToProps = (store)=>{
     return{
-        user : store.userReducer.user //this is accessing user data from user reducer and will be used in component as props
+        user : store.userReducer.user //this is accessing patient data from patient reducer and will be used in component as props
     }
 }
 

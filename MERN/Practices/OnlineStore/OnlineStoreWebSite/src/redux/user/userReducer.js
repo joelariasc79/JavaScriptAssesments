@@ -1,4 +1,4 @@
-// src/redux/user/userReducer.js
+// src/redux/patient/userReducer.js
 import {
     FETCH_USER_REQUEST,
     FETCH_USER_SUCCESS,
@@ -10,10 +10,10 @@ import {
 } from './userActions';
 
 const initialState = {
-    currentUser: null, // Stores the fetched or created user object, including nested address
+    currentUser: null, // Stores the fetched or created patient object, including nested address
     loading: false,
     error: null,
-    successMessage: null, // To indicate successful user creation/fetch
+    successMessage: null, // To indicate successful patient creation/fetch
 };
 
 const userReducer = (state = initialState, action) => {
@@ -38,7 +38,7 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: false,
-                currentUser: action.payload, // The newly created user
+                currentUser: action.payload, // The newly created patient
                 error: null,
                 successMessage: 'User created successfully!',
             };

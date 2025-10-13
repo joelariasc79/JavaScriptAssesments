@@ -61,7 +61,7 @@ export class PatientScreeningService {
   /**
    * R - Read By Patient ID: Returns all Patient Screenings for a given Patient ID.
    * This corresponds to the backend route GET /api/patients/patientScreenings/:patientId
-   * NOTE: The path is the same as getPatientScreeningById, the backend must distinguish the usage based on context (i.e., user role/ownership).
+   * NOTE: The path is the same as getPatientScreeningById, the backend must distinguish the usage based on context (i.e., patient role/ownership).
    */
   getPatientScreeningsByPatientId(patientId: string): Observable<PatientScreeningModel[]> {
     return this.http.get<PatientScreeningModel[]>(`${this.API_URL_SCREENINGS}/${patientId}`, { headers: this.getAuthHeaders() })

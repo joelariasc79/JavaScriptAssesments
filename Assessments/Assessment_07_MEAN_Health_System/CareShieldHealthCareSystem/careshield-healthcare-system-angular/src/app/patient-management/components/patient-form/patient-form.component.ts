@@ -81,7 +81,7 @@ export class PatientFormComponent implements OnInit, OnDestroy {
       this.newPatient.set({
         ...patientFromState,
         // SECURITY: NEVER pre-fill the password field during update.
-        // Force it to be an empty string. The user will only submit a new password
+        // Force it to be an empty string. The patient will only submit a new password
         // if they intentionally type one.
         password: '',
 

@@ -97,7 +97,7 @@ const reportsSlice = createSlice({
             })
             .addCase(fetchUserDemographicsReport.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.payload || 'Failed to fetch user demographics report.';
+                state.error = action.payload || 'Failed to fetch patient demographics report.';
             });
 
         // Handle fetchDosesDailyReport

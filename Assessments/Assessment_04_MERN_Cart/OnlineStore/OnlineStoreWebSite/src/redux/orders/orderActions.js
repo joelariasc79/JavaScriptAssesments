@@ -128,9 +128,9 @@ export const fetchAllOrders = (token) => {
 };
 
 /**
- * Fetches recent orders for a specific user.
+ * Fetches recent orders for a specific patient.
  * Note: This endpoint was made public in your last request, so it doesn't need a token by default.
- * @param {string} userId - The ID of the user.
+ * @param {string} userId - The ID of the patient.
  * @param {number} limit - Optional: Number of recent orders to fetch.
  */
 export const fetchRecentOrdersForUser = (userId, limit = 10) => {
@@ -230,7 +230,7 @@ export const deleteOrder = (orderId, token) => {
 /**
  * Cancels an order.
  * @param {string} orderId - The ID of the order to cancel.
- * @param {string} userId - The ID of the user who owns the order (now required in body).
+ * @param {string} userId - The ID of the patient who owns the order (now required in body).
  */
 export const cancelOrder = (orderId, userId) => {
     return async (dispatch) => {
@@ -249,7 +249,7 @@ export const cancelOrder = (orderId, userId) => {
 /**
  * Reopens a cancelled order.
  * @param {string} orderId - The ID of the order to reopen.
- * @param {string} userId - The ID of the user.
+ * @param {string} userId - The ID of the patient.
  */
 export const reopenOrder = (orderId, userId) => {
     return async (dispatch) => {
@@ -293,9 +293,9 @@ export const deliverOrder = (orderId, token) => { // 'token' is your authToken
 };
 
 /**
- * Reorders items from an existing order to the user's cart.
+ * Reorders items from an existing order to the patient's cart.
  * @param {string} orderId - The ID of the order to reorder from.
- * @param {string} userId - The ID of the user.
+ * @param {string} userId - The ID of the patient.
  * @param {'replace' | 'merge'} mergeBehavior - How to handle existing cart items ('replace' or 'merge').
  */
 export const reorderToCart = (orderId, userId, mergeBehavior) => {
@@ -319,10 +319,10 @@ export const reorderToCart = (orderId, userId, mergeBehavior) => {
 /**
  * Submits a review for a delivered order.
  * @param {string} orderId - The ID of the order being reviewed.
- * @param {string} userId - The ID of the user submitting the review.
+ * @param {string} userId - The ID of the patient submitting the review.
  * @param {number} rating - The rating (1-5 stars).
  * @param {string} comment - The review comment.
- * @param {string} authToken - The authentication token for the user.
+ * @param {string} authToken - The authentication token for the patient.
  */
 export const submitOrderReview = (orderId, userId, rating, comment, authToken) => {
     return async (dispatch) => {

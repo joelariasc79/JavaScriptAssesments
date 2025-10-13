@@ -76,7 +76,7 @@ const authSlice = createSlice({
                 state.error = null;
 
                 // --- FIX: Add a defensive check here to handle different API response structures ---
-                // We'll set the user object to either action.payload.user OR the entire action.payload
+                // We'll set the patient object to either action.payload.patient OR the entire action.payload
                 state.user = action.payload.user || action.payload;
 
             })
@@ -124,9 +124,9 @@ export default authSlice.reducer;
 //             const response = await apiService.login(usernameOrEmail, password);
 //             localStorage.setItem('jwtToken', response.data.token);
 //
-//             // After successful login, dispatch fetchUserProfile to get full user details
-//             // The userId is available in response.data.user.userId
-//             dispatch(fetchUserProfile(response.data.user.userId));
+//             // After successful login, dispatch fetchUserProfile to get full patient details
+//             // The userId is available in response.data.patient.userId
+//             dispatch(fetchUserProfile(response.data.patient.userId));
 //
 //             return response.data; // Return login data
 //         } catch (error) {
@@ -143,7 +143,7 @@ export default authSlice.reducer;
 //     async (userId, { rejectWithValue }) => {
 //         try {
 //             const response = await apiService.getProfile(userId);
-//             return response.data; // This should contain the user object with populated hospital
+//             return response.data; // This should contain the patient object with populated hospital
 //         } catch (error) {
 //             const message = error.response?.data?.message || error.message;
 //             return rejectWithValue(message);
@@ -154,7 +154,7 @@ export default authSlice.reducer;
 // const authSlice = createSlice({
 //     name: 'auth',
 //     initialState: {
-//         user: null,
+//         patient: null,
 //         token: localStorage.getItem('jwtToken') || null,
 //         isAuthenticated: !!localStorage.getItem('jwtToken'),
 //         status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -165,7 +165,7 @@ export default authSlice.reducer;
 //     },
 //     reducers: {
 //         logout: (state) => {
-//             state.user = null;
+//             state.patient = null;
 //             state.token = null;
 //             state.isAuthenticated = false;
 //             state.status = 'idle'; // Reset status on logout
@@ -174,12 +174,12 @@ export default authSlice.reducer;
 //             state.profileError = null; // Reset profile error
 //             localStorage.removeItem('jwtToken');
 //         },
-//         // A synchronous action to set user details if already available (e.g., from local storage after refresh)
-//         // This is good practice if you rehydrate user data from token on app load
+//         // A synchronous action to set patient details if already available (e.g., from local storage after refresh)
+//         // This is good practice if you rehydrate patient data from token on app load
 //         setUser: (state, action) => {
-//             state.user = action.payload;
-//             state.isAuthenticated = true; // Assume if user is set, they are authenticated
-//             state.status = 'succeeded'; // Reflect that user data is available
+//             state.patient = action.payload;
+//             state.isAuthenticated = true; // Assume if patient is set, they are authenticated
+//             state.status = 'succeeded'; // Reflect that patient data is available
 //         }
 //     },
 //     extraReducers: (builder) => {
@@ -190,23 +190,23 @@ export default authSlice.reducer;
 //                 state.error = null; // Clear any previous errors on new attempt
 //             })
 //             .addCase(loginUser.fulfilled, (state, action) => {
-//                 // We're no longer setting `user` here directly from `loginUser` payload
-//                 // because `fetchUserProfile` will populate the `user` state with full details.
+//                 // We're no longer setting `patient` here directly from `loginUser` payload
+//                 // because `fetchUserProfile` will populate the `patient` state with full details.
 //                 // We primarily set token and authentication status here.
 //                 state.status = 'succeeded';
 //                 state.token = action.payload.token;
 //                 state.isAuthenticated = true;
 //                 state.error = null;
-//                 // Optionally, you might want to store basic user info from login payload
+//                 // Optionally, you might want to store basic patient info from login payload
 //                 // if `fetchUserProfile` might take some time, but `fetchUserProfile`
 //                 // will eventually overwrite this with a fuller profile.
-//                 state.user = action.payload.user; // Basic user info from login payload (userId, username, name, role)
+//                 state.patient = action.payload.patient; // Basic patient info from login payload (userId, username, name, role)
 //             })
 //             .addCase(loginUser.rejected, (state, action) => {
 //                 state.status = 'failed';
 //                 state.error = action.payload;
 //                 state.isAuthenticated = false;
-//                 state.user = null;
+//                 state.patient = null;
 //                 state.token = null;
 //                 localStorage.removeItem('jwtToken');
 //             })
@@ -217,7 +217,7 @@ export default authSlice.reducer;
 //             })
 //             .addCase(fetchUserProfile.fulfilled, (state, action) => {
 //                 state.profileStatus = 'succeeded';
-//                 state.user = action.payload; // Set the full user profile including hospital
+//                 state.patient = action.payload; // Set the full patient profile including hospital
 //                 state.profileError = null;
 //                 // Also ensure main status is succeeded if profile fetch is central
 //                 state.status = 'succeeded'; // Ensures overall auth state reflects success after profile load
@@ -225,11 +225,11 @@ export default authSlice.reducer;
 //             .addCase(fetchUserProfile.rejected, (state, action) => {
 //                 state.profileStatus = 'failed';
 //                 state.profileError = action.payload;
-//                 // You might want to decide if a failed profile fetch makes user unauthenticated
+//                 // You might want to decide if a failed profile fetch makes patient unauthenticated
 //                 // For now, let's keep isAuthenticated based on token, but show profile error.
 //                 // If you want to force logout on profile fetch failure, uncomment:
 //                 // state.isAuthenticated = false;
-//                 // state.user = null;
+//                 // state.patient = null;
 //                 // state.token = null;
 //                 // localStorage.removeItem('jwtToken');
 //             });

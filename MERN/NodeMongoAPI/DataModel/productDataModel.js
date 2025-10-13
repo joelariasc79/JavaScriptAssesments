@@ -16,6 +16,6 @@ let productSchema = new schemaObj({
 }
 )
 
-let ProductModel = mongooseObj.model("product", productSchema);//user - collection name, pluralised by mongodb
+let ProductModel = mongooseObj.model("product", productSchema);//patient - collection name, pluralised by mongodb
 
 module.exports = ProductModel; //with capability to retrieve save udpate queries with mongo db

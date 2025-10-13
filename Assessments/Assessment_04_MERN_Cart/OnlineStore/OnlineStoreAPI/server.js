@@ -95,7 +95,7 @@ setupScheduledTasks();
 // Example of a protected route using the authenticateToken middleware
 // This route will only be accessible if a valid JWT is provided in the Authorization header.
 app.get('/api/protected-data', authenticateToken, (req, res) => {
-    // If we reach here, the token is valid, and req.user contains the decoded payload (userId, username)
+    // If we reach here, the token is valid, and req.patient contains the decoded payload (userId, username)
     res.status(200).json({ message: `Access granted! Welcome, ${req.user.username}. This is protected data.` });
 });
 
@@ -146,15 +146,15 @@ notificationService.init(io, connectedUsers);
 io.on('connection', (socket) => {
     console.log(`User connected to Socket.IO: ${socket.id}`);
 
-    // Listen for 'setUserId' event from the client to associate a user with a socket
+    // Listen for 'setUserId' event from the client to associate a patient with a socket
     socket.on('setUserId', async (userId) => {
         connectedUsers.set(socket.id, userId);
         console.log(`User ${userId} associated with socket ${socket.id}`);
 
-        // Setup static notifications for the user upon connection/login
+        // Setup static notifications for the patient upon connection/login
         await notificationService.setupStaticNotifications(userId);
 
-        // Also, send the current unread count to the newly connected user
+        // Also, send the current unread count to the newly connected patient
         const unreadCount = await notificationService.getUnreadNotificationCount(userId);
         socket.emit('notificationCountUpdate', { count: unreadCount });
     });
@@ -181,12 +181,12 @@ io.on('connection', (socket) => {
 // *******************************************************************************************
 
 
-// Get all notifications for a specific user
+// Get all notifications for a specific patient
 app.get('/api/notifications/:userId', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.userId;
-        // Security check: Ensure the token's user ID matches the requested user ID
-        if (req.user.userId !== userId) { // Assuming req.user.userId is the string userId
+        // Security check: Ensure the token's patient ID matches the requested patient ID
+        if (req.user.userId !== userId) { // Assuming req.patient.userId is the string userId
             return res.status(403).json({ message: "Forbidden: You can only view your own notifications." });
         }
 
@@ -200,11 +200,11 @@ app.get('/api/notifications/:userId', authenticateToken, async (req, res) => {
     }
 });
 
-// Get unread notification count for a specific user
+// Get unread notification count for a specific patient
 app.get('/api/notifications/count/:userId', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.userId;
-        // Security check: Ensure the token's user ID matches the requested user ID
+        // Security check: Ensure the token's patient ID matches the requested patient ID
         if (req.user.userId !== userId) {
             return res.status(403).json({ message: "Forbidden: You can only view your own notification count." });
         }
@@ -225,9 +225,9 @@ app.put('/api/notifications/:notificationId/read', authenticateToken, async (req
         if (!notification) {
             return res.status(404).json({ message: "Notification not found." });
         }
-        // Optional Security Check: Ensure the notification belongs to the authenticated user
+        // Optional Security Check: Ensure the notification belongs to the authenticated patient
         if (notification.userId && req.user.id && notification.userId.toString() !== req.user.id.toString()) {
-            // Assuming req.user.id is the ObjectId and notification.userId is also ObjectId
+            // Assuming req.patient.id is the ObjectId and notification.userId is also ObjectId
             return res.status(403).json({ message: "Forbidden: You can only mark your own notifications as read." });
         }
         res.status(200).json({ message: "Notification marked as read.", notification });
@@ -237,13 +237,13 @@ app.put('/api/notifications/:notificationId/read', authenticateToken, async (req
     }
 });
 
-// Clear (delete) notifications for a specific user (new API)
+// Clear (delete) notifications for a specific patient (new API)
 app.delete('/api/notifications/:userId', authenticateToken, async (req, res) => {
     try {
         const userId = req.params.userId;
         const type = req.query.type; // Optional query parameter for type
 
-        // Security check: Ensure the token's user ID matches the requested user ID
+        // Security check: Ensure the token's patient ID matches the requested patient ID
         if (req.user.userId !== userId) {
             return res.status(403).json({ message: "Forbidden: You can only clear your own notifications." });
         }
@@ -253,12 +253,12 @@ app.delete('/api/notifications/:userId', authenticateToken, async (req, res) => 
         if (result.deletedCount > 0) {
             res.status(200).json(result);
         } else {
-            // If deletedCount is 0, it means either no notifications matched, or user not found/invalid ID
-            // The service already logs warnings for user not found/invalid ID cases.
-            res.status(200).json({ deletedCount: 0, message: "No notifications found to clear or user not found." });
+            // If deletedCount is 0, it means either no notifications matched, or patient not found/invalid ID
+            // The service already logs warnings for patient not found/invalid ID cases.
+            res.status(200).json({ deletedCount: 0, message: "No notifications found to clear or patient not found." });
         }
     } catch (error) {
-        console.error("Error clearing user notifications:", error);
+        console.error("Error clearing patient notifications:", error);
         res.status(500).json({ message: "Failed to clear notifications." });
     }
 });
@@ -275,7 +275,7 @@ app.post('/api/notify/broadcast', async (req, res) => {
     res.status(200).send('Broadcast notification sent.');
 });
 
-// Endpoint to send a private notification to a specific user (requires userId in query)
+// Endpoint to send a private notification to a specific patient (requires userId in query)
 app.post('/api/notify/user/:userId', async (req, res) => {
     const targetUserId = req.params.userId; // This userId is the string userId, not ObjectId
     const notificationMessage = req.query.message || `Hello ${targetUserId}, here's a private update!`;

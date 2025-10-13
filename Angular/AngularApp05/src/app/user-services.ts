@@ -13,7 +13,7 @@ export class UserServices {
   // private http = inject(HttpClient);
 
   // private apiUrl = 'http://localhost:9000/user/api/users'; // Example API endpoint
-  private apiUrl = 'http://localhost:9000/user'; // Base URL for the user API
+  private apiUrl = 'http://localhost:9000/user'; // Base URL for the patient API
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<any> {

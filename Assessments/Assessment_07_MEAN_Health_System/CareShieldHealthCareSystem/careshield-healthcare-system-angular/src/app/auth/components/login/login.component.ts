@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
   isFormValid = computed(() => this.isUsernameOrEmailValid() && this.isPasswordValid());
 
   ngOnInit() {
-    this.fetchHospitals();
+    // this.fetchHospitals();
   }
 
   // Updated logic for the initial login attempt.
@@ -78,12 +78,15 @@ export class LoginComponent implements OnInit {
         this.loading.set(false);
         this.error.set(false);
 
-        // Check the user's role to determine the next step
+        // this.fetchHospitals();
+
+        // Check the patient's role to determine the next step
         if (response.user.role === 'admin') {
           this.message.set('Admin login successful! Redirecting...');
           // Redirect admins directly
           this.router.navigate(['/hospital-management']);
         } else if (response.user.role === 'hospital_admin' || response.user.role === 'doctor'  || response.user.role === 'patient') {
+          this.fetchHospitals();
           // For hospital staff, show the hospital selection modal
           this.userHospitals.set(response.user.hospitalIds);
           this.showHospitalModal.set(true);
@@ -108,7 +111,7 @@ export class LoginComponent implements OnInit {
     this.message.set('');
 
     // Assume AuthService has a new method for this.
-    // The user's token is typically stored in the service after the initial login.
+    // The patient's token is typically stored in the service after the initial login.
     this.authService.selectHospital(hospitalId).subscribe({
       next: (response) => {
         this.loading.set(false);

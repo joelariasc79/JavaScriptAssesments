@@ -19,7 +19,7 @@ function CartComponent({ userId }) {
     const cartState = useSelector((state) => state.cart);
     const { cart, loading, error, checkoutOrderDetails, paymentSuccess, appliedCoupon, couponLoading, couponError } = cartState;
 
-    // NEW: Select currentUser from the user slice
+    // NEW: Select currentUser from the patient slice
     const { currentUser } = useSelector(state => state.user);
 
     const [couponCodeInput, setCouponCodeInput] = useState('');
@@ -76,7 +76,7 @@ function CartComponent({ userId }) {
     const handleMakePayment = () => {
         if (checkoutOrderDetails) {
             const orderId = checkoutOrderDetails.orderId;
-            // FIX: amountPaid sent to backend should be the amount the user is expected to pay now
+            // FIX: amountPaid sent to backend should be the amount the patient is expected to pay now
             // which is the 'currentTotalAfterFrontendDiscount' we just calculated for display.
             const amountPaid = parseFloat(displayCurrentTotal); // Use the calculated display total
 

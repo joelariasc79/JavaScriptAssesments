@@ -60,7 +60,7 @@ export class PatientScreeningFormComponent implements OnInit, OnDestroy {
   constructor(
     private patientScreeningService: PatientScreeningService,
     // private diseaseService: DiseaseService,
-    private authService: AuthService, // Inject AuthService to get current user ID
+    private authService: AuthService, // Inject AuthService to get current patient ID
     private router: Router
   ) {
     this.initializePatientScreeningFromRouterState();
@@ -159,7 +159,7 @@ export class PatientScreeningFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Fetches the current user ID and populates the patientId property if in creation mode.
+   * Fetches the current patient ID and populates the patientId property if in creation mode.
    */
   setPatientIdFromAuth() {
     if (!this.isUpdateMode()) {

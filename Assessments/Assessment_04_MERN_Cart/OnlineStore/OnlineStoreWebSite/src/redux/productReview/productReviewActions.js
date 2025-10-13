@@ -68,7 +68,7 @@ export const fetchProductDetails = (productId) => {
  * which expects userId in the body and does NOT require authentication.
  *
  * @param {string} productId - The ID of the product being reviewed.
- * @param {string} userId - The ID of the user submitting the review.
+ * @param {string} userId - The ID of the patient submitting the review.
  * @param {number} rating - The rating (1-5 stars).
  * @param {string} comment - The review comment.
  */

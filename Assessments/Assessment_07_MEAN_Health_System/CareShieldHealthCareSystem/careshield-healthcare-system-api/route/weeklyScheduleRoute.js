@@ -8,7 +8,7 @@ const WeeklyScheduleModel = require('../dataModel/weeklyScheduleDataModel'); // 
 const weeklyScheduleRouter = express.Router({ strict: true, caseSensitive: true });
 
 /* -------------------------------------------
- * 1. Schema Reminder (based on user context)
+ * 1. Schema Reminder (based on patient context)
  * -------------------------------------------
  * The models fields expected for WeeklyScheduleModel:
  * - doctorId (ObjectId, ref: 'User')
@@ -20,9 +20,9 @@ const weeklyScheduleRouter = express.Router({ strict: true, caseSensitive: true 
 
 
 /**
- * Helper function to check if the current user can modify the schedule of a given doctor.
+ * Helper function to check if the current patient can modify the schedule of a given doctor.
  * This function encapsulates the authorization logic for POST, PUT, and DELETE.
- * @param {object} currentUser - The req.user object from the JWT payload.
+ * @param {object} currentUser - The req.patient object from the JWT payload.
  * @param {string} targetDoctorId - The ID of the doctor whose schedule is being modified.
  * @returns {boolean} True if authorized, false otherwise.
  */

@@ -22,7 +22,7 @@ if (!JWT_SECRET) {
 // --- Patient Registration Endpoint ---
 userRouter.post('/api/auth/register', async (req, res) => {
     try {
-        // This route is for general user registration (defaulting to 'patient' role)
+        // This route is for general patient registration (defaulting to 'patient' role)
         const {
             username,
             email,
@@ -52,14 +52,14 @@ userRouter.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({ message: 'Address fields (street, city, state, zipCode) are required for patient registration.' });
         }
 
-        // Check if user already exists by username or email
+        // Check if patient already exists by username or email
         const existingUser = await UserModel.findOne({ $or: [{ username: username }, { email: email }] });
 
         if (existingUser) {
             return res.status(409).json({ message: 'User with that username or email already exists.' });
         }
 
-        // Create new user. The pre-save hook in the models will hash the password.
+        // Create new patient. The pre-save hook in the models will hash the password.
         const newUser = new UserModel({
             username,
             email,
@@ -87,9 +87,9 @@ userRouter.post('/api/auth/register', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error during user registration:', error);
+        console.error('Error during patient registration:', error);
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         res.status(500).json({ message: 'Internal server error during registration.', error: error.message });
     }
@@ -99,7 +99,7 @@ userRouter.post('/api/auth/register', async (req, res) => {
 // --- NEW: Hospital Staff Registration Endpoint (Admin-only) ---
 /**
  * @route POST /api/auth/register-hospital-staff
- * @description Admin-only route to register a new hospital staff user.
+ * @description Admin-only route to register a new hospital staff patient.
  * Requires JWT authentication and admin role.
  * @body {string} username, {string} email, {string} password, {string} name, {string} contact_number, {object} [address], {string} hospital (ObjectId)
  * @access Protected (Admin-only)
@@ -123,13 +123,13 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
             return res.status(400).json({ message: 'Invalid hospital ID format provided.' });
         }
 
-        // Check if user already exists by username or email
+        // Check if patient already exists by username or email
         const existingUser = await UserModel.findOne({ $or: [{ username: username }, { email: email }] });
         if (existingUser) {
             return res.status(409).json({ message: 'User with that username or email already exists.' });
         }
 
-        // Create new hospital staff user
+        // Create new hospital staff patient
         const newUser = new UserModel({
             username,
             email,
@@ -146,12 +146,12 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
         // Populate hospital details before sending response
         const populatedUser = await UserModel.findById(savedUser._id).select('-password').populate('hospital');
 
-        res.status(201).json({ message: 'Hospital staff user registered successfully!', user: populatedUser });
+        res.status(201).json({ message: 'Hospital staff patient registered successfully!', user: populatedUser });
 
     } catch (error) {
         console.error('Error during hospital staff registration:', error);
         if (error.code === 11000) { // Duplicate key error
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
@@ -165,7 +165,7 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
 
 /**
  * @route POST /api/auth/register-admin
- * @description Admin-only route to register a new administrator user.
+ * @description Admin-only route to register a new administrator patient.
  * Requires JWT authentication and admin role.
  * @body {string} username, {string} email, {string} password, {string} name, {string} contact_number, {object} [address], {number} [age], {string} [profession], {string} [gender]
  * @access Protected (Admin-only)
@@ -179,7 +179,7 @@ userRouter.post('/api/auth/register-admin', authenticateToken, async (req, res) 
 
         const { username, email, password, name, contact_number, address, age, profession, gender } = req.body;
 
-        // Basic Validation: Required fields for an admin user
+        // Basic Validation: Required fields for an admin patient
         if (!username || !email || !password || !name || !contact_number) {
             return res.status(400).json({ message: 'Missing required fields: username, email, password, name, contact_number.' });
         }
@@ -188,13 +188,13 @@ userRouter.post('/api/auth/register-admin', authenticateToken, async (req, res) 
             return res.status(400).json({ message: 'Address fields (street, city, state, zipCode) are required for hospital staff registration if address is provided.' });
         }
 
-        // Check if user already exists by username or email
+        // Check if patient already exists by username or email
         const existingUser = await UserModel.findOne({ $or: [{ username: username }, { email: email }] });
         if (existingUser) {
             return res.status(409).json({ message: 'User with that username or email already exists.' });
         }
 
-        // Create new admin user
+        // Create new admin patient
         const newUser = new UserModel({
             username,
             email,
@@ -214,7 +214,7 @@ userRouter.post('/api/auth/register-admin', authenticateToken, async (req, res) 
         const savedUser = await newUser.save();
 
         res.status(201).json({
-            message: 'Admin user registered successfully!',
+            message: 'Admin patient registered successfully!',
             user: {
                 _id: savedUser._id,
                 username: savedUser.username,
@@ -227,7 +227,7 @@ userRouter.post('/api/auth/register-admin', authenticateToken, async (req, res) 
     } catch (error) {
         console.error('Error during admin registration:', error);
         if (error.code === 11000) { // Duplicate key error
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
@@ -248,7 +248,7 @@ userRouter.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ message: 'Username/Email and password are required.' });
         }
 
-        // Find the user. If you have a specific user models field for `hospital`
+        // Find the patient. If you have a specific patient models field for `hospital`
         // that's a direct reference, you might want to `populate` it if you need
         // more hospital details in the future, but for just the ID, `findOne` is fine.
         const user = await UserModel.findOne({
@@ -271,14 +271,14 @@ userRouter.post('/api/auth/login', async (req, res) => {
             username: user.username,
             role: user.role,
             // --- ADD THIS LINE ---
-            // Include hospital ID in the payload ONLY if the user has one
+            // Include hospital ID in the payload ONLY if the patient has one
             // This is crucial for the `authenticateToken` middleware
             ...(user.hospital && { hospitalId: user.hospital.toString() }) // Convert ObjectId to string for JWT
         };
 
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
-        // Include the 'name' and 'hospital' fields in the user object sent to the frontend
+        // Include the 'name' and 'hospital' fields in the patient object sent to the frontend
         res.status(200).json({
             message: 'Login successful!',
             token,
@@ -288,13 +288,13 @@ userRouter.post('/api/auth/login', async (req, res) => {
                 name: user.name,
                 role: user.role,
                 // --- ADD THIS LINE ---
-                // Include hospital ID in the user response object
+                // Include hospital ID in the patient response object
                 hospitalId: user.hospital ? user.hospital.toString() : null // Ensure it's string or null
             }
         });
 
     } catch (error) {
-        console.error('Error during user login:', error);
+        console.error('Error during patient login:', error);
         res.status(500).json({ message: 'Internal server error during login.', error: error.message });
     }
 });
@@ -303,9 +303,9 @@ userRouter.post('/api/auth/login', async (req, res) => {
 
 /**
  * @route POST /api/users
- * @description Admin route to create a new user (e.g., hospital staff, another admin).
+ * @description Admin route to create a new patient (e.g., hospital staff, another admin).
  * Requires JWT authentication and admin role.
- * @body {string} username, {string} email, {string} password, {object} address, {string} name, {string} contact_number, {string} role (and other user fields), {string} [hospital] (ObjectId)
+ * @body {string} username, {string} email, {string} password, {object} address, {string} name, {string} contact_number, {string} role (and other patient fields), {string} [hospital] (ObjectId)
  * @access Protected (Admin-only)
  */
 userRouter.post('/api/users', authenticateToken, async (req, res) => {
@@ -349,25 +349,25 @@ userRouter.post('/api/users', authenticateToken, async (req, res) => {
 
         res.status(201).json({ message: 'User created successfully!', user: populatedUser });
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error creating patient:', error);
         if (error.code === 11000) { // Duplicate key error
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
             return res.status(400).json({ message: 'Validation failed', errors: messages });
         }
-        res.status(500).json({ message: 'Error creating user', error: error.message });
+        res.status(500).json({ message: 'Error creating patient', error: error.message });
     }
 });
 
 
 /**
  * @route GET /api/users/:id
- * @description Get a single user by their MongoDB _id
+ * @description Get a single patient by their MongoDB _id
  * @access Protected (requires JWT)
- * Note: Add logic to ensure req.user.userId matches req.params.id if only a user can view their own profile.
+ * Note: Add logic to ensure req.patient.userId matches req.params.id if only a patient can view their own profile.
  * Or if admin, they can view any profile.
  */
 userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
@@ -376,10 +376,10 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
 
         // Validate if the ID is a valid MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(userIdToFetch)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
-        // Security check: A user can only view their own profile, unless they are an admin
+        // Security check: A patient can only view their own profile, unless they are an admin
         if (req.user.role !== 'admin' && req.user.userId.toString() !== userIdToFetch) { // Convert to string for comparison
             return res.status(403).json({ message: 'Access denied. You can only view your own profile.' });
         }
@@ -392,8 +392,8 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
         }
         res.status(200).json(user);
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Error fetching user', error: error.message });
+        console.error('Error fetching patient:', error);
+        res.status(500).json({ message: 'Error fetching patient', error: error.message });
     }
 });
 
@@ -401,25 +401,25 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
 //     try {
 //         const userId = req.params.id;
 //
-//         // Ensure user is authorized to view this profile
-//         if (req.user.role === 'patient' && req.user.userId !== userId) {
+//         // Ensure patient is authorized to view this profile
+//         if (req.patient.role === 'patient' && req.patient.userId !== userId) {
 //             return res.status(403).json({ message: 'Access denied. Patients can only view their own profile.' });
 //         }
-//         // Hospital staff can view any user's profile within their hospital (optional, depending on granular access)
+//         // Hospital staff can view any patient's profile within their hospital (optional, depending on granular access)
 //         // Admin can view any profile.
 //
-//         const user = await UserModel.findById(userId)
+//         const patient = await UserModel.findById(userId)
 //             .select('-password') // Exclude password
 //             .populate('hospital', 'name location'); // Populate hospital details
 //
-//         if (!user) {
+//         if (!patient) {
 //             return res.status(404).json({ message: 'User not found.' });
 //         }
 //
-//         res.status(200).json(user);
+//         res.status(200).json(patient);
 //     } catch (error) {
-//         console.error('Error fetching user profile:', error);
-//         res.status(500).json({ message: 'Internal server error fetching user profile.', error: error.message });
+//         console.error('Error fetching patient profile:', error);
+//         res.status(500).json({ message: 'Internal server error fetching patient profile.', error: error.message });
 //     }
 // });
 
@@ -427,7 +427,7 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
 // userRouter.get('/api/admin/users', authenticateToken, async (req, res) => {
 //     try {
 //         // Ensure only admins can access this route
-//         if (req.user.role !== 'admin') {
+//         if (req.patient.role !== 'admin') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators can view all users.' });
 //         }
 //
@@ -465,10 +465,10 @@ userRouter.put('/api/users/:id', authenticateToken, async (req, res) => {
         const userIdToUpdate = req.params.id;
 
         if (!mongoose.Types.ObjectId.isValid(userIdToUpdate)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
-        // Allow user to update their own profile, or admin to update any profile
+        // Allow patient to update their own profile, or admin to update any profile
         if (req.user.role !== 'admin' && req.user.userId.toString() !== userIdToUpdate) {
             return res.status(403).json({ message: 'Access denied. You can only update your own profile.' });
         }
@@ -501,16 +501,16 @@ userRouter.put('/api/users/:id', authenticateToken, async (req, res) => {
 
         res.status(200).json({ message: 'User updated successfully!', user: updatedUser });
     } catch (error) {
-        console.error('Error updating user:', error);
+        console.error('Error updating patient:', error);
         if (error.code === 11000) { // Duplicate key error
-            return res.status(409).json({ message: 'Update failed: A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'Update failed: A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
             return res.status(400).json({ message: 'Validation failed', errors: messages });
         }
-        res.status(500).json({ message: 'Error updating user', error: error.message });
+        res.status(500).json({ message: 'Error updating patient', error: error.message });
     }
 });
 
@@ -525,7 +525,7 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
         const userIdToDelete = req.params.id;
 
         if (!mongoose.Types.ObjectId.isValid(userIdToDelete)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
         const deletedUser = await UserModel.findByIdAndDelete(userIdToDelete);
@@ -536,8 +536,8 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
 
         res.status(200).json({ message: 'User deleted successfully!', user: { _id: deletedUser._id, username: deletedUser.username } });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ message: 'Error deleting user', error: error.message });
+        console.error('Error deleting patient:', error);
+        res.status(500).json({ message: 'Error deleting patient', error: error.message });
     }
 });
 
@@ -549,8 +549,8 @@ const authorizeReportAccess = (req, res, next) => {
 };
 
 /**
- * @route GET /api/reports/user-demographics
- * @description Generates reports on user demographics (Age, Gender, Pre-Existing Disease, Medical Practitioner).
+ * @route GET /api/reports/patient-demographics
+ * @description Generates reports on patient demographics (Age, Gender, Pre-Existing Disease, Medical Practitioner).
  * @queryParam {string} groupBy - Required. Can be 'age_group', 'gender', 'pre_existing_disease', 'medical_practitioner'.
  * @access Protected (Admin, Hospital Staff)
  *
@@ -582,7 +582,7 @@ userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeRep
 
         // 1. Match only distinct vaccinated users
         //    We want demographics of *people who have been vaccinated*.
-        //    A user might have multiple vaccination records (for different doses),
+        //    A patient might have multiple vaccination records (for different doses),
         //    so we need to get distinct users who have at least one record.
         aggregationPipeline.push(
             {
@@ -607,22 +607,22 @@ userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeRep
         );
 
         // Optional: If you want to filter by hospital for 'hospital_staff'
-        // This report is about *user demographics*, so filtering by user's hospital might not be
+        // This report is about *patient demographics*, so filtering by patient's hospital might not be
         // directly meaningful if a patient can be vaccinated at multiple hospitals.
         // If the intent is "demographics of patients *vaccinated at THIS hospital*",
         // the initial `$match` should be on `VaccinationRecord.hospitalId`.
         // For simplicity for now, this report provides demographics of all *vaccinated* patients.
-        // If `req.user.role === 'hospital_staff'` and you want to restrict to *their* hospital:
+        // If `req.patient.role === 'hospital_staff'` and you want to restrict to *their* hospital:
         // You would add a $match on hospitalId within the initial lookup/group for VaccinationRecord
         /*
-        if (req.user.role === 'hospital_staff' && req.user.hospitalId) {
+        if (req.patient.role === 'hospital_staff' && req.patient.hospitalId) {
             // Option A: If `VaccinationRecord` itself should be filtered by hospital.
             // This needs to be added *before* the $group by userId.
-            aggregationPipeline.unshift({ $match: { hospitalId: new mongoose.Types.ObjectId(req.user.hospitalId) } });
+            aggregationPipeline.unshift({ $match: { hospitalId: new mongoose.Types.ObjectId(req.patient.hospitalId) } });
         }
         */
 
-        // Now, apply the demographic grouping based on the user details
+        // Now, apply the demographic grouping based on the patient details
         switch (groupBy) {
             case 'age_group':
                 aggregationPipeline.push(
@@ -723,7 +723,7 @@ userRouter.get('/api/reports/user-demographics', authenticateToken, authorizeRep
         res.status(200).json(reportData);
 
     } catch (error) {
-        console.error('Error fetching user demographic report:', error);
+        console.error('Error fetching patient demographic report:', error);
         res.status(500).json({ message: 'Internal server error fetching report.', error: error.message });
     }
 });
@@ -775,7 +775,7 @@ userRouter.get('/api/reports/doses-daily', authenticateToken, authorizeReportAcc
         // Hospital filtering (remains the same)
         if (req.user.role === 'hospital_staff') {
             if (!req.user.hospitalId) {
-                return res.status(403).json({ message: 'Hospital staff user is not associated with a hospital.' });
+                return res.status(403).json({ message: 'Hospital staff patient is not associated with a hospital.' });
             }
             matchConditions.hospitalId = new mongoose.Types.ObjectId(req.user.hospitalId);
         } else if (req.user.role === 'admin' && hospitalId) {

@@ -60,12 +60,12 @@ const vaccinationOrderSchema = new mongoose.Schema({
     },
 }, { timestamps: true }); // Mongoose adds createdAt and updatedAt
 
-// Ensure a user doesn't create duplicate pending orders for the same dose of the same vaccine
+// Ensure a patient doesn't create duplicate pending orders for the same dose of the same vaccine
 vaccinationOrderSchema.index(
     { userId: 1, vaccineId: 1, dose_number: 1, paymentStatus: 1, appointmentStatus: 1, vaccinationStatus: 1 },
     { unique: true, partialFilterExpression: { vaccinationStatus: { $ne: 'vaccinated' } } }
     // Only enforce unique if the order hasn't been vaccinated yet.
-    // This allows a user to get a second dose even if they have a "vaccinated" order for dose 1.
+    // This allows a patient to get a second dose even if they have a "vaccinated" order for dose 1.
 );
 
 

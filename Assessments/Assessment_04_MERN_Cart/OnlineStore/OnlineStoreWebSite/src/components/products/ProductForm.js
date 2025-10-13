@@ -22,7 +22,7 @@ const ProductForm = () => {
 
     // This useEffect hook in a React component is designed to manage the display of status messages—specifically,
     // it makes a success or error message disappear after a certain period of time. It's a common pattern
-    // for creating a good user experience.
+    // for creating a good patient experience.
     // The code essentially says: "Anytime a success or error message appears, start a 5-second countdown.
     // When the countdown finishes, clear the message. But if a new message arrives before the countdown is over,
     // cancel the old countdown and start a brand new one."
@@ -39,14 +39,14 @@ const ProductForm = () => {
         //      1. When the component unmounts: It clears the timer, so the action to hide the message isn't called
         //      on a component that no longer exists.
         //      2. Before the next effect runs: If successMessage or error changes before the 5-second timer is up
-        //          (e.g., the user submits a form again), this function will first clear the old timer,
+        //          (e.g., the patient submits a form again), this function will first clear the old timer,
         //          so you don't end up with multiple timers racing each other. This ensures that the
         //          new message stays on screen for the full 5 seconds.
         return () => clearTimeout(timer);
     }, [successMessage, error, dispatch]);
 
     // This code says: "Whenever a successMessage appears, check if the name input field exists.
-    // If it does, automatically put the cursor in that field so the user can start typing right away."
+    // If it does, automatically put the cursor in that field so the patient can start typing right away."
     // The code inside this useEffect will only execute when the successMessage state changes.
     useEffect(() => {
 
@@ -56,7 +56,7 @@ const ProductForm = () => {
         if (successMessage && nameInputRef.current) {
 
             // This line uses the focus() method to programmatically set the cursor inside the nameInputRef input field
-            // This is a common practice to improve user experience, as it allows the user to immediately start
+            // This is a common practice to improve patient experience, as it allows the patient to immediately start
             // typing in the field after a successful action (e.g., submitting a form).
             nameInputRef.current.focus();
         }

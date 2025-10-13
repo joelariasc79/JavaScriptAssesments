@@ -33,7 +33,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
                 cart.items.push({ productId, quantity });
             }
         } else {
-            // No cart for this user, create a new one
+            // No cart for this patient, create a new one
             cart = new cartDataModel({
                 userId,
                 items: [{ productId, quantity }]
@@ -49,7 +49,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
 
 /**
  * @route GET /api/cart/:userId
- * @description Get a user's current cart, populated with product details.
+ * @description Get a patient's current cart, populated with product details.
  * @access Public (in a real app, userId would be derived from authentication)
  */
 cartRouter.get('/api/cart/:userId', async (req, res) => {
@@ -65,7 +65,7 @@ cartRouter.get('/api/cart/:userId', async (req, res) => {
         const cart = await cartDataModel.findOne({ userId: userId }).populate('items.productId');
 
         if (!cart) {
-            // If no cart is found for the user, return an empty cart structure
+            // If no cart is found for the patient, return an empty cart structure
             // This is often more convenient for the frontend than a 404, as it can just render an empty cart.
             return res.status(200).json({ userId: userId, items: [], _id: null, createdAt: new Date(), updatedAt: new Date() });
         }
@@ -119,7 +119,7 @@ cartRouter.get('/api/cart/:userId', async (req, res) => {
  * @description Saves the current cart (marks it as "checked out" or moves it to an orders collection).
  * For this example, we'll simply update the cart and potentially clear it or mark it as complete.
  * In a real scenario, this would involve creating an 'Order' document and potentially clearing the cart.
- * @body {string} userId - The ID of the user whose cart is being checked out.
+ * @body {string} userId - The ID of the patient whose cart is being checked out.
  * @access Public (in a real app, userId would be derived from authentication)
  */
 
@@ -146,7 +146,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
         const cart = await cartDataModel.findOne({ userId: stringUserId }).populate('items.productId');
 
         if (!cart) {
-            return res.status(404).json({ message: 'No active cart found for this user to checkout.' });
+            return res.status(404).json({ message: 'No active cart found for this patient to checkout.' });
         }
 
         if (cart.items.length === 0) {
@@ -204,7 +204,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => { // <--- REMOVED THE 
         // Save the new orders
         await order.save();
 
-        // 4. Clear the user's cart
+        // 4. Clear the patient's cart
         cart.items = [];
         await cart.save();
 

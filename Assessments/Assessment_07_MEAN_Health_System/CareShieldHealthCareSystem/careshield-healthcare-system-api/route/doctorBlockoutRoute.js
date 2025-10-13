@@ -7,7 +7,7 @@ const DoctorBlockoutModel = require('../dataModel/doctorBlockoutDataModel'); // 
 const doctorBlockoutRouter = express.Router({ strict: true, caseSensitive: true });
 
 /* -------------------------------------------
- * 1. Schema Reminder (based on user context)
+ * 1. Schema Reminder (based on patient context)
  * -------------------------------------------
  * The models fields expected for DoctorBlockoutModel:
  * - doctorId (ObjectId, ref: 'User')
@@ -19,9 +19,9 @@ const doctorBlockoutRouter = express.Router({ strict: true, caseSensitive: true 
 
 
 /**
- * Helper function to check if the current user can modify the blockout of a given doctor.
+ * Helper function to check if the current patient can modify the blockout of a given doctor.
  * This function encapsulates the authorization logic for POST, PUT, and DELETE.
- * @param {object} currentUser - The req.user object from the JWT payload.
+ * @param {object} currentUser - The req.patient object from the JWT payload.
  * @param {string} targetDoctorId - The ID of the doctor whose blockout is being modified.
  * @returns {boolean} True if authorized, false otherwise.
  */

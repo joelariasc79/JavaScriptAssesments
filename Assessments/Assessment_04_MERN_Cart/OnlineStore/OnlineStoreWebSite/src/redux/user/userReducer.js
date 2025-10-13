@@ -13,11 +13,11 @@ import {
 } from './userActions';
 
 const initialState = {
-    currentUser: null, // Stores the fetched or created user object, including nested address
+    currentUser: null, // Stores the fetched or created patient object, including nested address
     token: null,       // Stores the JWT token upon successful login
     loading: false,
     error: null,
-    successMessage: null, // To indicate successful user creation/fetch/login
+    successMessage: null, // To indicate successful patient creation/fetch/login
 };
 
 const userReducer = (state = initialState, action) => {
@@ -43,8 +43,8 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loading: false,
-                // The payload here is { message: 'User registered successfully!', user: {...} }
-                currentUser: action.payload.user, // Store the user object from the response
+                // The payload here is { message: 'User registered successfully!', patient: {...} }
+                currentUser: action.payload.user, // Store the patient object from the response
                 error: null,
                 successMessage: action.payload.message || 'User created successfully!', // Use message from payload
             };

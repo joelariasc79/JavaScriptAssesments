@@ -19,7 +19,7 @@ export class AuthService {
     // Inject PLATFORM_ID to determine the execution environment for SSR safety
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // When the service is instantiated, safely load the token and user data.
+    // When the service is instantiated, safely load the token and patient data.
     this.initializeState();
   }
 
@@ -46,7 +46,7 @@ export class AuthService {
 
   public currentUserId = signal<string | null>(null);
 
-  // Stores the currently logged-in user's details
+  // Stores the currently logged-in patient's details
   public currentUserName = signal<string | null>(null);
   public currentUserRole = signal<string | null>(null);
 
@@ -62,7 +62,7 @@ export class AuthService {
   // --- Core Authentication Methods ---
 
   /**
-   * Handles the initial login attempt, stores the token, and updates user signals.
+   * Handles the initial login attempt, stores the token, and updates patient signals.
    */
   login(usernameOrEmail: string, password: string): Observable<AuthResponse> {
     const payload = { usernameOrEmail, password };
@@ -74,7 +74,7 @@ export class AuthService {
         }
         this.tokenSignal.set(response.token);
 
-        // 2. Set user details from the response
+        // 2. Set patient details from the response
         this.currentUserId.set(response.user.userId);
         this.currentUserName.set(response.user.username);
         this.currentUserRole.set(response.user.role);
@@ -99,9 +99,9 @@ export class AuthService {
       tap(response => {
         // 🛑 Cliente más robusto: Se comprueba la existencia de los datos críticos.
         if (!response || !response.token || !response.user) {
-          console.error('SERVER CONTRACT VIOLATION: The select-hospital endpoint must return a new token and a full user object.', response);
+          console.error('SERVER CONTRACT VIOLATION: The select-hospital endpoint must return a new token and a full patient object.', response);
           // Si el servidor falla en el contrato, forzamos un error para detener el flujo de éxito.
-          throw new Error('Server response missing required token or user details after hospital selection.');
+          throw new Error('Server response missing required token or patient details after hospital selection.');
         }
 
 

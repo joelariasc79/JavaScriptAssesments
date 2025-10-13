@@ -3,7 +3,7 @@
 //NodeAPI
 //1. Explain your knowledge of - statelessness, http, REST, spa and classical applications
 //2. Create an express setup, with a capability to expose end points for restful api
-//3. Create an API with name CreateUser as get verb and pass user info such as name, session, address and age as query param
+//3. Create an API with name CreateUser as get verb and pass patient info such as name, session, address and age as query param
 //4. Save the information passed in #3 to a json file name userInfo in local
 
 //React

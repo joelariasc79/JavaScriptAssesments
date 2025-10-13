@@ -38,7 +38,7 @@ let UserHookComponent = (props)=>{
     
     let submitForm = (evt)=>{
         debugger
-        // let user = {
+        // let patient = {
         //     userName, street
         // } 
         //this is the call to dispatcher using action creater

@@ -114,7 +114,7 @@ console.log(LargeSum(...arrayNum))
 
 
 // Task - create a class named as account accepting 3 or more params  like - name, acct, type etc and
-// has three methods to show balance, user details and account offers
+// has three methods to show balance, patient details and account offers
 
 class Account{
     currentBalance = 5426

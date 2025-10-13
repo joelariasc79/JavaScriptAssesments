@@ -42,7 +42,7 @@ export class Home {
     });
   }
 
-  // Adds a new user to the server and refreshes the list
+  // Adds a new patient to the server and refreshes the list
   addUser() {
     // Basic validation to ensure fields are not empty
     if (!this.newUser.userName || !this.newUser.password || !this.newUser.street || !this.newUser.mobile) {
@@ -55,14 +55,14 @@ export class Home {
         console.log('User created successfully:', response);
         // Clear the form after a successful creation
         this.newUser = {  userName: '', password: '', street: '', mobile: ''};
-        // Fetch the updated list of users to display the new user
+        // Fetch the updated list of users to display the new patient
         this.fetchUsers();
       },
       error: (err) => {
         if (err.status === 409) {
           console.error('User creation failed: User with this username already exists.');
         } else {
-          console.error('An error occurred during user creation:', err);
+          console.error('An error occurred during patient creation:', err);
         }
       }
     });

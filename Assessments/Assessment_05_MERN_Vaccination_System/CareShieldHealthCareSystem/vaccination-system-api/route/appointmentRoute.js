@@ -34,7 +34,7 @@ appointmentRouter.post('/api/appointments', authenticateToken, async (req, res) 
         }
 
         if (!mongoose.Types.ObjectId.isValid(hospitalId) || !mongoose.Types.ObjectId.isValid(vaccineId) || !mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: 'Invalid ID format for hospital, vaccine, or user.' });
+            return res.status(400).json({ message: 'Invalid ID format for hospital, vaccine, or patient.' });
         }
 
         const parsedAppointmentDate = new Date(appointment_date);
@@ -107,7 +107,7 @@ appointmentRouter.post('/api/appointments', authenticateToken, async (req, res) 
 
 /**
  * @route GET /api/appointments/me
- * @description Get all appointments for the authenticated user.
+ * @description Get all appointments for the authenticated patient.
  * This route is crucial for the "Schedule screen" to show upcoming/past appointments.
  * @access Protected (Patient only)
  */
@@ -124,7 +124,7 @@ appointmentRouter.get('/api/appointments/me', authenticateToken, async (req, res
 
         res.status(200).json(appointments);
     } catch (error) {
-        console.error('Error fetching user appointments:', error);
+        console.error('Error fetching patient appointments:', error);
         res.status(500).json({ message: 'Internal server error fetching appointments.', error: error.message });
     }
 });
@@ -284,7 +284,7 @@ appointmentRouter.patch('/api/appointments/:id/status', authenticateToken, async
         }
 
         const appointment = await AppointmentModel.findById(appointmentId)
-            .populate('userId', 'username contact_number'); // Populate user for notification
+            .populate('userId', 'username contact_number'); // Populate patient for notification
 
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found.' });

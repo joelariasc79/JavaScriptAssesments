@@ -1,7 +1,7 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Hospital } from '../models/hospital.model';
 import { environment } from '../../../environments/environment';
-import { isPlatformBrowser } from '@angular/common'; // 1. Added import for SSR check
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'

@@ -24,7 +24,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
             return res.status(404).json({ message: 'Product not found.' });
         }
 
-        // 2. Find the user's cart.
+        // 2. Find the patient's cart.
         let cart = await cartDataModel.findOne({ userId });
 
         if (cart) {
@@ -39,7 +39,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
                 cart.items.push({ productId, quantity });
             }
         } else {
-            // 4. If no cart exists for the user, create a new one.
+            // 4. If no cart exists for the patient, create a new one.
             cart = new cartDataModel({
                 userId,
                 items: [{ productId, quantity }]
@@ -106,7 +106,7 @@ cartRouter.post('/api/cart/add', async (req, res) => {
 
 /**
  * @route GET /api/cart/:userId
- * @description Get a user's current cart, populated with product details.
+ * @description Get a patient's current cart, populated with product details.
  * @access Public (in a real app, userId would be derived from authentication)
  */
 cartRouter.get('/api/cart/:userId', async (req, res) => {
@@ -167,7 +167,7 @@ cartRouter.get('/api/cart/:userId', async (req, res) => {
  * @description Saves the current cart (marks it as "checked out" or moves it to an orders collection).
  * For this example, we'll simply update the cart and potentially clear it or mark it as complete.
  * In a real scenario, this would involve creating an 'Order' document and potentially clearing the cart.
- * @body {string} userId - The ID of the user whose cart is being checked out.
+ * @body {string} userId - The ID of the patient whose cart is being checked out.
  * @access Public (in a real app, userId would be derived from authentication)
  */
 cartRouter.post('/api/cart/checkout', async (req, res) => {
@@ -186,7 +186,7 @@ cartRouter.post('/api/cart/checkout', async (req, res) => {
         const cart = await cartDataModel.findOne({ userId: stringUserId }).populate('items.productId');
 
         if (!cart) {
-            return res.status(404).json({ message: 'No active cart found for this user to checkout.' });
+            return res.status(404).json({ message: 'No active cart found for this patient to checkout.' });
         }
 
         if (cart.items.length === 0) {
@@ -279,7 +279,7 @@ cartRouter.post('/api/cart/clear', async (req, res) => {
         const cart = await cartDataModel.findOne({ userId: stringUserId });
 
         if (!cart) {
-            return res.status(200).json({ message: 'No active cart found for this user, or cart is already empty.' });
+            return res.status(200).json({ message: 'No active cart found for this patient, or cart is already empty.' });
         }
 
         cart.items = [];
@@ -304,8 +304,8 @@ cartRouter.post('/api/cart/clear', async (req, res) => {
 
 /**
  * @route DELETE /api/cart/:userId/items/:productId
- * @description Remove a specific item from the user's cart.
- * @param {string} userId - The ID of the user whose cart to modify.
+ * @description Remove a specific item from the patient's cart.
+ * @param {string} userId - The ID of the patient whose cart to modify.
  * @param {string} productId - The ID of the product to remove from the cart.
  * @access Public (in a real app, userId would be derived from authentication)
  */
@@ -320,7 +320,7 @@ cartRouter.delete('/api/cart/:userId/items/:productId', async (req, res) => {
         let cart = await cartDataModel.findOne({ userId });
 
         if (!cart) {
-            return res.status(404).json({ message: 'Cart not found for this user.' });
+            return res.status(404).json({ message: 'Cart not found for this patient.' });
         }
 
         const initialItemCount = cart.items.length;

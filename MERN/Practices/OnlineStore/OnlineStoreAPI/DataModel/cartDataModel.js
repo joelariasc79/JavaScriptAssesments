@@ -10,9 +10,9 @@ const CartItemSchema = new mongoose.Schema({
 
 // cart Schema
 const CartSchema = new mongoose.Schema({
-    // In a real application, userId would come from an authenticated user session.
+    // In a real application, userId would come from an authenticated patient session.
     // For simplicity, we'll assume a userId is passed or generated for demonstration.
-    userId: { type: String, required: true, unique: true }, // Each user has one active cart
+    userId: { type: String, required: true, unique: true }, // Each patient has one active cart
     items: [CartItemSchema], // Array of cart items
 }, { timestamps: true });
 

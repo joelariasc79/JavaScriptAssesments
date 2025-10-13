@@ -8,7 +8,7 @@ import { selectCurrentUser } from '../../../store/features/auth/authSelectors';
 const Sidebar = () => {
     const currentUser = useSelector(selectCurrentUser);
 
-    // Determine sidebar links based on user role
+    // Determine sidebar links based on patient role
     const getSidebarLinks = () => {
         if (!currentUser) {
             return [];

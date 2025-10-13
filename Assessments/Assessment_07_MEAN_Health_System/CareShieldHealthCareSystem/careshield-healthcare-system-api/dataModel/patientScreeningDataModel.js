@@ -12,6 +12,13 @@ const PatientScreeningSchema = new mongoose.Schema({
         index: true
     },
 
+    hospitalId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Hospital',
+        required: true,
+        index: true
+    },
+
     // Reference to the Disease the patient believes they have, or the disease
     // that best matches their symptoms based on the screening.
     // This connects to the system's defined Disease models.
@@ -77,13 +84,6 @@ const PatientScreeningSchema = new mongoose.Schema({
         type: String,
         enum: ['submitted', 'reviewed', 'referred', 'archived', 'converted_to_appointment'],
         default: 'submitted'
-    },
-
-    // Optional: Reference to the Appointment created from this screening
-    appointmentId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Appointment',
-        default: null
     }
 
 }, {

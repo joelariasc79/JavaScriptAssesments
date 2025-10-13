@@ -4,7 +4,7 @@ const userDataModel = require('../DataModel/userDataModel'); // Import the new U
 
 /**
  * @route POST /api/users
- * @description Create a new user (for testing/setup purposes)
+ * @description Create a new patient (for testing/setup purposes)
  * @body {string} userId, {string} username, {string} email, {object} address
  * @access Public
  */
@@ -14,13 +14,13 @@ userRouter.post('/api/users', async (req, res) => {
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);
     } catch (error) {
-        res.status(400).json({ message: 'Error creating user', error: error.message });
+        res.status(400).json({ message: 'Error creating patient', error: error.message });
     }
 });
 
 /**
  * @route GET /api/users/:userId
- * @description Get a single user by their custom userId
+ * @description Get a single patient by their custom userId
  * @access Public (in a real app, this would be authenticated)
  */
 userRouter.get('/api/users/:userId', async (req, res) => {
@@ -31,7 +31,7 @@ userRouter.get('/api/users/:userId', async (req, res) => {
         }
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user', error: error.message });
+        res.status(500).json({ message: 'Error fetching patient', error: error.message });
     }
 });
 

@@ -5,10 +5,10 @@ const productDataModel = require('../DataModel/productDataModel');
 
 productRouter.post("/api/saveProduct",(req, res)=>{
 
-    let productObj = req.body; //user object passed in the body of sigininup api
+    let productObj = req.body; //patient object passed in the body of sigininup api
     console.log("productObj", productObj)
 
-    let prodSchemaObj = new productDataModel(req.body);//for new user
+    let prodSchemaObj = new productDataModel(req.body);//for new patient
 
     prodSchemaObj.save().then((newProd)=>{//will get _id once document is created
         console.log("successfully saved ", newProd);

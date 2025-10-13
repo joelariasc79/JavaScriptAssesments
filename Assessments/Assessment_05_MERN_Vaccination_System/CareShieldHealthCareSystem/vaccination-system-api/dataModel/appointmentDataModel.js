@@ -40,8 +40,8 @@ const AppointmentSchema = new mongoose.Schema({
     }
 }, { timestamps: true }); // Mongoose automatically adds createdAt and updatedAt
 
-// Add a unique index to prevent duplicate appointments for the same user, dose, and date
-// This might need adjustment based on business logic (e.g., if a user can book multiple vaccines on the same day)
+// Add a unique index to prevent duplicate appointments for the same patient, dose, and date
+// This might need adjustment based on business logic (e.g., if a patient can book multiple vaccines on the same day)
 AppointmentSchema.index({ userId: 1, vaccineId: 1, appointment_date: 1, dose_number: 1 }, { unique: true });
 
 

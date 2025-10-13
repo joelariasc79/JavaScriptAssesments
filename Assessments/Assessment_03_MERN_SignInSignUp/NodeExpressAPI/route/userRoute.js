@@ -1,5 +1,5 @@
-//all user api's will come here starting with sign-in and sign-up
-//we import userData models and create object to connect with user collection
+//all patient api's will come here starting with sign-in and sign-up
+//we import userData models and create object to connect with patient collection
 
 let expressObj = require("express")
 
@@ -9,11 +9,11 @@ let userDataModel = require("../DataModel/userDataModel");
 
 
 userRouter.post("/api/signinup",(req, res)=>{
-    let userData = req.body; //this will be the user object inserted by end user at fron end
+    let userData = req.body; //this will be the patient object inserted by end patient at fron end
     console.log(userData)
     userDataModel.findOne({userName:req.body.userName}).then((existingUser)=>{
         
-        if(existingUser){//user exists so send the user details - sign in
+        if(existingUser){//patient exists so send the patient details - sign in
             
             res.send(existingUser)            
         }

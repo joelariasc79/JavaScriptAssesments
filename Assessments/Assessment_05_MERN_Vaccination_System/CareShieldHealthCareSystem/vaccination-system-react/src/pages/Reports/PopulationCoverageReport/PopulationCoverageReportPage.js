@@ -34,7 +34,7 @@ const PopulationCoverageReportPage = () => {
         // You can pass filters here if your backend supports them, e.g., { hospitalId: 'xyz' }
         // The backend you provided takes 'hospitalId' as a query param.
         // For admin, it would be: dispatch(fetchPopulationCoverageReport({ hospitalId: 'someId' }));
-        // For hospital_staff, the backend uses req.user.hospitalId automatically.
+        // For hospital_staff, the backend uses req.patient.hospitalId automatically.
         dispatch(fetchPopulationCoverageReport({})); // Fetch without specific filters initially
         // Cleanup function: clear report status when component unmounts
         return () => {

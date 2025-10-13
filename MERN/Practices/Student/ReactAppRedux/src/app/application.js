@@ -15,7 +15,7 @@ export default class ApplicationComponent extends Component {
     constructor(props) {
         super();
         this.state = {
-            studentName : "react user ",
+            studentName : "react patient ",
             student : {
                     studentName : "Test Student",
                     studentAge : 19
@@ -44,9 +44,9 @@ export default class ApplicationComponent extends Component {
                 <div className="topdiv">
                     <Header />
                         <Routes>
-                            {/*<Route path="/" element={<Home user={this.state.user} />}/>*/}
-                            {/*<Route path="home" element={<Home user={this.state.user} />}/>*/}
-                            {/*<Route path="user" element={<StudentComponent />}/>*/}
+                            {/*<Route path="/" element={<Home patient={this.state.patient} />}/>*/}
+                            {/*<Route path="home" element={<Home patient={this.state.patient} />}/>*/}
+                            {/*<Route path="patient" element={<StudentComponent />}/>*/}
                             <Route path="studenthook" element={<StudentHookComponent />}/>
                         </Routes>
                     <Footer sessionName={this.sessionName}/>

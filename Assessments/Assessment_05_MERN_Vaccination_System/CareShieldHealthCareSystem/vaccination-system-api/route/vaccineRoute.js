@@ -185,7 +185,7 @@ vaccineRouter.delete('/api/vaccines/:id', authenticateToken, async (req, res) =>
 /**
  * @route GET /api/vaccines
  * @description Get all vaccines. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
+ * @access Protected (Any authenticated patient)
  */
 vaccineRouter.get('/api/vaccines', authenticateToken, async (req, res) => {
     try {
@@ -200,7 +200,7 @@ vaccineRouter.get('/api/vaccines', authenticateToken, async (req, res) => {
 /**
  * @route GET /api/vaccines/:id
  * @description Get a single vaccine by ID. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
+ * @access Protected (Any authenticated patient)
  */
 vaccineRouter.get('/api/vaccines/:id', authenticateToken, async (req, res) => {
     try {

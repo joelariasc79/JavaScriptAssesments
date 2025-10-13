@@ -52,7 +52,7 @@ app.listen(9000)
 //
 // // --- Simulated Database (In-memory array for demonstration) ---
 // // In a real MERN app, this would be a MongoDB collection
-// const users = []; // Stores user objects: { id, name, email, passwordHash }
+// const users = []; // Stores patient objects: { id, name, email, passwordHash }
 //
 // // --- JWT Secret (DO NOT USE HARDCODED SECRET IN PRODUCTION) ---
 // const JWT_SECRET = 'your_super_secret_jwt_key'; // Replace with a strong, random key in production!
@@ -67,8 +67,8 @@ app.listen(9000)
 //         return res.status(400).json({ message: 'All fields are required.' });
 //     }
 //
-//     // Check if user already exists
-//     if (users.some(user => user.email === email)) {
+//     // Check if patient already exists
+//     if (users.some(patient => patient.email === email)) {
 //         return res.status(409).json({ message: 'Email already registered.' });
 //     }
 //
@@ -77,7 +77,7 @@ app.listen(9000)
 //         const salt = await bcrypt.genSalt(10);
 //         const passwordHash = await bcrypt.hash(password, salt);
 //
-//         // Create new user object (simulated DB entry)
+//         // Create new patient object (simulated DB entry)
 //         const newUser = {
 //             id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1, // Simple ID generation
 //             name,
@@ -86,7 +86,7 @@ app.listen(9000)
 //         };
 //         users.push(newUser);
 //
-//         console.log('New user registered:', newUser.email);
+//         console.log('New patient registered:', newUser.email);
 //         // console.log('Current users in DB:', users); // For debugging
 //
 //         res.status(201).json({ message: 'Registration successful!' });
@@ -105,25 +105,25 @@ app.listen(9000)
 //         return res.status(400).json({ message: 'Email and password are required.' });
 //     }
 //
-//     // Find user by email
-//     const user = users.find(u => u.email === email);
-//     if (!user) {
+//     // Find patient by email
+//     const patient = users.find(u => u.email === email);
+//     if (!patient) {
 //         return res.status(401).json({ message: 'Invalid credentials.' });
 //     }
 //
 //     try {
 //         // Compare provided password with stored hash
-//         const isMatch = await bcrypt.compare(password, user.passwordHash);
+//         const isMatch = await bcrypt.compare(password, patient.passwordHash);
 //         if (!isMatch) {
 //             return res.status(401).json({ message: 'Invalid credentials.' });
 //         }
 //
 //         // Generate JWT token
 //         const payload = {
-//             user: {
-//                 id: user.id,
-//                 email: user.email,
-//                 name: user.name // Include name in payload for frontend
+//             patient: {
+//                 id: patient.id,
+//                 email: patient.email,
+//                 name: patient.name // Include name in payload for frontend
 //             }
 //         };
 //
@@ -133,14 +133,14 @@ app.listen(9000)
 //             { expiresIn: '1h' }, // Token expires in 1 hour
 //             (err, token) => {
 //                 if (err) throw err;
-//                 console.log('Student logged in:', user.email);
+//                 console.log('Student logged in:', patient.email);
 //                 res.json({
 //                     message: 'Login successful!',
 //                     token,
-//                     user: {
-//                         id: user.id,
-//                         name: user.name,
-//                         email: user.email
+//                     patient: {
+//                         id: patient.id,
+//                         name: patient.name,
+//                         email: patient.email
 //                     }
 //                 });
 //             }

@@ -26,8 +26,8 @@ let userSchema = new schemaObj({
 }
 )
 
-let StudentModel = mongooseObj.model("student", userSchema);//user - collection name, pluralised by mongodb
+let StudentModel = mongooseObj.model("student", userSchema);//patient - collection name, pluralised by mongodb
 
 module.exports = StudentModel; //with capability to retrieve save udpate queries with mongo db
 
-console.log("MongoDB connection with user datamodel is established!!")
+console.log("MongoDB connection with patient datamodel is established!!")

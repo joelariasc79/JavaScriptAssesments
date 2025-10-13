@@ -124,7 +124,7 @@
 //     };
 //
 //     // No longer need to check for currentUser.hospital for rendering the form
-//     // The page can always load, and the user chooses the hospital.
+//     // The page can always load, and the patient chooses the hospital.
 //
 //     return (
 //         <div className="create-vaccination-order-container">

@@ -6,7 +6,6 @@ import { catchError } from 'rxjs/operators';
 import { Doctor } from '../models/doctor.model';
 import { environment } from '../../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -49,6 +48,16 @@ export class DoctorService {
         catchError(error => {
           console.error('Error fetching doctor:', error);
           return throwError(() => new Error('Failed to fetch doctor.'));
+        })
+      );
+  }
+
+  getDoctorsBySpecialty(specialtyName: string): Observable<Doctor[]> {
+    return this.http.get<Doctor[]>(`${this.API_URL_DOCTORS}/by-specialty?specialty=${specialtyName}`, { headers: this.getAuthHeaders() })
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching doctors by specialty:', error);
+          return throwError(() => new Error('Failed to fetch doctors by specialty.'));
         })
       );
   }

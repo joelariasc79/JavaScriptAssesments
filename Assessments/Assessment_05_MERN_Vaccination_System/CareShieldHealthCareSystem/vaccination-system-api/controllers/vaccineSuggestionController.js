@@ -12,8 +12,8 @@ exports.getVaccineSuggestions = async (req, res) => {
         const { userId } = req.params;
 
         // --- 1. Authorization Check ---
-        // Ensure the logged-in user is the patient, an admin, or hospital_staff
-        // The token payload is typically attached to req.user by a middleware
+        // Ensure the logged-in patient is the patient, an admin, or hospital_staff
+        // The token payload is typically attached to req.patient by a middleware
         if (req.user.id !== userId && req.user.role !== 'patient') {
             return res.status(403).json({ success: false, message: 'Not authorized to view these suggestions.' });
         }

@@ -7,7 +7,7 @@ import { addCoupon } from "../../State/Coupon/CouponAction";
 //functional component
 let Coupon = (props) => {
     
-    //reading from user reducer using react-redux hook - useSelector
+    //reading from patient reducer using react-redux hook - useSelector
     //below code allows us the access of any store's state here is 
     let coupon = useSelector((state) => state.couponReducer.coupon); //inside implements mapStateToProps for one state
     let user = useSelector((state) => state.userReducer.user); //inside implements mapStateToProps for one state

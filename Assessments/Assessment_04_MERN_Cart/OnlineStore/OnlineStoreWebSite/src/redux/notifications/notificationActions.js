@@ -68,8 +68,8 @@ export const removeNotificationById = (notificationId) => ({
 const API_BASE_URL = 'http://localhost:9000/api'; // Ensure this matches your backend API
 
 /**
- * Fetches all notifications for a specific user from the backend.
- * @param {string} userId - The user's ID (string).
+ * Fetches all notifications for a specific patient from the backend.
+ * @param {string} userId - The patient's ID (string).
  * @param {string} authToken - The authentication token.
  */
 export const fetchNotifications = (userId, authToken) => {
@@ -88,9 +88,9 @@ export const fetchNotifications = (userId, authToken) => {
 };
 
 /**
- * Fetches the unread notification count for a specific user.
+ * Fetches the unread notification count for a specific patient.
  * This is useful to update the icon badge without fetching all notifications.
- * @param {string} userId - The user's ID (string).
+ * @param {string} userId - The patient's ID (string).
  * @param {string} authToken - The authentication token.
  */
 export const fetchUnreadNotificationCount = (userId, authToken) => {

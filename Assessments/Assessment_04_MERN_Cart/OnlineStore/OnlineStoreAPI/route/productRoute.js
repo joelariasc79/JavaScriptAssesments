@@ -52,7 +52,7 @@ productRouter.get('/api/products/:id', async (req, res) => {
 * @access Public (userId provided in body, NOT authenticated)
 * @body {number} rating - The rating (1-5)
 * @body {string} [comment] - The review comment
-* @body {string} userId - The ID of the user submitting the review (REQUIRED in body)
+* @body {string} userId - The ID of the patient submitting the review (REQUIRED in body)
 */
 productRouter.post('/api/products/:productId/reviews', async (req, res) => { // authenticateToken is REMOVED
     try {
@@ -68,7 +68,7 @@ productRouter.post('/api/products/:productId/reviews', async (req, res) => { // 
         // 2. Fetch reviewer details from the database using the provided userId
         const reviewer = await UserModel.findOne({ userId: userId }).select('username email');
         if (!reviewer) {
-            return res.status(404).json({ message: 'Reviewer user not found for the provided userId.' });
+            return res.status(404).json({ message: 'Reviewer patient not found for the provided userId.' });
         }
 
         // 3. Validate product existence
@@ -87,10 +87,10 @@ productRouter.post('/api/products/:productId/reviews', async (req, res) => { // 
             product: productId,
             rating: rating,
             comment: comment,
-            reviewerName: reviewer.username, // Use username from fetched user
-            reviewerEmail: reviewer.email,   // Use email from fetched user
-            // If you updated ProductReviewSchema to include a 'user' ObjectId field:
-            // user: reviewer._id,
+            reviewerName: reviewer.username, // Use username from fetched patient
+            reviewerEmail: reviewer.email,   // Use email from fetched patient
+            // If you updated ProductReviewSchema to include a 'patient' ObjectId field:
+            // patient: reviewer._id,
         });
 
         const savedReview = await newReview.save();

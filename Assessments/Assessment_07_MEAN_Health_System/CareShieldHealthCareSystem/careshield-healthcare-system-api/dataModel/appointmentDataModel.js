@@ -27,6 +27,13 @@ const AppointmentSchema = new mongoose.Schema({
         default: null
     },
 
+    screeningId: {
+        type: Schema.Types.ObjectId,
+        ref: 'PatientScreening',
+        required: false, // Not all appointments come from a screening
+        default: null
+    },
+
     // --- Time and Duration ---
 
     // The exact date and time the appointment starts (e.g., Fri Dec 12 2025 10:00:00 GMT...)
@@ -67,6 +74,38 @@ const AppointmentSchema = new mongoose.Schema({
     notes: {
         type: String,
         trim: true
+    },
+
+    // --- Payment and Billing (New Section) ---
+
+    // The total fee agreed upon for this specific appointment (in cents/smallest currency unit)
+    feeAmount: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0
+    },
+
+    // The current status of the payment
+    paymentStatus: {
+        type: String,
+        enum: ['unpaid', 'pending', 'paid', 'refunded', 'waived'],
+        required: true,
+        default: 'unpaid'
+    },
+
+    // Reference ID from the payment processor (Stripe/PayPal/etc.)
+    paymentTransactionId: {
+        type: String,
+        required: false,
+        default: null
+    },
+
+    // Method used for payment (useful for reporting)
+    paymentMethod: {
+        type: String,
+        enum: ['credit_card', 'insurance', 'cash', 'transfer', 'other'],
+        required: false
     }
 
 }, {

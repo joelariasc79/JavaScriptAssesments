@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProducts } from './redux/product/allProductsActions';
-// Removed: import { fetchUser } from './redux/user/userActions'; // No longer needed for App.js itself
+// Removed: import { fetchUser } from './redux/patient/userActions'; // No longer needed for App.js itself
 
 import ProductCard from './components/ProductCard';
 import CartComponent from './components/CartComponent';
@@ -16,15 +16,15 @@ function App() {
     // Select products, loading state, and error from the 'allProducts' slice of state
     const { products, loading: productsLoading, error: productsError } = useSelector(state => state.allProducts);
 
-    // Removed: Select current user, loading state, and error from the 'user' slice
-    // const { currentUser, loading: userLoading, error: userError } = useSelector(state => state.user);
+    // Removed: Select current patient, loading state, and error from the 'patient' slice
+    // const { currentUser, loading: userLoading, error: userError } = useSelector(state => state.patient);
 
     // Set currentUserId back to the hardcoded value
     const currentUserId = "user123";
 
     const [activeSection, setActiveSection] = useState('products');
 
-    // Removed: Effect to fetch initial user data on component mount
+    // Removed: Effect to fetch initial patient data on component mount
     // useEffect(() => {
     //     dispatch(fetchUser("joeD137"));
     // }, [dispatch]);
@@ -37,19 +37,19 @@ function App() {
     }, [dispatch, activeSection]); // Re-fetch if activeSection changes to 'products'
 
     const renderSection = () => {
-        // Removed: Conditional rendering for user loading/error
+        // Removed: Conditional rendering for patient loading/error
         // if (userLoading) {
         //     return (
         //         <section className="initial-load-message">
-        //             <p className="status-message loading">Loading user data...</p>
+        //             <p className="status-message loading">Loading patient data...</p>
         //         </section>
         //     );
         // }
         // if (userError) {
         //     return (
         //         <section className="initial-load-message">
-        //             <p className="status-message error">Error loading user: {userError}. Please ensure user "joeD137" exists.</p>
-        //             <p>Proceeding without a logged-in user for some functionalities.</p>
+        //             <p className="status-message error">Error loading patient: {userError}. Please ensure patient "joeD137" exists.</p>
+        //             <p>Proceeding without a logged-in patient for some functionalities.</p>
         //         </section>
         //     );
         // }

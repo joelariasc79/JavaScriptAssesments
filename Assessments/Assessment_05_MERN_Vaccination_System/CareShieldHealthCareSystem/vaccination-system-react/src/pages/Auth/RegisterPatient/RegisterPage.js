@@ -82,7 +82,7 @@ const RegisterPage = () => {
                 [name]: value,
             }));
         }
-        // Clear error for the field as user types
+        // Clear error for the field as patient types
         setErrors((prevErrors) => ({
             ...prevErrors,
             [name]: '',
@@ -170,10 +170,10 @@ const RegisterPage = () => {
                 .map(disease => disease.trim()) // Trim whitespace from each item
                 .filter(disease => disease !== '' && disease.toLowerCase() !== 'none'); // Remove empty strings and explicit 'none'
 
-            // If no actual diseases are listed, but the user typed something like "None" or nothing,
+            // If no actual diseases are listed, but the patient typed something like "None" or nothing,
             // ensure it's an empty array or ['None'] if that's preferred for "no diseases".
             // Backend script logic inserted ['None'] if nothing was selected.
-            // For now, if the user leaves it blank or types "None", we'll send an empty array.
+            // For now, if the patient leaves it blank or types "None", we'll send an empty array.
             const finalPreExistingDiseases = processedDiseases.length > 0 ? processedDiseases : ['None'];
 
 

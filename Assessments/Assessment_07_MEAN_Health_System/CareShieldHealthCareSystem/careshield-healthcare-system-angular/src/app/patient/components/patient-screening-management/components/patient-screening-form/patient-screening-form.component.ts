@@ -12,6 +12,7 @@ import { Patient } from '../../../../../patient-management/models/patient.model'
 import { AuthService } from '../../../../../auth/services/auth.service';
 import { PatientScreeningService } from '../../services/patient-screening.service';
 import {MedicationModel} from '../../models/medication.model';
+import {Hospital} from '../../../../../hospital/models/hospital.model';
 
 const DEFAULT_PATIENT: Patient = {
   username: '',
@@ -33,6 +34,20 @@ const DEFAULT_PATIENT: Patient = {
   role: 'patient',
   hospital: [],
 }
+
+/** Default Hospital Constant */
+const DEFAULT_HOSPITAL: Hospital = {
+  _id: '',
+  name: '',
+  address: {
+    street: '',
+    city: '',
+    state: '',
+  },
+  type: '',
+  contact_number: '',
+  charges: 0,
+};
 
 const MINIMAL_DEFAULT_DISEASE: Disease = {
   _id: '',
@@ -57,7 +72,7 @@ export class PatientScreeningFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private patientScreeningService: PatientScreeningService,
-    private authService: AuthService, // Inject AuthService to get current user ID
+    private authService: AuthService, // Inject AuthService to get current patient ID
     private router: Router
   ) {
     this.initializePatientScreeningFromRouterState();
@@ -76,6 +91,7 @@ export class PatientScreeningFormComponent implements OnInit, OnDestroy {
   newPatientScreening = signal<PatientScreeningModel>({
     _id: '',
     patientId: DEFAULT_PATIENT,
+    hospitalId: DEFAULT_HOSPITAL,
     selectedDisease: null,
     appointmentId: null,
     chiefComplaint: '',
@@ -153,7 +169,7 @@ export class PatientScreeningFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Fetches the current user ID and populates the patientId property if in creation mode.
+   * Fetches the current patient ID and populates the patientId property if in creation mode.
    */
   setPatientIdFromAuth() {
     if (!this.isUpdateMode()) {

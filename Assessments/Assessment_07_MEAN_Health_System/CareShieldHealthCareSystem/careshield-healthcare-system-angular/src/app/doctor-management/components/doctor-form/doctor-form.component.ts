@@ -65,7 +65,6 @@ export class DoctorFormComponent implements OnInit, OnDestroy {
 
   // --- Initialization Logic ---
 
-
   /**
    * Initializes the doctor form data and update mode from router state during navigation (for editing).
    */
@@ -82,7 +81,7 @@ export class DoctorFormComponent implements OnInit, OnDestroy {
       this.newDoctor.set({
         ...doctorFromState,
         // SECURITY: NEVER pre-fill the password field during update.
-        // Force it to be an empty string. The user will only submit a new password
+        // Force it to be an empty string. The patient will only submit a new password
         // if they intentionally type one.
         password: '',
 

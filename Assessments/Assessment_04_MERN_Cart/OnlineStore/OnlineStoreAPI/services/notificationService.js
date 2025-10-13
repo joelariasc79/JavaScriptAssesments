@@ -14,7 +14,7 @@ function init(io, usersMap) {
 
 /**
  * Creates and stores a new notification in the database, and emits it in real-time.
- * @param {string | null} userIdString The string ID of the user to notify (null for broadcast/general).
+ * @param {string | null} userIdString The string ID of the patient to notify (null for broadcast/general).
  * @param {string} message The notification message.
  * @param {string} type The type of notification (e.g., 'cart_update', 'order_cancellation', 'static').
  */
@@ -82,8 +82,8 @@ async function createNotification(userIdString, message, type) {
 }
 
 /**
- * Retrieves notifications for a specific user.
- * @param {string} userIdString The string ID of the user.
+ * Retrieves notifications for a specific patient.
+ * @param {string} userIdString The string ID of the patient.
  * @param {boolean} unreadOnly If true, return only unread notifications.
  * @returns {Promise<Array>} A promise that resolves to a list of notifications.
  */
@@ -98,7 +98,7 @@ async function getNotifications(userIdString) { // Removed unreadOnly parameter 
 
         if (!mongoose.Types.ObjectId.isValid(userIdObjectId)) {
             console.error(`Invalid ObjectId derived from user._id: ${userIdObjectId} for user string ID: ${userIdString}. Cannot fetch notifications.`);
-            return []; // Return empty array if the user's _id is malformed
+            return []; // Return empty array if the patient's _id is malformed
         }
 
         const query = { userId: userIdObjectId };
@@ -134,7 +134,7 @@ async function markNotificationAsRead(notificationId) {
         const notification = await Notification.findByIdAndUpdate(notificationId, { read: true }, { new: true });
         if (notification) {
             if (ioInstance && notification.userId) {
-                const user = await UserModel.findById(notification.userId); // Find user by their _id
+                const user = await UserModel.findById(notification.userId); // Find patient by their _id
                 const userIdString = user ? user.userId : null; // Get the string userId
                 for (let [socketId, connectedUserId] of connectedUsersMap.entries()) {
                     if (connectedUserId === userIdString) {
@@ -151,8 +151,8 @@ async function markNotificationAsRead(notificationId) {
 }
 
 /**
- * Creates static/initial notifications for a user.
- * @param {string} userIdString The string ID of the user.
+ * Creates static/initial notifications for a patient.
+ * @param {string} userIdString The string ID of the patient.
  */
 async function setupStaticNotifications(userIdString) {
     const staticNotifications = [
@@ -173,7 +173,7 @@ async function setupStaticNotifications(userIdString) {
     // CRITICAL FIX: Ensure the retrieved _id is a valid ObjectId before using in query/creation.
     if (!mongoose.Types.ObjectId.isValid(userIdObjectId)) {
         console.error(`Invalid ObjectId derived from user._id: ${userIdObjectId} for user string ID: ${userIdString}. Cannot setup static notifications.`);
-        return; // Exit if the user's _id is malformed
+        return; // Exit if the patient's _id is malformed
     }
 
     for (const notifData of staticNotifications) {
@@ -187,8 +187,8 @@ async function setupStaticNotifications(userIdString) {
 }
 
 /**
- * Retrieves the count of unread notifications for a specific user.
- * @param {string} userIdString The string ID of the user.
+ * Retrieves the count of unread notifications for a specific patient.
+ * @param {string} userIdString The string ID of the patient.
  * @returns {Promise<number>} A promise that resolves to the count of unread notifications.
  */
 async function getUnreadNotificationCount(userIdString) {
@@ -203,7 +203,7 @@ async function getUnreadNotificationCount(userIdString) {
         // CRITICAL FIX: Ensure the retrieved _id is a valid ObjectId before querying the Notification models.
         if (!mongoose.Types.ObjectId.isValid(userIdObjectId)) {
             console.error(`Invalid ObjectId derived from user._id: ${userIdObjectId} for user string ID: ${userIdString}. Cannot fetch unread notification count.`);
-            return 0; // Return 0 if the user's _id is malformed
+            return 0; // Return 0 if the patient's _id is malformed
         }
         return await Notification.countDocuments({ userId: userIdObjectId, read: false });
     } catch (error) {
@@ -213,10 +213,10 @@ async function getUnreadNotificationCount(userIdString) {
 }
 
 /**
- * Clears (deletes) notifications for a specific user.
- * @param {string} userIdString The string ID of the user.
+ * Clears (deletes) notifications for a specific patient.
+ * @param {string} userIdString The string ID of the patient.
  * @param {string | null} [type=null] Optional. The type of notifications to clear (e.g., 'static').
- * If not provided, all notifications for the user will be cleared.
+ * If not provided, all notifications for the patient will be cleared.
  * @returns {Promise<object>} A promise that resolves to an object containing the number of deleted notifications.
  */
 async function clearUserNotifications(userIdString, type = null) {
@@ -242,7 +242,7 @@ async function clearUserNotifications(userIdString, type = null) {
         console.log(`Cleared ${result.deletedCount} notifications for user ${userIdString}${type ? ` of type ${type}` : ''}.`);
         return { deletedCount: result.deletedCount, message: "Notifications cleared successfully." };
     } catch (error) {
-        console.error('Error clearing user notifications:', error);
+        console.error('Error clearing patient notifications:', error);
         throw error;
     }
 }

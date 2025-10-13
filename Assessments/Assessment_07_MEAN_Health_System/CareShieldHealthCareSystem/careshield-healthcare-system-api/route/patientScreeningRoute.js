@@ -1,11 +1,7 @@
-// patientScreeningRoute.js
-
 const express = require('express');
 const patientScreeningRouter = express.Router({ strict: true, caseSensitive: true });
-const mongoose = require('mongoose'); // <-- FIX 1: Import mongoose
+const mongoose = require('mongoose');
 const PatientScreeningModel = require('../dataModel/patientScreeningDataModel');
-// NOTE: PatientModel is not used in the existing routes, but kept for completeness
-// const PatientModel = require('../dataModel/userDataModel');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
 
@@ -24,73 +20,136 @@ const transformMedications = (medicationString) => {
 
 /**
  * @route GET /api/patients/patientScreening
- * @description Get all Patient Screenings. Accessible to Admin/Doctor roles only.
+ * @description Get all Patient Screenings (System-wide).
  * @access Protected (Admin, Hospital Admin, Doctor)
  */
 patientScreeningRouter.get('/', authenticateToken, async (req, res) => {
     try {
         const requestingUserRole = req.user.role;
-
-        // --- 🔒 AUTHORIZATION CHECK ---
         const isAdminOrDoctor = requestingUserRole === 'admin' || requestingUserRole === 'hospital_admin' || requestingUserRole === 'doctor';
 
         if (!isAdminOrDoctor) {
             return res.status(403).json({ message: 'Forbidden. Only authorized staff can view all screening records.' });
         }
-        // -----------------------------
 
-        // FIX 2: Correct models and variable name (was HospitalModel)
         const screenings = await PatientScreeningModel.find({});
         res.status(200).json(screenings);
     } catch (error) {
         console.error('Error fetching patient screenings:', error);
-        // FIX 3: Corrected error message
         res.status(500).json({ message: 'Internal server error fetching patient screenings.', error: error.message });
     }
 });
 
 
 /**
+ * @route GET /api/patients/patientScreening/my-hospital-screenings
+ * @description Get all Patient Screenings for the currently logged-in Patient,
+ * scoped by their currently selected hospital.
+ * @access Protected (Patient)
+ */
+patientScreeningRouter.get('/my-hospital-screenings', authenticateToken, async (req, res) => {
+    try {
+        const patientId = req.user.id || req.user._id;
+        // Use the hospital the patient is currently "logged into"
+        const currentHospitalId = req.user.selectedHospitalId;
+
+        // 1. Basic Validation & Authorization
+        if (req.user.role !== 'patient') {
+            return res.status(403).json({ message: 'Forbidden. This endpoint is for patients only.' });
+        }
+
+        if (!currentHospitalId || !mongoose.Types.ObjectId.isValid(currentHospitalId)) {
+            return res.status(400).json({
+                message: 'Hospital scope error: Current patient is not logged into a valid hospital context.'
+            });
+        }
+
+        // 2. Execute the Scoped Query
+        // Filters by patient and the hospital context the patient is currently using.
+        const screenings = await PatientScreeningModel.find({
+            patientId: patientId,
+            hospitalId: currentHospitalId // Requires hospitalId field in the Screening Schema
+        })
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(screenings);
+
+    } catch (error) {
+        console.error('Error fetching patient hospital-scoped screenings:', error);
+        res.status(500).json({
+            message: 'Internal server error fetching hospital-scoped patient screenings.',
+            error: error.message
+        });
+    }
+});
+
+
+/**
+ * @route GET /api/patients/patientScreening/my-hospital-open-screenings
+ * @description Get Patient Screenings (submitted, reviewed, referred) for the logged-in Patient,
+ * scoped by their currently selected hospital. These are "open" or actionable screenings.
+ * @access Protected (Patient)
+ */
+patientScreeningRouter.get('/my-hospital-open-screenings', authenticateToken, async (req, res) => {
+    try {
+        const patientId = req.user.id || req.user._id;
+        const currentHospitalId = req.user.selectedHospitalId;
+
+        // 1. Basic Validation & Authorization
+        if (req.user.role !== 'patient') {
+            return res.status(403).json({ message: 'Forbidden. This endpoint is for patients only.' });
+        }
+
+        if (!currentHospitalId || !mongoose.Types.ObjectId.isValid(currentHospitalId)) {
+            return res.status(400).json({
+                message: 'Hospital scope error: Current patient is not logged into a valid hospital context.'
+            });
+        }
+
+        // 2. Execute the Scoped Query, filtering out archived and converted appointments
+        const screenings = await PatientScreeningModel.find({
+            patientId: patientId,
+            hospitalId: currentHospitalId,
+            // Only return screenings that are NOT archived and NOT converted
+            screeningStatus: {
+                $nin: ['archived', 'converted_to_appointment']
+            }
+        })
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(screenings);
+
+    } catch (error) {
+        console.error('Error fetching patient open hospital-scoped screenings:', error);
+        res.status(500).json({
+            message: 'Internal server error fetching open hospital-scoped patient screenings.',
+            error: error.message
+        });
+    }
+});
+
+
+/**
+ * http://localhost:9200/api/patients/patientScreening/68e48bc78e62b8160bc0ccaf
  * @route GET /api/patients/patientScreening/:patientId
- * @description Get all Patient Screenings by Patient ID. Accessible only to patient owner or staff.
+ * @description Get all Patient Screenings by a specific Patient ID.
  * @access Protected (Owner, Admin, Hospital Admin, or Doctor)
  */
-patientScreeningRouter.get(`/:patientId`, authenticateToken, async (req, res) => {
+patientScreeningRouter.get(`/patients/:patientId`, authenticateToken, async (req, res) => {
     try {
         const targetPatientId = req.params.patientId;
-
-        // FIX 4: Use req.user.id which is standard for decoded JWT payloads,
-        // or ensure your middleware maps the ID to req.user._id
-        // Assuming req.user contains { id: <userId>, role: <role> }
         const requestingUserId = req.user.id || req.user._id;
-
-        const requestingUserRole = req.user.role; // Assuming role is available
+        const requestingUserRole = req.user.role;
 
         if (!mongoose.Types.ObjectId.isValid(targetPatientId)) {
             return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
-        // CRITICAL CHECK: Ensure the authenticated user ID is present before comparison
-        if (!requestingUserId) {
-            console.error("Auth payload missing user ID for comparison.");
-            return res.status(401).json({ message: 'Authorization error: User ID not found in token payload.' });
-        }
-
-        // --- 🔒 AUTHORIZATION CHECK ---
-        // The error likely occurred here because one side was undefined
+        // --- 🔒 AUTHORIZATION CHECK (Simplified) ---
         const isOwner = targetPatientId.toString() === requestingUserId.toString();
-
-        const isPatient = (requestingUserRole === 'patient');
-        const isAdminOrDoctor = requestingUserRole === 'admin' || requestingUserRole === 'hospital_admin'
-            || requestingUserRole === 'doctor';
-
-        if (isPatient && !isOwner) {
-            // A patient is trying to access another patient's records
-            return res.status(403).json({ message: 'Forbidden. You can only view your own screening history.' });
-        }
+        const isAdminOrDoctor = requestingUserRole === 'admin' || requestingUserRole === 'hospital_admin' || requestingUserRole === 'doctor';
 
         if (!isAdminOrDoctor && !isOwner) {
-            // Any other unauthorized user is trying to access this patient's records
             return res.status(403).json({ message: 'Access denied.' });
         }
         // -----------------------------
@@ -104,12 +163,11 @@ patientScreeningRouter.get(`/:patientId`, authenticateToken, async (req, res) =>
     }
 });
 
+
 /**
  * @route GET /api/patients/patientScreening/:id
  * @description Get a single Patient Screening by its unique Screening ID (_id).
  * @access Protected (Owner, Admin, Hospital Admin, or Doctor)
- * NOTE: This route needs to be updated to use a different path if the previous route is active,
- * but since express matches more specific routes first, this is okay for now.
  */
 patientScreeningRouter.get('/:id', authenticateToken, async (req, res) => {
     try {
@@ -117,15 +175,12 @@ patientScreeningRouter.get('/:id', authenticateToken, async (req, res) => {
         const requestingUserId = req.user.id || req.user._id;
         const requestingUserRole = req.user.role;
 
-        // 1. Validate the screening ID format
         if (!mongoose.Types.ObjectId.isValid(screeningId)) {
             return res.status(400).json({ message: 'Invalid screening ID format.' });
         }
 
-        // 2. Fetch the specific screening document
         const patientScreening = await PatientScreeningModel.findById(screeningId);
 
-        // 3. Handle 'Not Found' case
         if (!patientScreening) {
             return res.status(404).json({ message: 'Patient Screening not found.' });
         }
@@ -141,7 +196,6 @@ patientScreeningRouter.get('/:id', authenticateToken, async (req, res) => {
         }
         // -----------------------------
 
-        // 4. Return the screening data
         res.status(200).json(patientScreening);
 
     } catch (error) {
@@ -153,6 +207,7 @@ patientScreeningRouter.get('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+
 /**
  * @route POST /api/patients/patientScreening
  * @description Post a Patient Screening
@@ -160,36 +215,37 @@ patientScreeningRouter.get('/:id', authenticateToken, async (req, res) => {
  */
 patientScreeningRouter.post('/', authenticateToken, async (req, res) => {
     try {
-
         const requestingUserId = req.user.id || req.user._id;
         const requestingUserRole = req.user.role;
+        // Get the hospital the patient is currently "logged into"
+        const currentHospitalId = req.user.selectedHospitalId;
 
         // --- 🔒 AUTHORIZATION CHECK ---
-        const isPatient = requestingUserRole === 'patient';
-
-        if (!isPatient) {
-            // Only the patient role is authorized to submit a new screening
+        if (requestingUserRole !== 'patient') {
             return res.status(403).json({ message: 'Forbidden. Only patients can create a new screening record.' });
+        }
+
+        // --- 🛑 CRITICAL HOSPITAL SCOPE CHECK ---
+        if (!currentHospitalId || !mongoose.Types.ObjectId.isValid(currentHospitalId)) {
+            return res.status(400).json({ message: 'Hospital context required to submit screening.' });
         }
         // -----------------------------
 
         const { selectedDisease, chiefComplaint, symptomDescription, duration, currentMedications, painLevel } = req.body;
-
-        // --- FIX: Transform the currentMedications string ---
         const medicationsArray = transformMedications(currentMedications);
-        // --------------------------------------------------
 
         if (!chiefComplaint || !symptomDescription || !duration || painLevel === undefined) {
-            return res.status(400).json({ message: 'Missing required screening fields (chief complaint, symptom description, duration, pain level).' });
+            return res.status(400).json({ message: 'Missing required screening fields.' });
         }
 
         const newPatientScreening = new PatientScreeningModel({
             patientId: requestingUserId,
+            hospitalId: currentHospitalId, // 🌟 FIX: Include the hospital ID
             selectedDisease: selectedDisease || null,
             chiefComplaint,
             symptomDescription,
             duration,
-            currentMedications: medicationsArray, // Use the transformed array
+            currentMedications: medicationsArray,
             painLevel,
             screeningStatus: 'submitted'
         });
@@ -200,8 +256,8 @@ patientScreeningRouter.post('/', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error creating Patient Screening:', error);
         if (error.name === 'ValidationError') {
-            // You can optionally iterate over error.errors to send a more detailed response
-            return res.status(400).json({ message: 'Validation failed for Patient Screening.', errors: error.errors });
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ message: 'Validation failed for Patient Screening.', errors: messages });
         }
         res.status(500).json({ message: 'Internal server error during Patient Screening creation.', error: error.message });
     }
@@ -229,13 +285,7 @@ patientScreeningRouter.put('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'Patient Screening not found.' });
         }
 
-        // --- FIX: Transform currentMedications if present in updates for PUT request ---
-        if (updates.currentMedications) {
-            updates.currentMedications = transformMedications(updates.currentMedications);
-        }
-        // ----------------------------------------------------------------------------
-
-        // --- 🔒 AUTHORIZATION CHECK ---
+        // --- Authorization Setup ---
         const ownerId = patientScreening.patientId;
         const isOwner = ownerId.toString() === requestingUserId.toString();
         const isAdminOrDoctor = requestingUserRole === 'admin' || requestingUserRole === 'hospital_admin' || requestingUserRole === 'doctor';
@@ -243,6 +293,15 @@ patientScreeningRouter.put('/:id', authenticateToken, async (req, res) => {
         if (!isOwner && !isAdminOrDoctor) {
             return res.status(403).json({ message: 'Forbidden. You do not have permission to update this screening record.' });
         }
+
+        // --- Input Cleaning & Restrictions ---
+        if (updates.currentMedications) {
+            updates.currentMedications = transformMedications(updates.currentMedications);
+        }
+
+        // 🛑 PREVENT HOSPITAL ID UPDATE: Do not allow changing the hospital ID post-creation.
+        // This ensures the screening remains tied to its original hospital context.
+        delete updates.hospitalId;
 
         // Restriction for patients: prevent changing status fields
         if (isOwner && !isAdminOrDoctor) {
@@ -255,7 +314,6 @@ patientScreeningRouter.put('/:id', authenticateToken, async (req, res) => {
         }
         // -----------------------------
 
-        // Use the updates object which now contains the correctly formatted array (if medications were updated)
         const updatedScreening = await PatientScreeningModel.findByIdAndUpdate(
             screeningId,
             { $set: updates },
@@ -267,7 +325,8 @@ patientScreeningRouter.put('/:id', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error(`Error updating patient Screening with ID ${req.params.id}:`, error);
         if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ message: 'Validation failed.', errors: messages });
         }
         res.status(500).json({ message: 'Internal server error during Patient Screening update.', error: error.message });
     }

@@ -10,7 +10,7 @@ const { authenticateToken } = require('../middleware/authMiddleware');
  * @description Get all vaccine stock entries, with optional filters.
  * @queryparam {string} hospitalId - Filter by hospital.
  * @queryparam {string} vaccineId - Filter by vaccine.
- * @access Protected (Any authenticated user can view stock availability)
+ * @access Protected (Any authenticated patient can view stock availability)
  */
 vaccineStockRouter.get('/api/vaccine-stock', authenticateToken, async (req, res) => {
     try {
@@ -42,7 +42,7 @@ vaccineStockRouter.get('/api/vaccine-stock', authenticateToken, async (req, res)
 /**
  * @route GET /api/vaccine-stock/:hospitalId/:vaccineId
  * @description Get a single vaccine stock entry by its ID.
- * @access Protected (Any authenticated user)
+ * @access Protected (Any authenticated patient)
  */
 vaccineStockRouter.get('/api/vaccine-stock/:hospitalId/:vaccineId', authenticateToken, async (req, res) => {
     try {
@@ -195,7 +195,7 @@ module.exports = vaccineStockRouter;
 // vaccineStockRouter.post('/api/vaccine-stock', authenticateToken, async (req, res) => {
 //     try {
 //         // Only admins or hospital staff can manage vaccine stock
-//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can manage vaccine stock.' });
 //         }
 //
@@ -226,7 +226,7 @@ module.exports = vaccineStockRouter;
 //         }
 //
 //         // Hospital staff can only manage stock for their assigned hospital
-//         if (req.user.role === 'hospital_staff' && (!req.user.hospitalId || req.user.hospitalId.toString() !== hospitalId)) {
+//         if (req.patient.role === 'hospital_staff' && (!req.patient.hospitalId || req.patient.hospitalId.toString() !== hospitalId)) {
 //             return res.status(403).json({ message: 'Access denied. You can only manage stock for your assigned hospital.' });
 //         }
 //
@@ -265,7 +265,7 @@ module.exports = vaccineStockRouter;
 //  * @description Get all vaccine stock entries, with optional filters.
 //  * @queryparam {string} hospitalId - Filter by hospital.
 //  * @queryparam {string} vaccineId - Filter by vaccine.
-//  * @access Protected (Any authenticated user can view stock availability)
+//  * @access Protected (Any authenticated patient can view stock availability)
 //  */
 // vaccineStockRouter.get('/api/vaccine-stock', authenticateToken, async (req, res) => {
 //     try {
@@ -297,7 +297,7 @@ module.exports = vaccineStockRouter;
 // /**
 //  * @route GET /api/vaccine-stock/:id
 //  * @description Get a single vaccine stock entry by its ID.
-//  * @access Protected (Any authenticated user)
+//  * @access Protected (Any authenticated patient)
 //  */
 // vaccineStockRouter.get('/api/vaccine-stock/:hospitalId/:vaccineId', authenticateToken, async (req, res) => {
 //     try {
@@ -338,7 +338,7 @@ module.exports = vaccineStockRouter;
 //  */
 // vaccineStockRouter.put('/api/vaccine-stock/:id', authenticateToken, async (req, res) => {
 //     try {
-//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can update vaccine stock.' });
 //         }
 //
@@ -405,14 +405,14 @@ module.exports = vaccineStockRouter;
 //         }
 //
 //         // Ensure only authorized staff can update their hospital's stock
-//         if (req.user.role === 'hospital_staff') {
-//             if (!req.user.hospitalId || req.user.hospitalId.toString() !== hospitalId) {
+//         if (req.patient.role === 'hospital_staff') {
+//             if (!req.patient.hospitalId || req.patient.hospitalId.toString() !== hospitalId) {
 //                 return res.status(403).json({ message: 'Access denied. You can only update stock for your assigned hospital.' });
 //             }
 //         }
 //
 //         // Admin users can update stock for any hospital
-//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can update vaccine stock.' });
 //         }
 //
@@ -465,7 +465,7 @@ module.exports = vaccineStockRouter;
 //  */
 // vaccineStockRouter.delete('/api/vaccine-stock/:id', authenticateToken, async (req, res) => {
 //     try {
-//         if (req.user.role !== 'admin') {
+//         if (req.patient.role !== 'admin') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators can delete vaccine stock entries.' });
 //         }
 //

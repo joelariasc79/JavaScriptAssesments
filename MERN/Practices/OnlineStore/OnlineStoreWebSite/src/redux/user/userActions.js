@@ -1,4 +1,4 @@
-// src/redux/user/userActions.js
+// src/redux/patient/userActions.js
 import axios from 'axios';
 
 // --- Action Types ---
@@ -30,8 +30,8 @@ export const clearUserStatus = () => ({ type: CLEAR_USER_STATUS });
 const API_BASE_URL = 'http://localhost:9000/api';
 
 /**
- * Fetches a single user's details by their custom userId.
- * @param {string} userId - The custom user ID (e.g., "user123").
+ * Fetches a single patient's details by their custom userId.
+ * @param {string} userId - The custom patient ID (e.g., "user123").
  */
 export const fetchUser = (userId) => {
     return async (dispatch) => {
@@ -47,8 +47,8 @@ export const fetchUser = (userId) => {
 };
 
 /**
- * Creates a new user in the database.
- * @param {object} userData - Object containing user details (userId, username, email, address object)
+ * Creates a new patient in the database.
+ * @param {object} userData - Object containing patient details (userId, username, email, address object)
  */
 export const createUser = (userData) => {
     return async (dispatch) => {
@@ -56,7 +56,7 @@ export const createUser = (userData) => {
         try {
             const response = await axios.post(`${API_BASE_URL}/users`, userData);
             dispatch(createUserSuccess(response.data));
-            // Optional: Clear success/error status after a short delay for user feedback
+            // Optional: Clear success/error status after a short delay for patient feedback
             setTimeout(() => dispatch(clearUserStatus()), 3000);
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;

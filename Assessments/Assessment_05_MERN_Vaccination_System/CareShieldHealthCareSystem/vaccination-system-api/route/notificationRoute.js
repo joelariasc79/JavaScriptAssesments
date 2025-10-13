@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { createAndSendNotification, generateQrCodeBuffer } = require('../services/notificationService');
 
-const UserModel = require('../dataModel/userDataModel'); // Assuming you use this to get user email
+const UserModel = require('../dataModel/userDataModel'); // Assuming you use this to get patient email
 const VaccinationOrderModel = require('../dataModel/vaccinationOrderModel');
 const { authenticateToken } = require('../middleware/authMiddleware');
 

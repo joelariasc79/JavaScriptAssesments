@@ -46,7 +46,7 @@ const UserManagement = () => {
         }
     };
 
-    // Handler for top-level user data fields
+    // Handler for top-level patient data fields
     const handleNewUserChange = (e) => {
         const { name, value } = e.target;
         setNewUserData(prev => ({ ...prev, [name]: value }));
@@ -72,7 +72,7 @@ const UserManagement = () => {
             !newUserData.address.street || !newUserData.address.city ||
             !newUserData.address.state || !newUserData.address.zipCode ||
             !newUserData.address.country) {
-            alert('Please fill in all required user details and address fields.');
+            alert('Please fill in all required patient details and address fields.');
             return;
         }
         dispatch(createUser(newUserData));

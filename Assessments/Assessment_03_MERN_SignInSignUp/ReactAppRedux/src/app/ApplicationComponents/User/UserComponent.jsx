@@ -33,7 +33,7 @@ let UserComponent = (props)=>{
     }
 
     let saveUserClick = (evt)=>{
-        // let user = {
+        // let patient = {
         //     userName, street
         // } 
         //this is the call to dispatcher using action creater
@@ -107,7 +107,7 @@ export default UserComponent;
 // //subscribing from store - mapStateToProps - allows to access the store data in react component as props
 // let mapStateToProps = (store)=>{
 //     return{
-//         user : store.studentReducer.user //this is accessing user data from user reducer and will be used in component as props
+//         patient : store.studentReducer.patient //this is accessing patient data from patient reducer and will be used in component as props
 //     }
 // }
 

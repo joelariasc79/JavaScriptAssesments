@@ -27,7 +27,7 @@ const Header = () => {
                 {isAuthenticated ? (
                     <>
                         <span className="welcome-message">Welcome, {currentUser ? currentUser.username : 'User'}!</span>
-                        {/* Example navigation based on user role or general access */}
+                        {/* Example navigation based on patient role or general access */}
                         {currentUser && currentUser.role === 'ADMIN' && (
                             <Link to="/admin/hospitals" className="nav-link">Admin: Hospitals</Link>
                         )}

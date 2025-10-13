@@ -47,7 +47,7 @@ export class PatientScreeningListComponent implements OnInit, OnDestroy {
     }
 
     // 2. Call the service method to fetch screenings by the patient's ID
-    const sub = this.patientScreeningService.getPatientScreeningsByPatientId(patientId).subscribe({
+    const sub = this.patientScreeningService.getPatientOpenedScreeningsInCurrentHospital().subscribe({
       next: (data) => {
         // Data will be an array of PatientScreeningModel objects belonging to this patient
         this.patientScreenings.set(data);

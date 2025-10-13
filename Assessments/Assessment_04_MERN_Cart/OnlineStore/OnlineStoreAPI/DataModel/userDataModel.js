@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
         zipCode: { type: String, required: true },
         country: { type: String, required: true, default: 'USA' }
     },
-    // Add other user-related fields like roles, departments, projects, manager_id here if needed
+    // Add other patient-related fields like roles, departments, projects, manager_id here if needed
     // based on your other services and models.
 }, { timestamps: true });
 

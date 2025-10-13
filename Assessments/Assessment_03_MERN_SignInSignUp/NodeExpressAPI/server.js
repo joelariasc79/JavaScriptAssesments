@@ -22,7 +22,7 @@ app.use('/static', express.static('public')) //localhost:9000/static/alert_info.
 app.use(express.json({limit:'2mb', extended:false})); 
 
 
-app.use("/user", userApp) 
+app.use("/patient", userApp)
 userApp.use("/",userRoute)
 
 

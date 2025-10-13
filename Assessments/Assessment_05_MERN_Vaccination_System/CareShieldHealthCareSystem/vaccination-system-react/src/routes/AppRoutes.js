@@ -52,7 +52,7 @@ const WatchlistDisplayPage = lazy(() => import('../pages/Watchlist/WatchlistDisp
 // PrivateRoute component - Updated to check roles
 const PrivateRoute = ({ children, allowedRoles }) => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
-    const currentUser = useSelector(selectCurrentUser); // Get current user to check role
+    const currentUser = useSelector(selectCurrentUser); // Get current patient to check role
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
@@ -60,7 +60,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 
     // Optional: Add role-based access control here
     if (allowedRoles && !allowedRoles.includes(currentUser?.role)) {
-        // If user is authenticated but doesn't have an allowed role
+        // If patient is authenticated but doesn't have an allowed role
         return <Navigate to="/" replace />; // Redirect to home or a /unauthorized page
     }
 

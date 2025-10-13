@@ -16,7 +16,7 @@ export default class ApplicationComponent extends Component {
     constructor(props) {
         super();
         this.state = {
-            userName : "react user ",
+            userName : "react patient ",
             user : {
                     userName : "Test Student",
                     userAge : 19

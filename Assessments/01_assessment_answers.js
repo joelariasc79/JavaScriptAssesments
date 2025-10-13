@@ -329,7 +329,7 @@ Student2.getData(); // With bind, 'this' refers to Student2.
 //
 //      When you need an object to act solely as a key-value store (like a dictionary or map), you don't want
 //      any accidental interference from inherited properties.
-//      For example, if you're storing user-provided keys, there's a risk that a key might accidentally
+//      For example, if you're storing patient-provided keys, there's a risk that a key might accidentally
 //      shadow a property inherited from Object.prototype (like toString or hasOwnProperty).
 //      Using Object.create(null) eliminates this risk, ensuring that your data store is completely isolated.
 //

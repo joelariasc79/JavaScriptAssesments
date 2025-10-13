@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
             // Token is invalid or expired
             return res.status(403).json({ message: 'Invalid or expired token.' });
         }
-        req.user = user; // Attach user payload to request
+        req.user = user; // Attach patient payload to request
         next();
     });
 };

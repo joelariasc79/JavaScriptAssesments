@@ -1,0 +1,115 @@
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="min-h-screen p-4 sm:p-8 bg-gray-50 font-sans">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="mb-8 flex justify-between items-center border-b pb-4">
+      <h1 class="text-3xl font-extrabold text-gray-900">Medical Encounter Record</h1>
+      <button (click)="close()"
+              class="flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors">
+        <span>Close</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Loading / Error States -->
+    @if (isLoading()) {
+      <div class="text-center p-8 bg-white rounded-xl shadow-lg">
+        <p class="text-blue-600 font-medium">Loading clinical encounter details...</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="text-center p-8 bg-red-100 text-red-700 rounded-xl shadow-lg border border-red-300">
+        <p class="font-semibold">Error: {{ errorMessage() }}</p>
+        <p class="text-sm mt-2">Could not load the record. Please check the ID or network connection.</p>
+      </div>
+    }
+
+    <!-- Read-Only Content -->
+    @if (encounter(); as record) {
+      <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl space-y-8">
+
+        <!-- General Information Section -->
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Encounter Overview</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500">Date & Time</p>
+              <p class="text-gray-900 font-semibold">{{ record.startTime | date: 'medium' }}</p>
+            </div>
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500">Status</p>
+              <p [ngClass]="{'text-green-600 bg-green-100': record.status === 'Final', 'text-yellow-600 bg-yellow-100': record.status === 'Amended', 'text-blue-600 bg-blue-100': record.status === 'Draft'}"
+                 class="inline-block px-3 py-1 text-sm font-semibold rounded-full uppercase">
+                {{ record.status || 'Draft' }}
+              </p>
+            </div>
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500">Attending Physician</p>
+              <p class="text-gray-900">{{ record.doctorId.name || 'N/A' }}</p>
+            </div>
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500">Reason for Visit</p>
+              <p class="text-gray-900">{{ record.reasonForVisit || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinical Details Section -->
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Clinical Details</h2>
+
+          <div class="space-y-6">
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500 mb-1">Diagnosis</p>
+              <div class="p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[50px] whitespace-pre-wrap">{{ record.diagnosis || 'No diagnosis recorded.' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500 mb-1">Physician Notes</p>
+              <div class="p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[100px] whitespace-pre-wrap">{{ record.physicianNotes || 'No notes available.' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <p class="text-sm font-medium text-gray-500 mb-1">Recommendations</p>
+              <div class="p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[50px] whitespace-pre-wrap">{{ record.recommendations || 'No specific recommendations provided.' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prescriptions Section -->
+        <div>
+          <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Prescriptions</h2>
+          @if (record.prescriptions && record.prescriptions.length > 0) {
+            <ul class="space-y-3">
+              @for (rx of record.prescriptions; track $index) {
+                <li class="p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
+                  <p class="text-lg font-semibold text-blue-800">{{ rx.medicationName }}</p>
+                  <p class="text-sm text-gray-700 mt-1">Dosage: <span class="font-medium">{{ rx.dosage }}</span></p>
+                  <p class="text-sm text-gray-700">Notes: <span class="font-medium">{{ rx.notes }}</span></p>
+                  <p class="text-sm text-gray-700">Frequency: <span class="font-medium">{{ rx.frequency }}</span></p>
+                  <p class="text-xs text-gray-500 mt-2">Prescribed By: {{ record.doctorId.name || 'N/A' }}</p>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="p-4 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-lg">
+              <p class="text-sm font-medium">No prescriptions were issued during this encounter.</p>
+            </div>
+          }
+        </div>
+
+        <!-- Footer Button for Accessibility -->
+        <div class="text-center pt-4">
+          <button (click)="close()"
+                  class="px-8 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition-colors">
+            Close Record View
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+

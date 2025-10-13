@@ -86,7 +86,7 @@ function App() {
                 socket.disconnect();
                 setSocket(null); // Clear socket state
             }
-            return; // Only connect if a user ID is available
+            return; // Only connect if a patient ID is available
         }
 
         // Disconnect existing socket if it exists to avoid multiple connections
@@ -138,7 +138,7 @@ function App() {
     }, [currentUserId, dispatch, token]);
 
 
-    // Fetch initial notifications and count when user is available and token exists
+    // Fetch initial notifications and count when patient is available and token exists
     useEffect(() => {
         if (currentUserId && token) {
             dispatch(fetchNotifications(currentUserId, token));
@@ -222,7 +222,7 @@ function App() {
     const handleLogout = async () => { // Made function async
         if (currentUserId && token) {
             try {
-                // 1. Clear user notifications
+                // 1. Clear patient notifications
                 console.log(`Clearing notifications for user: ${currentUserId}`);
                 await axios.delete(`${API_BASE_URL}/api/notifications/${currentUserId}`, {
                     headers: {
@@ -236,7 +236,7 @@ function App() {
             }
 
             try {
-                // 2. Clear user cart
+                // 2. Clear patient cart
                 console.log(`Clearing cart for user: ${currentUserId}`);
                 await axios.post(`${API_BASE_URL}/api/cart/clear`, { userId: currentUserId }, { // Assumes POST with userId in body
                     headers: {
@@ -284,8 +284,8 @@ function App() {
             );
         }
 
-        // Handle the cases where the user is NOT logged in and lands on 'home', 'about', or 'logoutSuccess'
-        // Or if the user IS logged in and lands on any section.
+        // Handle the cases where the patient is NOT logged in and lands on 'home', 'about', or 'logoutSuccess'
+        // Or if the patient IS logged in and lands on any section.
         switch (activeSection) {
             // NEW: Home section
             case 'home':
@@ -407,7 +407,7 @@ function App() {
                             className={activeSection === 'home' ? 'active' : ''}>Home
                     </button>
 
-                    {/* These tabs are visible only when a user is logged in (token exists) */}
+                    {/* These tabs are visible only when a patient is logged in (token exists) */}
                     {token && (
                         <>
                             <button onClick={() => setActiveSection('coupons')}
@@ -448,7 +448,7 @@ function App() {
                         <>
                             <span className="welcome-message">Welcome, {username || 'User'}!</span>
                             <button onClick={handleLogout} className="logout-button">Logout</button>
-                            {currentUserId && ( // Show notification icon only if user is logged in
+                            {currentUserId && ( // Show notification icon only if patient is logged in
                                 <div className="notification-bell-container" ref={notificationRef}>
                                     <button
                                         className="notification-bell"

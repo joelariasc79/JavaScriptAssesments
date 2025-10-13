@@ -21,7 +21,7 @@ const ProductReviewSchema = new mongoose.Schema({
         trim: true, // Remove whitespace from both ends
         maxlength: 1000, // Limit comment length
     },
-    // (Optional) If you have a User models, link to the user who made the review
+    // (Optional) If you have a User models, link to the patient who made the review
     // For now, we'll use a simple reviewer name/email.
     reviewerName: {
         type: String,

@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Assuming you might want to display user info
+import { useSelector } from 'react-redux'; // Assuming you might want to display patient info
 import { selectCurrentUser } from '../../../store/features/auth/authSelectors'; // Assuming you have this selector
 
 import './AdminDashboard.css'; // Create this CSS file for styling
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-    const currentUser = useSelector(selectCurrentUser); // Get current user details
+    const currentUser = useSelector(selectCurrentUser); // Get current patient details
 
     const handleNavigation = (path) => {
         navigate(path);

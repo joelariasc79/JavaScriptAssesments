@@ -5,7 +5,7 @@ const notificationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId, // Assuming users have ObjectId as _id
         ref: 'User', // Reference to your User models
-        required: false // Notifications can be general (null userId) or specific to a user
+        required: false // Notifications can be general (null userId) or specific to a patient
     },
     message: {
         type: String,

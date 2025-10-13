@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
   // Using the MockAuthService for dependency injection
   private authService = inject(AuthService);
 
-  // Simulate user role and logged-in user with signals
+  // Simulate patient role and logged-in patient with signals
   userRole = this.authService.currentUserRole;
   loggedInUser = this.authService.currentUserName;
 
@@ -37,11 +37,11 @@ export class HeaderComponent implements OnInit {
   //   // 1. Call your authentication service's logout method (using mock for now)
   //   this.authService.logout();
   //
-  //   // 2. Clear local user state signals
+  //   // 2. Clear local patient state signals
   //   this.userRole.set(null);
   //   this.loggedInUser.set(null);
   //
-  //   // 3. Navigate the user to the login page
+  //   // 3. Navigate the patient to the login page
   //   this.router.navigate(['/login']);
   // }
 
@@ -52,7 +52,7 @@ export class HeaderComponent implements OnInit {
     // The component's signals (userRole, loggedInUser) automatically update
     // because they are bound to the AuthService signals.
 
-    // 2. Navigate the user to the login page
+    // 2. Navigate the patient to the login page
     this.router.navigate(['/auth/login']); // Assuming '/auth/login' is the correct route
   }
 

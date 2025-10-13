@@ -233,7 +233,7 @@ function OrderManagementComponent({ currentUserId, authToken }) {
 
     const handleSubmitOrderReview = async () => {
         if (!selectedOrderForReview || !currentUserId || !authToken) {
-            setUiMessage('Missing order, user ID, or auth token for review submission.');
+            setUiMessage('Missing order, patient ID, or auth token for review submission.');
             setIsUiError(true);
             return;
         }

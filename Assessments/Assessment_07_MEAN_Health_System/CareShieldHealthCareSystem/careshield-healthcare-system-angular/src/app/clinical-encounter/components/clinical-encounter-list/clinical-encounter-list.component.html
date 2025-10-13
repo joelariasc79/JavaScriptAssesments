@@ -1,0 +1,86 @@
+<div class="min-h-screen p-4 sm:p-8 bg-gray-50 font-sans">
+  <div class="max-w-7xl mx-auto">
+
+    <header class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+      <div class="mb-4 sm:mb-0">
+        <h1 class="text-3xl font-extrabold text-gray-900">Clinical Encounters</h1>
+        <p class="text-gray-500">View and manage all recorded patient visits.</p>
+      </div>
+      <button (click)="onCreateClick()"
+              class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>New Encounter</span>
+      </button>
+    </header>
+
+    <!-- Loading / Error State -->
+    @if (loading()) {
+      <div class="text-center p-8 bg-white rounded-xl shadow-lg">
+        <p class="text-blue-600 font-medium">Loading clinical encounters...</p>
+      </div>
+    } @else if (error()) {
+      <div class="text-center p-8 bg-red-100 text-red-700 rounded-xl shadow-lg border border-red-300">
+        <p class="font-semibold">Error: {{ message() }}</p>
+        <p class="text-sm mt-2">Could not fetch data. Please try again.</p>
+      </div>
+    } @else if (clinicalEncounters().length === 0) {
+      <div class="text-center p-8 bg-yellow-100 text-yellow-700 rounded-xl shadow-lg border border-yellow-300">
+        <p class="font-semibold">No Encounters Found</p>
+        <p class="text-sm mt-2">Start by creating a new clinical encounter.</p>
+      </div>
+    }
+
+    <!-- Encounters Table -->
+    @if (clinicalEncounters().length > 0) {
+      <div class="bg-white rounded-xl shadow-2xl overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+          <tr>
+            <!-- Changed to start time and increased width -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[20%]">Date/Time</th>
+            <!-- Patient column is now always visible on SM+ -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[25%]">Patient</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell w-[25%]">Doctor</th>
+            <!-- Changed to Reason for Visit -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Reason for Visit</th>
+            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]">Actions</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @for (encounter of clinicalEncounters(); track encounter._id) {
+              <tr class="hover:bg-blue-50 transition-colors">
+                <!-- Display start time -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ encounter.startTime | date: 'short' }}
+                </td>
+                <!-- Display patient name -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {{ encounter.patientId.name || 'N/A' }}
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                  {{ encounter.doctorId.name || 'N/A' }}
+                </td>
+                <!-- Display reasonForVisit -->
+                <td class="px-4 py-4 text-sm text-gray-600 truncate max-w-xs">
+                  {{ encounter.reasonForVisit }}
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <button (click)="onUpdateClick(encounter)"
+                          title="View Details"
+                          class="text-blue-600 hover:text-blue-800 transform hover:scale-110 transition-transform p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

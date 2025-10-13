@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 //     fetchUser,
 //     createUser,
 //     clearUserStatus
-// } from '../../redux/user/userActions';
+// } from '../../redux/patient/userActions';
 
 import {
     fetchUser,
@@ -46,7 +46,7 @@ const UserManagement = () => {
 
     const handleFetchUser = () => {
         if (!token) { // Check if token exists before fetching protected data
-            alert('Please log in to fetch user details.');
+            alert('Please log in to fetch patient details.');
             return;
         }
         if (fetchId) {
@@ -78,7 +78,7 @@ const UserManagement = () => {
             !newUserData.address.street || !newUserData.address.city ||
             !newUserData.address.state || !newUserData.address.zipCode ||
             !newUserData.address.country) {
-            alert('Please fill in all required user details, password, and address fields.');
+            alert('Please fill in all required patient details, password, and address fields.');
             return;
         }
         dispatch(createUser(newUserData));
@@ -101,7 +101,7 @@ const UserManagement = () => {
         <div className="user-management-container">
             <h2>User Management</h2>
 
-            {/* Display loading, error, success messages here as they are global to user state */}
+            {/* Display loading, error, success messages here as they are global to patient state */}
             {loading && <p className="status-message loading">Loading...</p>}
             {error && <p className="status-message error">Error: {error}</p>}
             {successMessage && <p className="status-message success">{successMessage}</p>}

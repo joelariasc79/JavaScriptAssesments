@@ -85,9 +85,9 @@ export default class Home extends PureComponent {
         // console.log("prevState", prevState);
         // console.log("prevProps", prevProps);
 
-        // this.prevUser = prevState.user;
+        // this.prevUser = prevState.patient;
         // this.setState({
-        //     user : this.prevUser
+        //     patient : this.prevUser
         // })
 
         return {

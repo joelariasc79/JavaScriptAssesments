@@ -59,7 +59,7 @@ let Checkout = ()=>{
             <div>
                 Thankyou for the payment, your items under process!
                 <hr />
-                {/* <p>Coming from useState {user.name +" "+user.age}</p> */}
+                {/* <p>Coming from useState {patient.name +" "+patient.age}</p> */}
             </div>
             <div>
                 <button onClick={func} >

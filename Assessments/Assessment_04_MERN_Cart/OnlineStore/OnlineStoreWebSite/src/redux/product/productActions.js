@@ -34,7 +34,7 @@ export const addProduct = (productData) => {
             // Updated: Sending productData as is, ensure it matches API expectation
             const response = await axios.post('http://localhost:9000/api/products', productData);
             dispatch(addProductSuccess(response.data));
-            // Optional: Clear status after a short delay for user feedback
+            // Optional: Clear status after a short delay for patient feedback
             setTimeout(() => dispatch(clearProductStatus()), 3000);
         } catch (error) {
             const errorMessage = error.response && error.response.data && error.response.data.message

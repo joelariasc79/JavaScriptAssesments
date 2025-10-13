@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { connect } from "react-redux"; //helps to connect react component with redux store
 
 let Header = (props)=>{
-    let user = props.user; //reading from mapStateToProps which reads from userReducer.user
+    let user = props.user; //reading from mapStateToProps which reads from userReducer.patient
     
     console.log(user)
     
@@ -25,7 +25,7 @@ let Header = (props)=>{
         }   
             <div>
                 <NavLink to="/home"  className="button" activeclassname="true"> Home </NavLink>
-                {/* <NavLink to="/user"  className="button" activeclassname="true"> Login </NavLink> */}
+                {/* <NavLink to="/patient"  className="button" activeclassname="true"> Login </NavLink> */}
                 <NavLink to="/userhook"  className="button" activeclassname="true"> Login </NavLink>
                 <NavLink to="/product"  className="button" activeclassname="true"> Product </NavLink>
                 <NavLink to="/cart"  className="button" activeclassname="true"> Cart </NavLink>
@@ -46,7 +46,7 @@ let Header = (props)=>{
 //subscribing from store - mapStateToProps - allows to access the store data in react component as props
 let mapStateToProps = (store)=>{
     return{
-        user : store.userReducer.user //this is accessing user data from user reducer and will be used in component as props
+        user : store.userReducer.user //this is accessing patient data from patient reducer and will be used in component as props
     }
 }
 

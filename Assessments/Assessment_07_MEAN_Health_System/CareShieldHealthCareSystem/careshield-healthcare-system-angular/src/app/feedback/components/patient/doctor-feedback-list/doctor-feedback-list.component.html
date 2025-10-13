@@ -1,0 +1,137 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="min-h-screen bg-gray-100 p-8 font-sans">
+  <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-2">
+    My Submitted Feedbacks
+  </h1>
+  <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+    Review the feedback you have submitted to your doctors after your clinical encounters.
+  </p>
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Feedback History</h2>
+
+        <button
+          class="flex items-center space-x-2 w-full justify-center sm:w-auto bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="!hasPendingEncounters"
+          (click)="goToAddFeedback()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>Give Feedback to a Doctor</span>
+        </button>
+      </div>
+
+      <div *ngIf="isLoading" class="text-center py-12 text-gray-500">
+        <svg class="animate-spin h-6 w-6 text-indigo-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p>Loading your feedbacks...</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+        <p class="font-bold">Error</p>
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <!-- Display Success Message after a successful operation like delete -->
+      <div *ngIf="successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+        <p class="font-bold">Success!</p>
+        <p>{{ successMessage }}</p>
+      </div>
+
+      <div *ngIf="hasPendingEncounters && !isLoading && !errorMessage && !successMessage" class="bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-6" role="alert">
+        <p class="font-semibold">Pending Encounters:</p>
+        <p>You can give feedback on your most recent clinical encounters.</p>
+      </div>
+      <div *ngIf="!hasPendingEncounters && !isLoading && !errorMessage && !successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+        <p class="font-semibold">Completed:</p>
+        <p>✅ You have given feedback on all your recent clinical encounters!</p>
+      </div>
+
+      <div *ngIf="feedbacks.length > 0 && !isLoading" class="overflow-hidden">
+        <p class="text-sm text-gray-600 mb-4">Total Feedbacks Submitted: <span class="font-bold text-indigo-600">{{ feedbacks.length }}</span></p>
+
+        <ul class="divide-y divide-gray-200">
+          <li *ngFor="let feedback of feedbacks" class="py-4 hover:bg-gray-50 transition duration-150 px-4 -mx-4 rounded-lg">
+
+            <!-- Feedback Details Section -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <h5 class="text-lg font-bold text-gray-800 mb-1 sm:mb-0">
+                Doctor: Dr. {{ $any(feedback.doctorId).name }}
+              </h5>
+              <small class="text-sm text-gray-500">
+                Date: <span class="font-medium">{{ feedback.createdAt | date:'mediumDate' }}</span>, <span class="text-xs">{{ feedback.createdAt | date:'shortTime' }}</span>
+              </small>
+            </div>
+
+            <p class="text-xs text-gray-500 mb-2">
+              Doctor ID: <span class="font-mono text-gray-600">{{ $any(feedback.doctorId)._id }}</span>
+            </p>
+
+            <div class="mt-2 text-gray-700">
+              <p class="mb-1">
+                <span class="font-semibold text-indigo-600">Rating:</span> {{ feedback.rating }} / 5 ⭐
+              </p>
+              <p>
+                <span class="font-semibold">Comment:</span> {{ feedback.comment || 'Not Provided' }}
+              </p>
+            </div>
+            <!-- End Feedback Details Section -->
+
+            <!-- Action Buttons -->
+            <div class="mt-4 flex space-x-3 justify-end">
+              <button
+                (click)="goToUpdateFeedback(feedback)"
+                class="flex items-center space-x-1 text-sm bg-blue-500 text-white font-semibold py-1 px-3 rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-5.464 5.464a1 1 0 000 1.414l3.14 3.14a1 1 0 001.414 0l3.14-3.14a1 1 0 000-1.414l-3.14-3.14a1 1 0 00-1.414 0l-3.14 3.14z" />
+                  <path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v3H6a1 1 0 00-1 1v4a1 1 0 001 1h3v3a1 1 0 102 0v-3h3a1 1 0 001-1V7a1 1 0 00-1-1h-3V3a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Update</span>
+              </button>
+
+              <button
+                (click)="deleteFeedback(feedback)"
+                class="flex items-center space-x-1 text-sm bg-red-500 text-white font-semibold py-1 px-3 rounded-lg shadow-md hover:bg-red-600 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Delete</span>
+              </button>
+            </div>
+            <!-- End Action Buttons -->
+
+            <small class="text-xs text-gray-500 mt-2 block pt-2 border-t border-gray-100">
+              Clinical Encounter ID: <span class="font-mono text-gray-600">{{ feedback.clinicalEncounterId }}</span>
+            </small>
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="feedbacks.length === 0 && !isLoading && !errorMessage && !successMessage" class="text-center py-12 text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.69A9.71 9.71 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        <p class="text-lg font-semibold">No Feedbacks Yet</p>
+        <p>Submit your feedback to see it appear here.</p>
+      </div>
+
+    </div>
+  </div>
+</div>

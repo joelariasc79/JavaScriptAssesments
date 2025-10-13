@@ -31,7 +31,7 @@
 // //  */
 // // reportRouter.get('/api/reports/demographics', authenticateToken, async (req, res) => {
 // //     try {
-// //         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+// //         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 // //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view demographic reports.' });
 // //         }
 // //
@@ -55,7 +55,7 @@
 // //             aggregationPipeline.push({ $match: matchStage });
 // //         }
 // //
-// //         // Add lookups for user and vaccine data
+// //         // Add lookups for patient and vaccine data
 // //         aggregationPipeline.push(
 // //             {
 // //                 $lookup: {
@@ -66,7 +66,7 @@
 // //                 }
 // //             },
 // //             {
-// //                 $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } // Handle cases where user might be deleted
+// //                 $unwind: { path: '$userDetails', preserveNullAndEmptyArrays: true } // Handle cases where patient might be deleted
 // //             },
 // //             {
 // //                 $lookup: {
@@ -183,7 +183,7 @@
 // //  */
 // // reportRouter.get('/api/reports/daily-doses', authenticateToken, async (req, res) => {
 // //     try {
-// //         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+// //         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 // //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view daily doses report.' });
 // //         }
 // //
@@ -244,7 +244,7 @@
 // //  */
 // // reportRouter.get('/api/reports/population-coverage', authenticateToken, async (req, res) => {
 // //     try {
-// //         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+// //         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 // //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can view population coverage reports.' });
 // //         }
 // //
@@ -296,7 +296,7 @@
 // //         } else if (type === 'fully_vaccinated') {
 // //             // Find users who have completed all required doses for a vaccine
 // //             // This is complex as different vaccines have different doses_required.
-// //             // This aggregation assumes a user is fully vaccinated if they have completed
+// //             // This aggregation assumes a patient is fully vaccinated if they have completed
 // //             // the maximum doses required for *any* vaccine they received.
 // //             // A more precise definition would link to a specific vaccine or a 'primary series' completion.
 // //             const fullyVaccinatedUsers = await VaccinationRecordModel.aggregate([
@@ -355,7 +355,7 @@
 // // reportRouter.get('/api/reports/watchlist-stats', authenticateToken, async (req, res) => {
 // //     try {
 // //         // Access can be more lenient for general overview stats, or restricted based on your needs
-// //         if (!['admin', 'hospital_staff', 'patient'].includes(req.user.role)) {
+// //         if (!['admin', 'hospital_staff', 'patient'].includes(req.patient.role)) {
 // //             return res.status(403).json({ message: 'Access denied. You do not have permission to view watchlist statistics.' });
 // //         }
 // //

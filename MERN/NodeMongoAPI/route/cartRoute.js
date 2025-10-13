@@ -7,7 +7,7 @@ router.post("/api/saveUserCart",(req, res)=>{
 
     CartDataModel.findOne({userid: req.body.userid})
         .then((cartDbObj) => {        
-                if (!cartDbObj) { //checks for null cart of given user
+                if (!cartDbObj) { //checks for null cart of given patient
                         console.log("No cartitems Present, Adding / Inserting!"); 
                         let cartObj = new CartDataModel(req.body);
 
@@ -17,9 +17,9 @@ router.post("/api/saveUserCart",(req, res)=>{
                             res.send("Error Occurred"+ err);
                         });
                 }
-                else{ //update the cart for given user
+                else{ //update the cart for given patient
                     console.log("CartItems Present, Replacing / Updating!");
-                    cartDbObj.cart = req.body.cart;//replacing db cart with cart that user has sent from cartcomponent page
+                    cartDbObj.cart = req.body.cart;//replacing db cart with cart that patient has sent from cartcomponent page
                     
                     cartDbObj.save()
                     .then((data)=>{        

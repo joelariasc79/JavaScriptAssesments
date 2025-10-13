@@ -2,7 +2,7 @@ import React from "react"; // this is responsible to parse the JSX code
 import { NavLink, useNavigate } from "react-router-dom";
 
 let Header = (props)=>{
-    let user = props.user; //reading from mapStateToProps which reads from studentReducer.user
+    let user = props.user; //reading from mapStateToProps which reads from studentReducer.patient
     console.log(user)
     
     const usrName = user && user.userName ? user.userName : "";

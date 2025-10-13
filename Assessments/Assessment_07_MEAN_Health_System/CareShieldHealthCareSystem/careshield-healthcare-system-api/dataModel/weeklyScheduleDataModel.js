@@ -33,8 +33,10 @@ const WeeklyScheduleSchema = new mongoose.Schema({
     },
 });
 
+// Ensures a doctor only has one schedule defined per day of the week, preventing logic errors.
 WeeklyScheduleSchema.index({ doctorId: 1, dayOfWeek: 1 }, { unique: true });
+const WeeklyScheduleModel = mongoose.models.WeeklySchedule
+    ? mongoose.models.WeeklySchedule
+    : mongoose.model('WeeklySchedule', WeeklyScheduleSchema);
 
-// Use the robust pattern: check if the models already exists before compiling it.
-const WeeklyScheduleModel = mongoose.models.WeeklySchedule || mongoose.model('WeeklySchedule', WeeklyScheduleSchema);
 module.exports = WeeklyScheduleModel;

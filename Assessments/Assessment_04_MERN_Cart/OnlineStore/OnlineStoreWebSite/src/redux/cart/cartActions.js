@@ -138,7 +138,7 @@ export const clearCart = (userId) => {
     return async (dispatch) => {
         dispatch(clearCartOnlyRequest());
         try {
-            // Assuming backend has a /cart/clear endpoint for specific user
+            // Assuming backend has a /cart/clear endpoint for specific patient
             const response = await axios.post(`${API_BASE_URL}/cart/clear`, { userId }); // Or a DELETE endpoint
             dispatch(clearCartOnlySuccess(response.data));
             // After clearing, refetch to ensure cart state is consistent (e.g., now empty)

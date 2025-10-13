@@ -14,7 +14,7 @@ const vaccinationOrderRouter = express.Router({ strict: true, caseSensitive: tru
 const VaccinationOrderModel = require('../dataModel/vaccinationOrderModel'); // Adjust path as needed
 const VaccinationRecordModel = require('../dataModel/vaccinationRecordDataModel'); // NEW: For creating vaccination records
 const VaccineStockModel = require('../dataModel/vaccineStockDataModel'); // NEW: For updating vaccine stock
-const UserModel = require('../dataModel/userDataModel'); // For checking if user (patient) exists
+const UserModel = require('../dataModel/userDataModel'); // For checking if patient (patient) exists
 const VaccineModel = require('../dataModel/vaccineDataModel'); // For checking if vaccine exists
 const HospitalModel = require('../dataModel/hospitalDataModel'); // For checking if hospital exists
 
@@ -40,12 +40,12 @@ vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async 
             return res.status(403).json({ message: 'Access denied. Only administrators, hospital staff, and patients can create vaccination orders.' });
         }
 
-        // For patients, the userId for the order is implicitly the authenticated user's ID.
+        // For patients, the userId for the order is implicitly the authenticated patient's ID.
         // For admin/hospital_staff, the userId for the patient is expected in the body.
         const userId = req.user.role === 'patient' ? req.user.userId : req.body.userId;
 
         const { hospitalId, vaccineId, dose_number, charge_to_be_paid } = req.body;
-        const createdBy = req.user.userId; // The ID of the user creating the order (patient, staff, or admin)
+        const createdBy = req.user.userId; // The ID of the patient creating the order (patient, staff, or admin)
 
         // --- Input Validation ---
         // userId is now derived for patients, so it's not checked in req.body for missing fields.
@@ -61,7 +61,7 @@ vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async 
 
         // Validate Object IDs
         if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(hospitalId) || !mongoose.Types.ObjectId.isValid(vaccineId)) {
-            return res.status(400).json({ message: 'Invalid ID format for user, hospital, or vaccine.' });
+            return res.status(400).json({ message: 'Invalid ID format for patient, hospital, or vaccine.' });
         }
 
         // --- Authorization Check (Hospital Staff specific - removed for patient) ---
@@ -82,9 +82,9 @@ vaccinationOrderRouter.post('/api/vaccination-orders', authenticateToken, async 
         ]);
 
         if (!userExists) return res.status(404).json({ message: 'Patient (User) not found.' });
-        // Ensure the selected user (who is creating the order for themselves) is indeed a patient
+        // Ensure the selected patient (who is creating the order for themselves) is indeed a patient
         if (userExists.role !== 'patient') {
-            return res.status(400).json({ message: 'The authenticated user is not registered as a patient.' });
+            return res.status(400).json({ message: 'The authenticated patient is not registered as a patient.' });
         }
         if (!hospitalExists) return res.status(404).json({ message: 'Hospital not found.' });
         if (!vaccineExists) return res.status(404).json({ message: 'Vaccine not found.' });
@@ -261,7 +261,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/reject', authenticateT
 //         // Authorization check: Only admin or hospital staff can mark orders as paid
 //         // If a patient is to initiate payment, this authorization needs to be adjusted
 //         // or a separate payment gateway flow needs to be implemented.
-//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can mark vaccination orders as paid.' });
 //         }
 //
@@ -280,7 +280,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/reject', authenticateT
 //         }
 //
 //         // Hospital staff specific authorization: Can only mark as paid for their own hospital
-//         if (req.user.role === 'hospital_staff' && order.hospitalId && req.user.hospitalId.toString() !== order.hospitalId.toString()) {
+//         if (req.patient.role === 'hospital_staff' && order.hospitalId && req.patient.hospitalId.toString() !== order.hospitalId.toString()) {
 //             return res.status(403).json({ message: 'Access denied. Hospital staff can only mark orders as paid for their assigned hospital.' });
 //         }
 //
@@ -392,7 +392,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-as-paid', authent
 vaccinationOrderRouter.patch('/api/vaccination-orders/:id/cancel-by-patient', authenticateToken, async (req, res) => {
     try {
         const orderId = req.params.id;
-        const patientId = req.user.userId; // The ID of the logged-in user (patient)
+        const patientId = req.user.userId; // The ID of the logged-in patient (patient)
 
         // Validate order ID format
         if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -406,7 +406,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/cancel-by-patient', au
             return res.status(404).json({ message: 'Vaccination order not found.' });
         }
 
-        // Authorization check: Ensure the logged-in user is the owner of the order
+        // Authorization check: Ensure the logged-in patient is the owner of the order
         if (order.userId.toString() !== patientId) {
             return res.status(403).json({ message: 'Access denied. You can only cancel your own vaccination orders.' });
         }
@@ -519,7 +519,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/refund', authenticateT
 vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment', authenticateToken, async (req, res) => {
     try {
         const orderId = req.params.id;
-        const patientId = req.user.userId; // The ID of the logged-in user (patient)
+        const patientId = req.user.userId; // The ID of the logged-in patient (patient)
         const { appointment_date } = req.body;
 
         // Validate order ID format
@@ -543,7 +543,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
             return res.status(404).json({ message: 'Vaccination order not found.' });
         }
 
-        // Authorization check: Ensure the logged-in user is the owner of the order
+        // Authorization check: Ensure the logged-in patient is the owner of the order
         if (order.userId.toString() !== patientId) {
             return res.status(403).json({ message: 'Access denied. You can only schedule appointments for your own orders.' });
         }
@@ -594,13 +594,13 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
 // vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', authenticateToken, async (req, res) => {
 //     try {
 //         // Authorization check: Only admin or hospital staff can mark as vaccinated
-//         if (req.user.role !== 'admin' && req.user.role !== 'hospital_staff') {
+//         if (req.patient.role !== 'admin' && req.patient.role !== 'hospital_staff') {
 //             return res.status(403).json({ message: 'Access denied. Only administrators and hospital staff can mark orders as vaccinated.' });
 //         }
 //
 //         const orderId = req.params.id;
 //         const { vaccination_date } = req.body; // Optional vaccination date
-//         const administeredBy = req.user.userId; // The staff administering the vaccine
+//         const administeredBy = req.patient.userId; // The staff administering the vaccine
 //
 //         // Validate order ID format
 //         if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -615,7 +615,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
 //         }
 //
 //         // Hospital staff specific authorization: Can only mark as vaccinated for their own hospital
-//         if (req.user.role === 'hospital_staff' && order.hospitalId && req.user.hospitalId.toString() !== order.hospitalId.toString()) {
+//         if (req.patient.role === 'hospital_staff' && order.hospitalId && req.patient.hospitalId.toString() !== order.hospitalId.toString()) {
 //             return res.status(403).json({ message: 'Access denied. Hospital staff can only mark orders as vaccinated for their assigned hospital.' });
 //         }
 //
@@ -705,7 +705,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/schedule-appointment',
 vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated1', authenticateToken, async (req, res) => {
     try {
         const orderId = req.params.id;
-        const loggedInUser = req.user; // The logged-in user (admin, hospital_staff, or patient)
+        const loggedInUser = req.user; // The logged-in patient (admin, hospital_staff, or patient)
         const { vaccination_date } = req.body; // Optional vaccination date
 
         // Validate order ID format
@@ -777,7 +777,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated1', aut
 
 
         // 2. Create Vaccination Record
-        // AdministeredBy will be the logged-in staff user, or null if patient is updating.
+        // AdministeredBy will be the logged-in staff patient, or null if patient is updating.
         const administeredById = isAdminOrHospitalStaff ? loggedInUser.userId : null;
 
         const newVaccinationRecord = new VaccinationRecordModel({
@@ -875,7 +875,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
         // --- SECONDARY IDEMPOTENCY CHECK / RECONCILIATION ---
         // This handles cases where a VaccinationRecord exists but the order's
         // vaccinationRecordId field wasn't updated (e.g., partial failure),
-        // or if VaccinationRecord has other unique indices (e.g., on user/vaccine/dose).
+        // or if VaccinationRecord has other unique indices (e.g., on patient/vaccine/dose).
         let savedVaccinationRecord = null; // Will hold the new or existing record
         let populatedOrder = null; // Will hold the final populated order for response
 
@@ -883,7 +883,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
         let existingRecordInDb = await VaccinationRecordModel.findOne({ vaccinationOrderId: order._id });
         console.log("existingRecordInDb: ", existingRecordInDb);
 
-        // 2. If not found by orderId, try to find by user, vaccine, and dose number.
+        // 2. If not found by orderId, try to find by patient, vaccine, and dose number.
         //    This addresses potential unique indexes on VaccinationRecord like {userId, vaccineId, dose_number}
         //    that might prevent a new record creation even if vaccinationOrderId isn't linked yet.
         if (!existingRecordInDb) {
@@ -895,7 +895,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
         }
 
         if (existingRecordInDb) {
-            // A VaccinationRecord for this order (or this user/vaccine/dose) already exists.
+            // A VaccinationRecord for this order (or this patient/vaccine/dose) already exists.
             // This means the vaccination was recorded, but the order document itself
             // might not have been fully updated or linked. Reconcile the order document.
             console.warn(`Reconciling order ${order._id}: Found existing VaccinationRecord (${existingRecordInDb._id}) for order/user/vaccine/dose. Correcting order status.`);
@@ -927,7 +927,7 @@ vaccinationOrderRouter.patch('/api/vaccination-orders/:id/mark-vaccinated', auth
             });
 
         } else {
-            // No existing VaccinationRecord found for this order ID or user/vaccine/dose.
+            // No existing VaccinationRecord found for this order ID or patient/vaccine/dose.
             // Proceed with the normal flow of creating a new record.
 
             // --- Status Checks before proceeding with NEW vaccination ---
@@ -1126,10 +1126,10 @@ vaccinationOrderRouter.get('/api/vaccination-orders/patient', authenticateToken,
 //  */
 // // vaccinationOrderRouter.get('/api/vaccination-orders/patient/approved-for-vaccination', authenticateToken, async (req, res) => {
 //     try {
-//         const patientId = req.user.userId; // Get the patient's ID from the authenticated token
+//         const patientId = req.patient.userId; // Get the patient's ID from the authenticated token
 //
 //         // Authorization check: Only patients can access their own approved orders
-//         if (req.user.role !== 'patient') {
+//         if (req.patient.role !== 'patient') {
 //             return res.status(403).json({ message: 'Access denied. This endpoint is for patients only.' });
 //         }
 //
@@ -1278,7 +1278,7 @@ vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authentica
 // vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authenticateToken, async (req, res) => {
 //     try {
 //         const orderId = req.params.id;
-//         const loggedInUser = req.user;
+//         const loggedInUser = req.patient;
 //
 //         if (!mongoose.Types.ObjectId.isValid(orderId)) {
 //             return res.status(400).json({ message: 'Invalid order ID format.' });
@@ -1403,7 +1403,7 @@ vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authentica
 // vaccinationOrderRouter.get('/api/vaccination-orders/:id/certificate', authenticateToken, async (req, res) => {
 //     try {
 //         const orderId = req.params.id;
-//         const loggedInUser = req.user;
+//         const loggedInUser = req.patient;
 //
 //         if (!mongoose.Types.ObjectId.isValid(orderId)) {
 //             return res.status(400).json({ message: 'Invalid order ID format.' });

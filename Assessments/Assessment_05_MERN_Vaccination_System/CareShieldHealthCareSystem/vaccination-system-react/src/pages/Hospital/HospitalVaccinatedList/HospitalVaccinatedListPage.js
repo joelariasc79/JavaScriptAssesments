@@ -16,18 +16,18 @@ import './HospitalVaccinatedListPage.css'; // Assuming you'll create this CSS fi
 
 const HospitalVaccinatedListPage = () => {
     const dispatch = useDispatch();
-    const currentUser = useSelector(selectCurrentUser); // Get current user to access hospitalId
+    const currentUser = useSelector(selectCurrentUser); // Get current patient to access hospitalId
 
     const vaccinatedPersons = useSelector(selectVaccinatedPersons);
     const fetchStatus = useSelector(selectFetchVaccinatedPersonsStatus);
     const fetchError = useSelector(selectFetchVaccinatedPersonsError);
 
-    // Get the hospitalId from the logged-in user
+    // Get the hospitalId from the logged-in patient
     const hospitalId = currentUser?.hospital?._id;
     const userRole = currentUser?.role;
 
     useEffect(() => {
-        // Fetch vaccinated persons only if the user is hospital staff or admin and has a hospitalId
+        // Fetch vaccinated persons only if the patient is hospital staff or admin and has a hospitalId
         if (hospitalId && (userRole === 'hospital_staff' || userRole === 'admin')) {
             dispatch(fetchVaccinatedPersonsByHospital(hospitalId));
         }

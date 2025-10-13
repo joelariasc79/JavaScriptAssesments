@@ -30,7 +30,7 @@ const generateTokenWithHospital = (payload) => {
 
 
 const fetchUserById = async (userId) => {
-    // ⚠️ LÓGICA REAL: Busca al usuario por ID, excluye la contraseña y ejecuta la consulta.
+    //  Busca al usuario por ID, excluye la contraseña y ejecuta la consulta.
     const user = await UserModel.findById(userId)
         .select('-password') // Excluir la contraseña
         // Si tienes populado el campo 'hospital', hazlo aquí: .populate('hospital')
@@ -101,7 +101,7 @@ userRouter.post('/api/auth/login', async (req, res) => {
                 username: user.username,
                 name: user.name,
                 role: user.role,
-                // Include all hospital IDs in the user response object.
+                // Include all hospital IDs in the patient response object.
                 hospitalIds: user.hospital ? user.hospital.map(h => h._id.toString()) : [],
                 // This is an optional field to tell the client which hospital was used for login.
                 hospital: finalHospitalId || null
@@ -109,17 +109,17 @@ userRouter.post('/api/auth/login', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error during user login:', error);
+        console.error('Error during patient login:', error);
         res.status(500).json({ message: 'Internal server error during login.', error: error.message });
     }
 });
 
-// --- Endpoint to verify if the authenticated user is an admin ---
+// --- Endpoint to verify if the authenticated patient is an admin ---
 /**
  * @route GET /api/auth/verify-admin
- * @description Verifies if the authenticated user has the 'admin' role.
+ * @description Verifies if the authenticated patient has the 'admin' role.
  * Requires JWT authentication.
- * @access Protected (Any authenticated user can call this to check their role)
+ * @access Protected (Any authenticated patient can call this to check their role)
  */
 
 userRouter.get('/api/auth/verify-admin', authenticateToken, (req, res) => {
@@ -145,7 +145,7 @@ userRouter.get('/api/auth/verify-admin', authenticateToken, (req, res) => {
 userRouter.post('/api/auth/select-hospital', authenticateToken, async (req, res) => {
     try {
         const { hospitalId } = req.body;
-        // req.user proviene del middleware authenticateToken (contiene datos del JWT)
+        // req.patient proviene del middleware authenticateToken (contiene datos del JWT)
         const { userId, role, hospitalIds } = req.user;
 
         // 1. Verificar si el usuario está autorizado para hacer la selección
@@ -175,7 +175,7 @@ userRouter.post('/api/auth/select-hospital', authenticateToken, async (req, res)
         // 4. Obtener el objeto de usuario final para la respuesta (simulando una DB fetch)
         const user = await fetchUserById(userId);
 
-        // 5. ÉXITO: Devolver AuthResponse completa (token, user, message)
+        // 5. ÉXITO: Devolver AuthResponse completa (token, patient, message)
         res.status(200).json({
             message: 'Hospital selected successfully.',
             token: newToken,
@@ -203,7 +203,7 @@ userRouter.post('/api/auth/select-hospital', authenticateToken, async (req, res)
 
 
 // ----------------------------------
-// --- doctors Endpoints ---
+// --- patients Endpoints ---
 // ----------------------------------
 
 
@@ -261,15 +261,15 @@ userRouter.post('/api/patients', authenticateToken, async (req, res) => {
         res.status(201).json({ message: 'User created successfully!', user: populatedUser });
 
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error creating patient:', error);
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
             return res.status(400).json({ message: 'Validation failed', errors: messages });
         }
-        res.status(500).json({ message: 'Error creating user', error: error.message });
+        res.status(500).json({ message: 'Error creating patient', error: error.message });
     }
 });
 
@@ -283,7 +283,7 @@ userRouter.put('/api/patients/:id', authenticateToken, async (req, res) => {
 
         // 1. Basic Validation: ID format
         if (!mongoose.Types.ObjectId.isValid(userIdToUpdate)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
         // 2. Prevent unauthorized updates to sensitive fields
@@ -295,7 +295,7 @@ userRouter.put('/api/patients/:id', authenticateToken, async (req, res) => {
             delete updates.hospital;
         }
 
-        // 3. Find the user to be updated. This is crucial for all subsequent checks.
+        // 3. Find the patient to be updated. This is crucial for all subsequent checks.
         const userToUpdate = await UserModel.findById(userIdToUpdate);
         if (!userToUpdate) {
             return res.status(404).json({ message: 'Patient not found.' });
@@ -314,7 +314,7 @@ userRouter.put('/api/patients/:id', authenticateToken, async (req, res) => {
                 return res.status(403).json({ message: 'Access denied. You can only update your own profile.' });
             }
         } else if (currentUserRole === 'hospital_admin' || currentUserRole === 'doctor') {
-            // Check if the user being updated is associated with any of the current user's hospitals
+            // Check if the patient being updated is associated with any of the current patient's hospitals
             const isAssociated = userToUpdate.hospital.some(h => req.user.hospitalIds.includes(h.toString()));
             if (!isAssociated) {
                 return res.status(403).json({ message: 'Access denied. You can only update patients within your hospitals.' });
@@ -335,7 +335,7 @@ userRouter.put('/api/patients/:id', authenticateToken, async (req, res) => {
             }
         }
 
-        // Save the updated user, which triggers the pre('save') hook if 'password' was modified
+        // Save the updated patient, which triggers the pre('save') hook if 'password' was modified
         const savedUser = await userToUpdate.save({ validateBeforeSave: true });
 
         // Populate the hospital field for the final response
@@ -351,7 +351,7 @@ userRouter.put('/api/patients/:id', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error updating patient:', error);
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'Update failed: A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'Update failed: A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
@@ -371,10 +371,10 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
 
         // 1. Validate if the ID is a valid MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(userIdToFetch)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
-        // 2. Find the user to be fetched
+        // 2. Find the patient to be fetched
         const userToFetch = await UserModel.findById(userIdToFetch).select('-password');
         if (!userToFetch) {
             return res.status(404).json({ message: 'User not found.' });
@@ -395,16 +395,16 @@ userRouter.get('/api/users/:id', authenticateToken, async (req, res) => {
         }
 
         if (!canView) {
-            return res.status(403).json({ message: 'Access denied. You do not have permission to view this user profile.' });
+            return res.status(403).json({ message: 'Access denied. You do not have permission to view this patient profile.' });
         }
 
-        // 4. If authorized, populate the hospital field and return the user data
+        // 4. If authorized, populate the hospital field and return the patient data
         const populatedUser = await userToFetch.populate('hospital');
         res.status(200).json(populatedUser);
 
     } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Error fetching user', error: error.message });
+        console.error('Error fetching patient:', error);
+        res.status(500).json({ message: 'Error fetching patient', error: error.message });
     }
 });
 
@@ -414,16 +414,16 @@ userRouter.get('/api/patients', authenticateToken, async (req, res) => {
         const currentUserRole = req.user.role;
         const currentHospitalIds = req.user.hospitalIds;
 
-        // 1. Check if the user has permission to view patient lists
+        // 1. Check if the patient has permission to view patient lists
         if (currentUserRole !== 'admin' && currentUserRole !== 'hospital_admin' && currentUserRole !== 'doctor') {
             return res.status(403).json({ message: 'Access denied. You do not have permission to view this resource.' });
         }
 
         let query = { role: 'patient' };
 
-        // 2. Adjust the query based on the user's role
+        // 2. Adjust the query based on the patient's role
         if (currentUserRole === 'hospital_admin' || currentUserRole === 'doctor') {
-            // VERIFIED FIX: Find patients where their hospital array contains at least one of the user's hospital IDs
+            // VERIFIED FIX: Find patients where their hospital array contains at least one of the patient's hospital IDs
             query.hospital = { $in: currentHospitalIds };
         }
 
@@ -504,7 +504,7 @@ userRouter.post('/api/doctors', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error creating doctor:', error);
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
@@ -536,7 +536,7 @@ userRouter.put('/api/doctors/:id', authenticateToken, async (req, res) => {
             delete updates.hospital;
         }
 
-        // 3. Find the user to be updated. This is crucial for all subsequent checks.
+        // 3. Find the patient to be updated. This is crucial for all subsequent checks.
         const userToUpdate = await UserModel.findById(userIdToUpdate);
         if (!userToUpdate) {
             return res.status(404).json({ message: 'Doctor not found.' });
@@ -555,7 +555,7 @@ userRouter.put('/api/doctors/:id', authenticateToken, async (req, res) => {
                 return res.status(403).json({ message: 'Access denied. You can only update your own profile.' });
             }
         } else if (currentUserRole === 'hospital_admin') {
-            // Check if the user being updated is associated with any of the current doctor's hospitals
+            // Check if the patient being updated is associated with any of the current doctor's hospitals
             const isAssociated = userToUpdate.hospital.some(h => req.user.hospitalIds.includes(h.toString()));
             if (!isAssociated) {
                 return res.status(403).json({ message: 'Access denied. You can only update doctors within your hospitals.' });
@@ -576,7 +576,7 @@ userRouter.put('/api/doctors/:id', authenticateToken, async (req, res) => {
             }
         }
 
-        // Save the updated user, which triggers the pre('save') hook if 'password' was modified
+        // Save the updated patient, which triggers the pre('save') hook if 'password' was modified
         const savedUser = await userToUpdate.save({ validateBeforeSave: true });
 
         // Populate the hospital field for the final response
@@ -592,7 +592,7 @@ userRouter.put('/api/doctors/:id', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Error updating doctor:', error);
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'Update failed: A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'Update failed: A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
@@ -604,6 +604,76 @@ userRouter.put('/api/doctors/:id', authenticateToken, async (req, res) => {
 });
 
 
+// http://localhost:9200/api/doctors/by-specialty?specialty=Cardiologist
+userRouter.get('/api/doctors/by-specialty', authenticateToken, async (req, res) => {
+    try {
+        // req.patient is populated by authenticateToken, which MUST include role and hospitalIds
+        const currentUserRole = req.user.role;
+
+        console.log("req.patient", req.user);
+        // This array comes from the 'hospitalIds' property we MUST add to req.patient in authMiddleware
+        const currentHospitalId = req.user.selectedHospitalId;
+
+        // --- 1. Robust Query Parameter Parsing and Validation ---
+        let requestedSpecialty = req.query.specialty;
+        if (Array.isArray(requestedSpecialty)) {
+            requestedSpecialty = requestedSpecialty[0];
+        }
+        requestedSpecialty = requestedSpecialty ? String(requestedSpecialty).trim() : '';
+
+        // Check 1: Validate Specialty Query
+        if (!requestedSpecialty) {
+            return res.status(400).json({ message: 'Specialty query parameter is required (e.g., ?specialty=Cardiologist).' });
+        }
+
+        // Check 2: Basic Authorization
+        if (currentUserRole !== 'admin' && currentUserRole !== 'hospital_admin' &&
+            currentUserRole !== 'doctor' && currentUserRole !== 'patient') {
+            return res.status(403).json({ message: 'Access denied. You do not have permission to view this resource.' });
+        }
+
+        // Check 3: Mandatory Hospital Scope/Affiliation
+        if (!currentHospitalId || currentHospitalId.length === 0) {
+            // This is a necessary restriction if the patient is supposed to be scoped to a hospital.
+            return res.status(403).json({
+                message: 'Access denied. User is not associated with any hospital to scope the doctor search results.'
+            });
+        }
+
+        // --- 2. Construct the Mongoose Query ---
+        let query = {
+            role: 'doctor',
+            // Case-insensitive specialty match is safer, though Mongoose enum enforces case.
+            // Using the value directly is fine if the input is guaranteed to be correct.
+            specialty: requestedSpecialty,
+            // Ensures the doctor is affiliated with the patient's active hospital.
+            hospital: { $in: [currentHospitalId] }
+        };
+
+        // --- 3. Execute the Filtered Query ---
+        const doctors = await UserModel.find(query)
+            .select('-password -__v') // Exclude sensitive fields
+            .populate('hospital', 'name'); // Only populate the hospital name for context
+
+        // --- 4. Return the List ---
+        res.status(200).json(doctors);
+
+    } catch (error) {
+        // Log the detailed error for debugging purposes
+        console.error('Error fetching doctors by specialty:', error);
+
+        res.status(500).json({
+            message: 'Internal server error fetching doctors by specialty.',
+            error: error.message
+        });
+    }
+});
+
+// This must be after /api/doctors/by-specialty
+// The most common cause for this specific misrouting is the order of your route definitions
+// in your Express router configuration. If a more specific, parameterized route is defined before a
+// static route, the parameterized route can "catch" the static one.
+
 userRouter.get('/api/doctors/:id', authenticateToken, async (req, res) => {
     try {
         const userIdToFetch = req.params.id;
@@ -614,21 +684,22 @@ userRouter.get('/api/doctors/:id', authenticateToken, async (req, res) => {
             return res.status(400).json({ message: 'Invalid doctor ID format.' });
         }
 
-        // 2. Find the user to be fetched
+        // 2. Find the patient to be fetched
         const userToFetch = await UserModel.findById(userIdToFetch).select('-password');
         if (!userToFetch) {
             return res.status(404).json({ message: 'Doctor not found.' });
         }
 
         // 3. Implement granular authorization based on role
+        const isPatient = currentUser.role === 'patient';
         const isAdmin = currentUser.role === 'admin';
         const isSelf = currentUser.userId.toString() === userIdToFetch;
         const isHospitalStaff = currentUser.role === 'hospital_admin' || currentUser.role === 'doctor';
 
-        let canView = isAdmin || isSelf;
+        let canView = isAdmin || isSelf || isPatient;
 
         if (isHospitalStaff) {
-            // Check if the user to fetch is associated with any of the current user's hospitals
+            // Check if the patient to fetch is associated with any of the current patient's hospitals
             const isAssociated = userToFetch.hospital.some(h => currentUser.hospitalIds.includes(h.toString()));
             if (isAssociated) {
                 canView = true;
@@ -639,7 +710,7 @@ userRouter.get('/api/doctors/:id', authenticateToken, async (req, res) => {
             return res.status(403).json({ message: 'Access denied. You do not have permission to view this doctor profile.' });
         }
 
-        // 4. If authorized, populate the hospital field and return the user data
+        // 4. If authorized, populate the hospital field and return the patient data
         const populatedUser = await userToFetch.populate('hospital');
         res.status(200).json(populatedUser);
 
@@ -649,13 +720,13 @@ userRouter.get('/api/doctors/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// <-- Get all patients (for hospital staff to select patients)
+// <-- Get all doctors
 userRouter.get('/api/doctors', authenticateToken, async (req, res) => {
     try {
         const currentUserRole = req.user.role;
         const currentHospitalIds = req.user.hospitalIds;
 
-        // 1. Check if the user has permission to view patient lists, this because should be able to find another doctors
+        // 1. Check if the patient has permission to view patient lists, this because should be able to find another doctors
         // for referral for treatments that needs a different specialities
         if (currentUserRole !== 'admin' && currentUserRole !== 'hospital_admin' && currentUserRole !== 'doctor') {
             return res.status(403).json({ message: 'Access denied. You do not have permission to view this resource.' });
@@ -663,9 +734,9 @@ userRouter.get('/api/doctors', authenticateToken, async (req, res) => {
 
         let query = { role: 'doctor' };
 
-        // 2. Adjust the query based on the user's role
+        // 2. Adjust the query based on the patient's role
         if (currentUserRole === 'hospital_admin' || currentUserRole === 'doctor') {
-            // Find patients where their hospital array contains at least one of the user's hospital IDs
+            // Find patients where their hospital array contains at least one of the patient's hospital IDs
             query.hospital = { $in: currentHospitalIds };
         }
 
@@ -690,7 +761,7 @@ userRouter.get('/api/doctors', authenticateToken, async (req, res) => {
 
 /**
  * @route POST /api/auth/register-hospital-staff
- * @description Admin-only route to register a new hospital staff user.
+ * @description Admin-only route to register a new hospital staff patient.
  * Requires JWT authentication and admin role.
  * @body {string} username, {string} email, {string} password, {string} name, {string} contact_number, {object} [address], {string} hospital (ObjectId)
  * @access Protected (Admin-only)
@@ -721,13 +792,13 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
             }
         }
 
-        // Check if user already exists by username or email
+        // Check if patient already exists by username or email
         const existingUser = await UserModel.findOne({ $or: [{ username: username }, { email: email }] });
         if (existingUser) {
             return res.status(409).json({ message: 'User with that username or email already exists.' });
         }
 
-        // Create new hospital staff user
+        // Create new hospital staff patient
         const newUser = new UserModel({
             username,
             email,
@@ -744,12 +815,12 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
         // Populate hospital details before sending response
         const populatedUser = await UserModel.findById(savedUser._id).select('-password').populate('hospital');
 
-        res.status(201).json({ message: 'Hospital staff user registered successfully!', user: populatedUser });
+        res.status(201).json({ message: 'Hospital staff patient registered successfully!', user: populatedUser });
 
     } catch (error) {
         console.error('Error during hospital staff registration:', error);
         if (error.code === 11000) { // Duplicate key error
-            return res.status(409).json({ message: 'A user with the provided username or email already exists.' });
+            return res.status(409).json({ message: 'A patient with the provided username or email already exists.' });
         }
         // Handle Mongoose validation errors
         if (error.name === 'ValidationError') {
@@ -763,7 +834,7 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
 
 // /**
 //  * @route POST /api/auth/register-admin
-//  * @description Admin-only route to register a new administrator user.
+//  * @description Admin-only route to register a new administrator patient.
 //  * Requires JWT authentication and admin role.
 //  * @body {string} username, {string} email, {string} password, {string} name, {string} contact_number, {object} [address], {number} [age], {string} [profession], {string} [gender]
 //  * @access Protected (Admin-only)
@@ -771,8 +842,8 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
 // userRouter.post('/api/auth/select-hospital', authenticateToken, async (req, res) => {
 //     try {
 //         const { hospitalId } = req.body;
-//         // req.user proviene del middleware authenticateToken (contiene datos del JWT)
-//         const { userId, role, hospitalIds } = req.user;
+//         // req.patient proviene del middleware authenticateToken (contiene datos del JWT)
+//         const { userId, role, hospitalIds } = req.patient;
 //
 //         // 1. Verificar si el usuario está autorizado para hacer la selección
 //         if (role !== 'hospital_admin' && role !== 'doctor' && role !== 'patient') {
@@ -797,19 +868,19 @@ userRouter.post('/api/auth/register-hospital-staff', authenticateToken, async (r
 //         });
 //
 //         // 4. Obtener el objeto de usuario final para la respuesta (simulando una DB fetch)
-//         const user = await fetchUserById(userId);
+//         const patient = await fetchUserById(userId);
 //
-//         // 5. ÉXITO: Devolver AuthResponse completa (token, user, message)
+//         // 5. ÉXITO: Devolver AuthResponse completa (token, patient, message)
 //         res.status(200).json({
 //             message: 'Hospital selected successfully.',
 //             token: newToken,
-//             user: {
+//             patient: {
 //                 // Aquí usamos los datos completos del usuario
-//                 userId: user.userId,
-//                 username: user.username,
-//                 name: user.name,
-//                 role: user.role,
-//                 hospitalIds: user.hospitalIds
+//                 userId: patient.userId,
+//                 username: patient.username,
+//                 name: patient.name,
+//                 role: patient.role,
+//                 hospitalIds: patient.hospitalIds
 //                 // NOTA: Si el backend cambia el rol o los permisos basados en el hospital,
 //                 // esos cambios deben reflejarse aquí.
 //             }
@@ -832,21 +903,21 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
         const userRole = req.user.role;
         const currentUserId = req.user.userId.toString();
 
-        // Check if the user has the required roles
+        // Check if the patient has the required roles
         if (userRole !== 'admin' && userRole !== 'hospital_admin') {
             return res.status(403).json({ message: 'Access denied. Only administrators can delete users.' });
         }
 
-        // Check if the user is trying to delete their own profile
+        // Check if the patient is trying to delete their own profile
         if (userIdToDelete === currentUserId) {
             return res.status(403).json({ message: 'Access denied. You cannot delete your own profile.' });
         }
 
         if (!mongoose.Types.ObjectId.isValid(userIdToDelete)) {
-            return res.status(400).json({ message: 'Invalid user ID format.' });
+            return res.status(400).json({ message: 'Invalid patient ID format.' });
         }
 
-        // Find the user to be deleted before deleting
+        // Find the patient to be deleted before deleting
         const userToDelete = await UserModel.findById(userIdToDelete);
 
         if (!userToDelete) {
@@ -855,7 +926,7 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
 
         // VERIFIED FIX: Enforce hospital-level scope for hospital_admin role
         if (userRole === 'hospital_admin') {
-            // Check if the user being deleted is associated with one of the admin's hospitals
+            // Check if the patient being deleted is associated with one of the admin's hospitals
             const isAssociated = userToDelete.hospital.some(h => req.user.hospitalIds.includes(h.toString()));
             if (!isAssociated) {
                 return res.status(403).json({ message: 'Access denied. You can only delete users within your hospitals.' });
@@ -867,8 +938,8 @@ userRouter.delete('/api/users/:id', authenticateToken, async (req, res) => {
 
         res.status(200).json({ message: 'User deleted successfully!', user: { _id: deletedUser._id, username: deletedUser.username } });
     } catch (error) {
-        console.error('Error deleting user:', error);
-        res.status(500).json({ message: 'Error deleting user', error: error.message });
+        console.error('Error deleting patient:', error);
+        res.status(500).json({ message: 'Error deleting patient', error: error.message });
     }
 });
 

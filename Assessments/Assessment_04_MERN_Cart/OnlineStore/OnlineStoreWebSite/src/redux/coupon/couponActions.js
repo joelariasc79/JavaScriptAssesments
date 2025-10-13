@@ -28,7 +28,7 @@ export const generateCoupon = () => {
                 payload: response.data.coupon, // The payload is the coupon object
             });
         } catch (error) {
-            // Extract a user-friendly error message
+            // Extract a patient-friendly error message
             const errorMessage = error.response?.data?.message || error.message;
             dispatch({
                 type: GENERATE_COUPON_FAILURE,

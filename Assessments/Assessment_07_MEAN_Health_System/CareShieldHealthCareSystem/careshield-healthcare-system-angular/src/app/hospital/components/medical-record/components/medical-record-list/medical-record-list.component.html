@@ -1,0 +1,91 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<div class="min-h-screen p-4 sm:p-8 bg-gray-50 font-sans">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header for Patient View -->
+    <header class="mb-8 border-b pb-4">
+      <div class="mb-4 sm:mb-0">
+        <h1 class="text-3xl font-extrabold text-gray-900">Patients Clinical History</h1>
+        <p class="text-gray-500">View all recorded clinical visits.</p>
+      </div>
+      <!-- Removed creation/edit buttons to maintain read-only patients context -->
+    </header>
+
+    <!-- Loading / Error / Empty States -->
+    @if (loading()) {
+      <div class="text-center p-8 bg-white rounded-xl shadow-lg">
+        <p class="text-blue-600 font-medium">Loading clinical records...</p>
+      </div>
+    } @else if (error()) {
+      <div class="text-center p-8 bg-red-100 text-red-700 rounded-xl shadow-lg border border-red-300">
+        <p class="font-semibold">Error: {{ message() }}</p>
+        <p class="text-sm mt-2">Could not fetch data. Please try again.</p>
+      </div>
+    } @else if (clinicalEncounters().length === 0) {
+      <div class="text-center p-8 bg-yellow-100 text-yellow-700 rounded-xl shadow-lg border border-yellow-300">
+        <p class="font-semibold">No Clinical Records Found</p>
+        <p class="text-sm mt-2">There is no historical clinical data recorded for you.</p>
+      </div>
+    }
+
+    <!-- Encounters Table -->
+    @if (clinicalEncounters().length > 0) {
+      <div class="bg-white rounded-xl shadow-2xl overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+          <tr>
+            <!-- Date/Time of the encounter's start -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[20%]">Date/Time</th>
+            <!-- Doctor Name (Hidden on small screens) -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell w-[25%]">Doctor</th>
+            <!-- Changed to Reason for Visit -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Reason for Visit</th>
+            <!-- Status -->
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-[20%]">Status</th>
+            <!-- Updated column header to reflect read-only action -->
+            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-[10%]">View</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @for (encounter of clinicalEncounters(); track encounter._id) {
+              <tr class="hover:bg-blue-50 transition-colors">
+                <!-- Display start time -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ encounter.startTime | date: 'short' }}
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                  <!-- Assumes doctorId field is populated with a 'name' property -->
+                  {{ encounter.doctorId.name || 'N/A' }}
+                </td>
+                <!-- Display reasonForVisit -->
+                <td class="px-4 py-4 text-sm text-gray-600 truncate max-w-xs">
+                  {{ encounter.reasonForVisit }}
+                </td>
+                <!-- Status badge styling -->
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <!-- Uses the required getStatusClasses method for dynamic color -->
+                  <span [ngClass]="getStatusClasses(encounter.status)"
+                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider border border-opacity-70 shadow-sm">
+                    {{ encounter.status || 'DRAFT' }}
+                  </span>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <!-- Action button for read-only view -->
+                  <button (click)="onViewClick(encounter)"
+                          title="View Medical Encounter"
+                          class="text-blue-600 hover:text-blue-800 transform hover:scale-110 transition-transform p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+

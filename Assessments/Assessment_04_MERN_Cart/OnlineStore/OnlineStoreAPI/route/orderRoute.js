@@ -32,7 +32,7 @@ orderRouter.post('/api/orders/:orderId/pay', async (req, res) => {
         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found or does not belong to the provided user.' });
+            return res.status(404).json({ message: 'Order not found or does not belong to the provided patient.' });
         }
 
         // 3. Check current order status
@@ -64,7 +64,7 @@ orderRouter.post('/api/orders/:orderId/pay', async (req, res) => {
                 // Ensure order.userId (string) is used to find UserModel and get its ObjectId for `usedBy`
                 const userDoc = await UserModel.findOne({ userId: order.userId });
                 if (userDoc) {
-                    coupon.usedBy = userDoc._id; // Store the ObjectId of the user
+                    coupon.usedBy = userDoc._id; // Store the ObjectId of the patient
                     console.log(`Coupon '${coupon.code}' will be linked to user ID: ${order.userId}`);
                 } else {
                     coupon.usedBy = null;
@@ -130,8 +130,8 @@ orderRouter.post('/api/orders/:orderId/pay', async (req, res) => {
 });
 
 
-// API endpoint to fetch current user's recent orders
-// GET /api/orders/user/recent - Fetch recent orders for a user, including associated review data
+// API endpoint to fetch current patient's recent orders
+// GET /api/orders/patient/recent - Fetch recent orders for a patient, including associated review data
 orderRouter.get('/api/orders/user/recent', async (req, res) => {
     const userId = req.query.userId;
     const limit = parseInt(req.query.limit) || 10;
@@ -147,7 +147,7 @@ orderRouter.get('/api/orders/user/recent', async (req, res) => {
             .lean();
 
         if (!recentOrders || recentOrders.length === 0) {
-            return res.status(404).json({ message: 'No recent orders found for this user.' });
+            return res.status(404).json({ message: 'No recent orders found for this patient.' });
         }
 
         for (let i = 0; i < recentOrders.length; i++) {
@@ -193,7 +193,7 @@ orderRouter.put('/api/orders/:orderId/cancel', async (req, res) => {
         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found or does not belong to the provided user.' });
+            return res.status(404).json({ message: 'Order not found or does not belong to the provided patient.' });
         }
 
         if (order.status === 'Shipped' || order.status === 'Delivered' || order.status === 'Cancelled') {
@@ -246,7 +246,7 @@ orderRouter.put('/api/orders/:orderId/reopen', async (req, res) => {
         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found or does not belong to the provided user.' });
+            return res.status(404).json({ message: 'Order not found or does not belong to the provided patient.' });
         }
 
         if (order.status !== 'Cancelled') {
@@ -280,7 +280,7 @@ orderRouter.put('/api/orders/:orderId/reopen', async (req, res) => {
 // orderRouter.put('/api/orders/:orderId/deliver', async (req, res) => {
 //     const { orderId } = req.params;
 //     // Assuming userId might be implicitly derived or handled by authentication
-//     const userId = req.body.userId; // If you still need to ensure user ownership
+//     const userId = req.body.userId; // If you still need to ensure patient ownership
 //
 //     if (!orderId || !mongoose.Types.ObjectId.isValid(orderId)) {
 //         return res.status(400).json({ message: 'A valid Order ID is required.' });
@@ -291,7 +291,7 @@ orderRouter.put('/api/orders/:orderId/reopen', async (req, res) => {
 //         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 //
 //         if (!order) {
-//             return res.status(404).json({ message: 'Order not found or does not belong to the provided user.' });
+//             return res.status(404).json({ message: 'Order not found or does not belong to the provided patient.' });
 //         }
 //
 //         if (order.status === 'Delivered' || order.status === 'Cancelled') {
@@ -330,17 +330,17 @@ orderRouter.put('/api/orders/:orderId/deliver', protect, async (req, res) => { /
     }
 
     try {
-        // Find the order by its ID AND verify it belongs to the user from the token.
+        // Find the order by its ID AND verify it belongs to the patient from the token.
         // This is your authorization step.
         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!order) {
-            // Be specific if it's not found vs. not owned by user for better debugging
+            // Be specific if it's not found vs. not owned by patient for better debugging
             const genericOrder = await OrderModel.findById(orderId);
             if (!genericOrder) {
                 return res.status(404).json({ message: 'Order not found.' });
             } else {
-                // This means the order exists, but not for the authenticated user ID.
+                // This means the order exists, but not for the authenticated patient ID.
                 // Could be an attempt to deliver someone else's order.
                 console.warn(`Unauthorized attempt to deliver order ${orderId} by user ${userId}. Order owner: ${genericOrder.userId}`);
                 return res.status(403).json({ message: 'Not authorized to deliver this order.' });
@@ -353,7 +353,7 @@ orderRouter.put('/api/orders/:orderId/deliver', protect, async (req, res) => { /
 
         // Add any additional business logic for delivery.
         // For example, perhaps only an admin can mark it delivered, or it should already be 'Shipped'.
-        // if (order.status !== 'Shipped' && !req.user.isAdmin) { // Example for admin check
+        // if (order.status !== 'Shipped' && !req.patient.isAdmin) { // Example for admin check
         //     return res.status(400).json({ message: 'Order must be shipped before marking as delivered, or you need admin privileges.' });
         // }
 
@@ -362,7 +362,7 @@ orderRouter.put('/api/orders/:orderId/deliver', protect, async (req, res) => { /
         await order.save();
 
         // --- Dynamic Notification Trigger: Order Delivered ---
-        // Use userId for the notification as well, as it's the verified user ID
+        // Use userId for the notification as well, as it's the verified patient ID
         await notificationService.createNotification(
             userId, // Use the secure userIdFromToken
             `Order #${order._id} has been delivered!`,
@@ -404,7 +404,7 @@ orderRouter.put('/api/orders/:orderId/review', async (req, res) => {
         const order = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found or does not belong to the provided user.' });
+            return res.status(404).json({ message: 'Order not found or does not belong to the provided patient.' });
         }
 
         if (order.status !== 'Delivered') {
@@ -415,7 +415,7 @@ orderRouter.put('/api/orders/:orderId/review', async (req, res) => {
 
         const reviewerUser = await UserModel.findOne({ userId: userId }).select('username email');
         if (!reviewerUser) {
-            return res.status(404).json({ message: 'Reviewer user not found for the provided userId.' });
+            return res.status(404).json({ message: 'Reviewer patient not found for the provided userId.' });
         }
 
         if (orderReview) {
@@ -457,7 +457,7 @@ orderRouter.put('/api/orders/:orderId/review', async (req, res) => {
 
     } catch (error) {
         if (error.code === 11000) {
-            return res.status(409).json({ message: 'This order has already been reviewed by this user.', error: error.message });
+            return res.status(409).json({ message: 'This order has already been reviewed by this patient.', error: error.message });
         }
         console.error('Error adding/updating order review:', error);
         res.status(500).json({ message: 'Error adding/updating order review', error: error.message });
@@ -465,7 +465,7 @@ orderRouter.put('/api/orders/:orderId/review', async (req, res) => {
 });
 
 // API endpoint to get a review by userId and orderId
-// GET /api/orders/:orderId/review/user/:userId
+// GET /api/orders/:orderId/review/patient/:userId
 orderRouter.get('/api/orders/:orderId/review/user/:userId', async (req, res) => {
     const { orderId, userId } = req.params;
 
@@ -480,7 +480,7 @@ orderRouter.get('/api/orders/:orderId/review/user/:userId', async (req, res) => 
         const orderReview = await OrderReviewModel.findOne({ order: orderId, user: userId });
 
         if (!orderReview) {
-            return res.status(404).json({ message: 'Review not found for this order and user combination.' });
+            return res.status(404).json({ message: 'Review not found for this order and patient combination.' });
         }
 
         res.status(200).json({
@@ -518,7 +518,7 @@ orderRouter.post('/api/orders/:orderId/reorder-to-cart', async (req, res) => {
         const originalOrder = await OrderModel.findOne({ _id: orderId, userId: userId });
 
         if (!originalOrder) {
-            return res.status(404).json({ message: 'Original order not found or does not belong to the provided user.' });
+            return res.status(404).json({ message: 'Original order not found or does not belong to the provided patient.' });
         }
 
         let userCart = await CartModel.findOne({ userId: userId });

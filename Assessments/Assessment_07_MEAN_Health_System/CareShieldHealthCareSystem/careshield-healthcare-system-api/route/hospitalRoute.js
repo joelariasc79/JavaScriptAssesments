@@ -9,7 +9,7 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 /**
  * @route GET /api/hospitals
  * @description Get all hospitals. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
+ * @access Protected (Any authenticated patient)
  */
 hospitalRouter.get('/api/hospitals', authenticateToken, async (req, res) => {
     try {
@@ -25,7 +25,7 @@ hospitalRouter.get('/api/hospitals', authenticateToken, async (req, res) => {
 /**
  * @route GET /api/hospitals/:id
  * @description Get a single hospital by ID. Accessible to all authenticated users.
- * @access Protected (Any authenticated user)
+ * @access Protected (Any authenticated patient)
  */
 hospitalRouter.get('/api/hospitals/:id', authenticateToken, async (req, res) => {
     try {
