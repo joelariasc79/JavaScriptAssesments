@@ -60,7 +60,7 @@ const AppointmentSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'completed', 'canceled_by_doctor', 'canceled_by_patient'],
+        enum: ['pending', 'confirmed', 'completed', 'canceled_by_doctor', 'canceled_by_patient', 'no_show'],
         default: 'pending'
     },
 
@@ -115,6 +115,6 @@ const AppointmentSchema = new mongoose.Schema({
 
 // Optional: Add a compound index to prevent double-booking the exact same time slot
 // This ensures that for a single doctor, no two appointments can start at the exact same time.
-AppointmentSchema.index({ doctorId: 1, startTime: 1 }, { unique: true });
+// AppointmentSchema.index({ doctorId: 1, startTime: 1 }, { unique: true });
 
 module.exports = mongoose.model('Appointment', AppointmentSchema);

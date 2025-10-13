@@ -29,9 +29,8 @@ const doctorFeedbackRouter = require("./route/doctorFeedbackRoute");
 const { default: diseaseRouter } = require("./route/disease.routes");
 const { default: specialtyRouter } = require("./route/specialty.routes");
 
+const appointmentEfficiencyKPIsRouter  = require("./route/appointmentEfficiencyKPIsRoute");
 
-// const reportRouter = require("./route/reportRoute");
-// const patientRouter = require('./route/patientRoute');
 
 
 const cors = require("cors");
@@ -75,6 +74,7 @@ app.use('/api/doctor-feedback', doctorFeedbackRouter);
 // app.use(diseaseRouter);
 app.use('/api/diseases', diseaseRouter);
 app.use('/api/specialties', specialtyRouter);
+app.use('/api/appointmentEfficiency', appointmentEfficiencyKPIsRouter);
 
 // app.use(reportRouter);
 // app.use(patientRouter);

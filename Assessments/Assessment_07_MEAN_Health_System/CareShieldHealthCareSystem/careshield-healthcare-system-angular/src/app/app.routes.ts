@@ -28,10 +28,6 @@ export const routes: Routes = [
   },
   // Main application routes, matching the login component's redirection logic
   {
-    path: 'admin',
-    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
-  },
-  {
     path: 'hospital-management',
     loadChildren: () => import('./hospital-management/hospital-management.module').then(m => m.HospitalManagementModule)
   },
