@@ -230,6 +230,15 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'statistics/appointment-efficiency-kpis',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./statistics/components/appointment-efficiency/appointment-efficiency-kpis/appointment-efficiency-kpis.component').then(m => m.AppointmentEfficiencyKpisComponent)
+      }
+    ]
+  },
 
   // Redirect to the login page as the default route
   {

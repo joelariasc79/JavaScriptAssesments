@@ -43,7 +43,7 @@ const UserSchema = new mongoose.Schema({
     // --- DOCTOR-SPECIFIC FIELDS ---
     specialty: {
         type: String,
-        enum: ['Oncologist', 'Pediatrician', 'Cardiologist', 'Gastroenterologist'],
+        enum: ['Emergency Room', 'Oncologist', 'Pediatrician', 'Cardiologist', 'Gastroenterologist'],
         required: function() { return this.role === 'doctor'; }
     },
     experience: {

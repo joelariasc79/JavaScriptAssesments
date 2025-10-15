@@ -53,6 +53,7 @@ export class DoctorService {
   }
 
   getDoctorsBySpecialty(specialtyName: string): Observable<Doctor[]> {
+    console.log("specialtyName: ", specialtyName);
     return this.http.get<Doctor[]>(`${this.API_URL_DOCTORS}/by-specialty?specialty=${specialtyName}`, { headers: this.getAuthHeaders() })
       .pipe(
         catchError(error => {

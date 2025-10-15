@@ -1,0 +1,202 @@
+db.createCollection("weeklyschedules");
+
+db.weeklyschedules.insertMany([
+    // ----------------------
+    // Doctor: james (ID: 68dc914d3c1f3780de129b74) - Mon to Fri
+    // ----------------------
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        dayOfWeek: 1, // Monday
+        startTime: "09:00",
+        endTime: "17:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        dayOfWeek: 2, // Tuesday
+        startTime: "09:00",
+        endTime: "17:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        dayOfWeek: 3, // Wednesday
+        startTime: "09:00",
+        endTime: "17:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        dayOfWeek: 4, // Thursday
+        startTime: "09:00",
+        endTime: "17:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        dayOfWeek: 5, // Friday
+        startTime: "09:00",
+        endTime: "17:00",
+        slotDuration: 30
+    },
+
+    // ----------------------
+    // Doctor: anna (ID: 68e14edf489f6f332400c4db) - Mon to Fri
+    // ----------------------
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        dayOfWeek: 1, // Monday
+        startTime: "08:30",
+        endTime: "16:30",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        dayOfWeek: 2, // Tuesday
+        startTime: "08:30",
+        endTime: "16:30",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        dayOfWeek: 3, // Wednesday
+        startTime: "08:30",
+        endTime: "16:30",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        dayOfWeek: 4, // Thursday
+        startTime: "08:30",
+        endTime: "16:30",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        dayOfWeek: 5, // Friday
+        startTime: "08:30",
+        endTime: "16:30",
+        slotDuration: 30
+    },
+
+    // ----------------------
+    // Doctor: maria (ID: 68e1515e489f6f332400c4e6) - Tue, Thu, Sat
+    // ----------------------
+    {
+        doctorId: ObjectId("68e1515e489f6f332400c4e6"),
+        dayOfWeek: 2, // Tuesday
+        startTime: "10:00",
+        endTime: "14:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e1515e489f6f332400c4e6"),
+        dayOfWeek: 4, // Thursday
+        startTime: "10:00",
+        endTime: "14:00",
+        slotDuration: 30
+    },
+    {
+        doctorId: ObjectId("68e1515e489f6f332400c4e6"),
+        dayOfWeek: 6, // Saturday
+        startTime: "09:00",
+        endTime: "13:00",
+        slotDuration: 30
+    },
+
+    // ----------------------
+    // Doctor: pedro (ID: 68e15202489f6f332400c4f1) - Mon, Wed, Fri (60-min slots)
+    // ----------------------
+    {
+        doctorId: ObjectId("68e15202489f6f332400c4f1"),
+        dayOfWeek: 1, // Monday
+        startTime: "14:00",
+        endTime: "18:00",
+        slotDuration: 60 // Longer appointments
+    },
+    {
+        doctorId: ObjectId("68e15202489f6f332400c4f1"),
+        dayOfWeek: 3, // Wednesday
+        startTime: "14:00",
+        endTime: "18:00",
+        slotDuration: 60
+    },
+    {
+        doctorId: ObjectId("68e15202489f6f332400c4f1"),
+        dayOfWeek: 5, // Friday
+        startTime: "14:00",
+        endTime: "18:00",
+        slotDuration: 60
+    }
+]);
+
+
+
+
+/**
+ * Weekly schedule for the Emergency Room doctor (ID: 68ef2794ff6a9325660d0ece).
+ * Available 24 hours a day (00:00 to 23:59) for all seven days of the week,
+ * with a standard 30-minute slot duration.
+ */
+db.weeklyschedules.insertMany([
+    // -----------------------------------------------------
+    // Doctor ID: 68ef2794ff6a9325660d0ece (24/7 Coverage)
+    // -----------------------------------------------------
+    // Monday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 1,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Tuesday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 2,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Wednesday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 3,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Thursday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 4,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Friday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 5,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Saturday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 6,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    },
+    // Sunday (24 hours)
+    {
+        doctorId: ObjectId("68ef2794ff6a9325660d0ece"),
+        dayOfWeek: 7,
+        startTime: "00:00",
+        endTime: "23:59",
+        slotDuration: 30
+    }
+]);
+

@@ -1,0 +1,11 @@
+.input-field
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all
+
+.font-sans
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif
+
+/* Fixed radius for r=45, stroke-width=8: inner radius is 41, outer is 49. Center is 50. */
+svg
+  circle:nth-child(2)
+    /* Ensure the progress arc uses the color defined by Tailwind on the SVG's parent */
+    stroke: currentColor

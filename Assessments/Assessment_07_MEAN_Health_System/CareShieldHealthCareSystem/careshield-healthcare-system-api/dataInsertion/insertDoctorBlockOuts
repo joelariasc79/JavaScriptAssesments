@@ -1,0 +1,47 @@
+db.doctorBlockouts.insertMany([
+    // ----------------------
+    // Doctor: james (ID: 68dc914d3c1f3780de129b74)
+    // ----------------------
+    {
+        doctorId: ObjectId("68dc914d3c1f3780de129b74"),
+        reason: "Lunch Break",
+        // Monday, Oct 14, 2024 at 1:00 PM (13:00)
+        startDate: ISODate("2024-10-14T13:00:00.000Z"),
+        // Monday, Oct 14, 2024 at 2:00 PM (14:00)
+        endDate: ISODate("2024-10-14T14:00:00.000Z"),
+        type: "daily_break"
+    },
+
+    // ----------------------
+    // Doctor: anna (ID: 68e14edf489f6f332400c4db)
+    // ----------------------
+    {
+        doctorId: ObjectId("68e14edf489f6f332400c4db"),
+        reason: "Lunch Break",
+        startDate: ISODate("2024-10-14T13:00:00.000Z"),
+        endDate: ISODate("2024-10-14T14:00:00.000Z"),
+        type: "daily_break"
+    },
+
+    // ----------------------
+    // Doctor: maria (ID: 68e1515e489f6f332400c4e6)
+    // ----------------------
+    {
+        doctorId: ObjectId("68e1515e489f6f332400c4e6"),
+        reason: "Lunch Break",
+        startDate: ISODate("2024-10-14T13:00:00.000Z"),
+        endDate: ISODate("2024-10-14T14:00:00.000Z"),
+        type: "daily_break"
+    },
+
+    // ----------------------
+    // Doctor: pedro (ID: 68e15202489f6f332400c4f1)
+    // ----------------------
+    {
+        doctorId: ObjectId("68e15202489f6f332400c4f1"),
+        reason: "Lunch Break",
+        startDate: ISODate("2024-10-14T13:00:00.000Z"),
+        endDate: ISODate("2024-10-14T14:00:00.000Z"),
+        type: "daily_break"
+    }
+]);

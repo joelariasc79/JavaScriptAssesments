@@ -13,24 +13,43 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
         <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Upcoming and Past Appointments</h2>
 
-        <button
-          (click)="onCreateClick()"
-          class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.02]"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+        <!-- Button Container for both standard and emergency appointments -->
+        <div class="flex flex-col space-y-3 w-full sm:w-auto sm:flex-row sm:space-y-0 sm:space-x-4">
+          <!-- NEW Emergency Appointment Button -->
+          <button
+            (click)="onCreateClick()"
+            class="flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.02]"
+            title="Book an immediate Emergency Room appointment"
           >
-            <path
-              fill-rule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <span>Book New Appointment</span>
-        </button>
+            <!-- Lightning Bolt Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 1.01l-7 11h5v11l7-11h-5v-11z" />
+            </svg>
+            <span>New Emergency Appointment</span>
+          </button>
+
+          <!-- Original Book New Appointment Button -->
+          <button
+            (click)="onCreateClick()"
+            class="flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-[1.02]"
+            title="Book a standard appointment"
+          >
+            <!-- Plus Icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>Book New Appointment</span>
+          </button>
+        </div>
       </div>
 
       <div *ngIf="loading()" class="text-center py-12 text-gray-500">

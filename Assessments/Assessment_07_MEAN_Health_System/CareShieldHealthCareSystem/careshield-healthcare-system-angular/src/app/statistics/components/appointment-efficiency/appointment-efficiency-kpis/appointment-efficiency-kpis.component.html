@@ -1,1 +1,109 @@
-<p>appointment-efficiency-kpis works!</p>
+<div class="p-4 sm:p-8 bg-gray-50 min-h-screen font-sans">
+  <h1 class="text-3xl font-extrabold text-indigo-700 mb-8 tracking-tight">
+    Appointment Efficiency Dashboard
+  </h1>
+
+  <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-8">
+    <!-- Error State -->
+    @if (error()) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl w-full" role="alert">
+        <p class="font-bold">Data Loading Error</p>
+        <p class="text-sm">{{ error() }}</p>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="flex justify-center items-center w-full h-40 bg-white rounded-xl shadow-lg">
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-gray-600">Loading KPI Data...</p>
+      </div>
+    }
+
+    <!-- KPI Cards -->
+    @if (!loading() && !error()) {
+      <div class="grid w-full gap-8 lg:grid-cols-2">
+        <!-- No-Show Rate Card -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 group hover:shadow-xl transition-shadow duration-300">
+          <h2 class="text-2xl font-semibold mb-2 text-indigo-600">No-Show Rate</h2>
+          @if (noShow(); as data) {
+            <p class="text-gray-500 mb-4">Appointments not attended out of {{data.totalAppointments | number}} total.</p>
+            <div class="flex items-center space-x-6">
+              <!-- Circular Progress Bar (SVG Chart) -->
+              <div class="relative w-28 h-28">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <!-- Background Circle -->
+                  <circle cx="50" cy="50" r="45" stroke-width="8" class="text-gray-200 fill-none"></circle>
+                  <!-- Progress Arc -->
+                  <circle cx="50" cy="50" r="45" stroke-width="8"
+                          class="text-red-500 fill-none transition-stroke duration-700"
+                          [attr.stroke-dasharray]="circumferenceDoughnut"
+                          [attr.stroke-dashoffset]="noShowOffset()"
+                          stroke-linecap="round"></circle>
+                </svg>
+                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold text-red-600">
+                          {{ data.noShowRate | number: '1.1-1' }}%
+                        </span>
+              </div>
+
+              <!-- Details -->
+              <div class="flex-grow">
+                <p class="text-4xl font-extrabold text-gray-800 mb-2">
+                  {{ data.noShowRate | number: '1.1-1' }}<span class="text-2xl text-red-500">%</span>
+                </p>
+                <p class="text-sm text-gray-600">
+                  <span class="font-bold">{{ data.noShowAppointments | number }}</span> No-Show Appointments
+                </p>
+                <p class="text-xs text-gray-400 mt-1">
+                  Target: <span class="font-bold text-green-500">&lt; 5.0%</span>
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Combined Cancellation Rate Card -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 group hover:shadow-xl transition-shadow duration-300">
+          <h2 class="text-2xl font-semibold mb-2 text-indigo-600">Combined Cancellation Rate</h2>
+          @if (cancellation(); as data) {
+            <p class="text-gray-500 mb-4">No-shows + patient cancellations out of {{data.totalAppointments | number}} total.</p>
+            <div class="flex items-center space-x-6">
+              <!-- Circular Progress Bar (SVG Chart) -->
+              <div class="relative w-28 h-28">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <!-- Background Circle -->
+                  <circle cx="50" cy="50" r="45" stroke-width="8" class="text-gray-200 fill-none"></circle>
+                  <!-- Progress Arc -->
+                  <circle cx="50" cy="50" r="45" stroke-width="8"
+                          class="text-orange-500 fill-none transition-stroke duration-700"
+                          [attr.stroke-dasharray]="circumferenceDoughnut"
+                          [attr.stroke-dashoffset]="cancelOffset()"
+                          stroke-linecap="round"></circle>
+                </svg>
+                <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold text-orange-600">
+                          {{ data.cancellationRate | number: '1.1-1' }}%
+                        </span>
+              </div>
+
+              <!-- Details -->
+              <div class="flex-grow">
+                <p class="text-4xl font-extrabold text-gray-800 mb-2">
+                  {{ data.cancellationRate | number: '1.1-1' }}<span class="text-2xl text-orange-500">%</span>
+                </p>
+                <p class="text-sm text-gray-600">
+                  <span class="font-bold">{{ data.problemAppointments | number }}</span> Problem Appointments
+                </p>
+                <p class="text-xs text-gray-400 mt-1">
+                  Target: <span class="font-bold text-green-500">&lt; 10.0%</span>
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

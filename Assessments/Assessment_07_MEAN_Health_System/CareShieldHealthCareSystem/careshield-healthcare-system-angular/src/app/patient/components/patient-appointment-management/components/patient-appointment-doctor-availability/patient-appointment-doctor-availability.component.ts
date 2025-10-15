@@ -1,11 +1,11 @@
 import { Component, inject, signal, OnInit, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { AvailableSlot, AvailabilitySlots, NextAvailabilityResponse } from '../../models/availability-slots.model';
-import { DoctorAvailabilityService} from '../../services/doctor-availability.service';
-import {AppointmentService} from '../../../../../appointment-management/services/appointment.service';
-import {Router} from '@angular/router';
-import {Doctor} from '../../../../../doctor-management/models/doctor.model';
-import {Hospital} from '../../../../../hospital/models/hospital.model';
+import { DoctorAvailabilityService } from '../../services/doctor-availability.service';
+import { AppointmentService } from '../../../../../appointment-management/services/appointment.service';
+import { Router } from '@angular/router';
+import { Doctor } from '../../../../../doctor-management/models/doctor.model';
+import { Hospital } from '../../../../../hospital/models/hospital.model';
 
 // Helper interface for grouping slots in the template
 interface GroupedSlots {
